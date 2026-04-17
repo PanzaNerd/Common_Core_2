@@ -6,15 +6,30 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:20:31 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/07 23:43:45 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/04/17 19:24:05 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-static int	ft_isdigit(char c)
+static int	is_valid(char *str)
 {
-	return (c >= '0' && c <= '9');
+	int	i;
+
+	i = 0;
+	if (!str || !str[0])
+		return (0);
+	if (str[i] == '-' || str[i] == '+')
+		i++;
+	if (!str[i])
+		return (0);
+	while (str[i])
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (0);
+		i++;
+	}
+	return (1);
 }
 
 static long	ft_atol(const char *str)
@@ -30,30 +45,16 @@ static long	ft_atol(const char *str)
 			sign = -1;
 		str++;
 	}
-	while (*str)
+	while (*str >= '0' && *str <= '9')
 	{
 		result = result * 10 + (*str - '0');
+		if (result * sign > INT_MAX)
+			return ((long)INT_MAX + 1);
+		if (result * sign < INT_MIN)
+			return ((long)INT_MIN - 1);
 		str++;
 	}
 	return (result * sign);
-}
-
-static int	is_valid(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (str[i] == '-' || str[i] == '+')
-		i++;
-	if (!str[i])
-		return (0);
-	while (str[i])
-	{
-		if (!ft_isdigit(str[i]))
-			return (0);
-		i++;
-	}
-	return (1);
 }
 
 static int	has_dup(t_node *stack, int val)

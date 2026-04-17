@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:20:10 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/07 23:54:43 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/04/17 21:31:56 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,20 @@ int	main(int ac, char **av)
 {
 	t_node	*a;
 	t_node	*b;
+	int		size;
 
 	if (ac < 2)
 		return (0);
 	a = NULL;
 	b = NULL;
 	parse_args(ac, av, &a);
-	if (stack_size(a) == 1)
-	{
-		free_stack(&a);
-		return (0);
-	}
+	size = stack_size(a);
+	if (size <= 1 || is_sorted(a))
+		return (free_stack(&a), 0);
 	assign_index(a);
-	if (is_sorted(a))
-	{
-		free_stack(&a);
-		return (0);
-	}
-	if (stack_size(a) == 2)
+	if (size == 2)
 		sort_two(&a);
-	else if (stack_size(a) == 3)
+	else if (size == 3)
 		sort_three(&a);
 	else
 		turk_sort(&a, &b);

@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:19:57 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/07 23:52:13 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/04/17 19:25:24 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,23 @@ void	sort_three(t_node **a)
 	int	mid;
 	int	bot;
 
-	top = (*a)->value;
-	mid = (*a)->next->value;
-	bot = (*a)->next->next->value;
+	top = (*a)->index;
+	mid = (*a)->next->index;
+	bot = (*a)->next->next->index;
 	if (top > mid && mid < bot && top < bot)
 		sa(a);
 	else if (top > mid && mid > bot)
-		{ sa(a); rra(a); }
+	{
+		sa(a);
+		rra(a);
+	}
 	else if (top > mid && mid < bot && top > bot)
 		ra(a);
 	else if (top < mid && mid > bot && top < bot)
-		{ sa(a); ra(a); }
+	{
+		sa(a);
+		ra(a);
+	}
 	else if (top < mid && mid > bot && top > bot)
 		rra(a);
 }

@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:34:35 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/07 23:45:41 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/04/17 19:26:02 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static void	set_positions(t_node *a, t_node *b)
 	}
 }
 
-static void	set_target(t_node *a, t_node *b)
+static void	set_target(t_node *b, t_node *a)
 {
 	t_node	*cb;
 	t_node	*ca;
@@ -43,17 +43,18 @@ static void	set_target(t_node *a, t_node *b)
 		ca = a;
 		while (ca)
 		{
-			if (ca->index < cb->index)
-				if (!best || ca->index > best->index)
+			if (ca->index > cb->index)
+				if (!best || ca->index < best->index)
 					best = ca;
 			ca = ca->next;
 		}
 		if (!best)
 		{
+			best = a;
 			ca = a;
 			while (ca)
 			{
-				if (!best || ca->index > best->index)
+				if (ca->index < best->index)
 					best = ca;
 				ca = ca->next;
 			}
@@ -122,6 +123,22 @@ static t_node	*cheapest(t_node *b)
 	return (best);
 }
 
+static void	do_rotations(t_node **a, t_node **b, int *ca, int *cb)
+{
+	while (*ca > 0 && *cb > 0)
+	{
+		rr(a, b);
+		(*ca)--;
+		(*cb)--;
+	}
+	while (*ca < 0 && *cb < 0)
+	{
+		rrr(a, b);
+		(*ca)++;
+		(*cb)++;
+	}
+}
+
 static void	do_move(t_node **a, t_node **b, t_node *node)
 {
 	int	ca;
@@ -129,18 +146,7 @@ static void	do_move(t_node **a, t_node **b, t_node *node)
 
 	ca = node->cost_a;
 	cb = node->cost_b;
-	while (ca > 0 && cb > 0)
-	{
-		rr(a, b);
-		ca--;
-		cb--;
-	}
-	while (ca < 0 && cb < 0)
-	{
-		rrr(a, b);
-		ca++;
-		cb++;
-	}
+	do_rotations(a, b, &ca, &cb);
 	while (cb > 0)
 	{
 		rb(b);
@@ -189,19 +195,32 @@ static void	rotate_min(t_node **a)
 	}
 }
 
-void	turk_sort(t_node **a, t_node **b)
+static void	push_to_b(t_node **a, t_node **b)
 {
-	int		size;
-	t_node	*node;
+	int	size;
+	int	threshold;
 
 	size = stack_size(*a);
-	while (size-- > 3)
-		pb(a, b);
+	threshold = size - 3;
+	while (stack_size(*a) > 3)
+	{
+		if ((*a)->index < threshold)
+			pb(a, b);
+		else
+			ra(a);
+	}
+}
+
+void	turk_sort(t_node **a, t_node **b)
+{
+	t_node	*node;
+
+	push_to_b(a, b);
 	sort_three(a);
 	while (*b)
 	{
 		set_positions(*a, *b);
-		set_target(*a, *b);
+		set_target(*b, *a);
 		set_costs(*b, stack_size(*a), stack_size(*b));
 		node = cheapest(*b);
 		do_move(a, b, node);
