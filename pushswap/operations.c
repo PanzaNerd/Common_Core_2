@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:32:44 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/17 19:23:25 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/04/28 20:58:16 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,17 @@ static void	swap(t_node **s)
 	(*s)->next->index = tmp_idx;
 }
 
-void	sa(t_node **a) { swap(a); print_op("sa"); }
-void	sb(t_node **b) { swap(b); print_op("sb"); }
+void	sa(t_node **a)
+{
+	swap(a);
+	print_op("sa");
+}
+
+void	sb(t_node **b)
+{
+	swap(b);
+	print_op("sb");
+}
 
 void	ss(t_node **a, t_node **b)
 {
@@ -49,8 +58,17 @@ static void	push(t_node **dst, t_node **src)
 	*dst = node;
 }
 
-void	pa(t_node **a, t_node **b) { push(a, b); print_op("pa"); }
-void	pb(t_node **a, t_node **b) { push(b, a); print_op("pb"); }
+void	pa(t_node **a, t_node **b)
+{
+	push(a, b);
+	print_op("pa");
+}
+
+void	pb(t_node **a, t_node **b)
+{
+	push(b, a);
+	print_op("pb");
+}
 
 static void	rotate(t_node **s)
 {
@@ -68,8 +86,17 @@ static void	rotate(t_node **s)
 	last->next = first;
 }
 
-void	ra(t_node **a) { rotate(a); print_op("ra"); }
-void	rb(t_node **b) { rotate(b); print_op("rb"); }
+void	ra(t_node **a)
+{
+	rotate(a);
+	print_op("ra");
+}
+
+void	rb(t_node **b)
+{
+	rotate(b);
+	print_op("rb");
+}
 
 void	rr(t_node **a, t_node **b)
 {
@@ -97,8 +124,17 @@ static void	rev_rotate(t_node **s)
 	*s = cur;
 }
 
-void	rra(t_node **a) { rev_rotate(a); print_op("rra"); }
-void	rrb(t_node **b) { rev_rotate(b); print_op("rrb"); }
+void	rra(t_node **a)
+{
+	rev_rotate(a);
+	print_op("rra");
+}
+
+void	rrb(t_node **b)
+{
+	rev_rotate(b);
+	print_op("rrb");
+}
 
 void	rrr(t_node **a, t_node **b)
 {
