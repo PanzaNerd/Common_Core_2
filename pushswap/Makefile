@@ -6,7 +6,7 @@
 #    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/04/07 23:35:24 by mpanzani          #+#    #+#              #
-#    Updated: 2026/04/17 19:22:40 by mpanzani         ###   ########.fr        #
+#    Updated: 2026/04/30 16:55:57 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,8 @@ NAME	= push_swap
 CC		= cc
 CFLAGS	= -Wall -Wextra -Werror
 
-SRCS	= main.c parse.c operations.c utils.c sort.c turk.c
+SRCS = main.c parse.c utils.c utils2.c operations.c operations2.c \
+		operations3.c sort.c turk.c turk2.c turk3.c
 OBJS	= $(SRCS:.c=.o)
 
 HEADER	= push_swap.h

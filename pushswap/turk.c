@@ -6,13 +6,13 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:34:35 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/17 19:26:02 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/04/30 18:34:47 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-static void	set_positions(t_node *a, t_node *b)
+void	set_positions(t_node *a, t_node *b)
 {
 	int	i;
 
@@ -30,7 +30,8 @@ static void	set_positions(t_node *a, t_node *b)
 	}
 }
 
-static void	set_target(t_node *b, t_node *a)
+void	set_target(t_node *b, t_node *a)
+
 {
 	t_node	*cb;
 	t_node	*ca;
@@ -49,22 +50,13 @@ static void	set_target(t_node *b, t_node *a)
 			ca = ca->next;
 		}
 		if (!best)
-		{
-			best = a;
-			ca = a;
-			while (ca)
-			{
-				if (ca->index < best->index)
-					best = ca;
-				ca = ca->next;
-			}
-		}
+			best = find_min(a);
 		cb->target_pos = best->pos;
 		cb = cb->next;
 	}
 }
 
-static void	set_costs(t_node *b, int size_a, int size_b)
+void	set_costs(t_node *b, int size_a, int size_b)
 {
 	t_node	*cur;
 
@@ -85,10 +77,12 @@ static void	set_costs(t_node *b, int size_a, int size_b)
 
 static int	abs_val(int n)
 {
-	return (n < 0 ? -n : n);
+	if (n < 0)
+		return (-n);
+	return (n);
 }
 
-static int	total_cost(t_node *n)
+int	total_cost(t_node *n)
 {
 	int	ca;
 	int	cb;
@@ -96,134 +90,16 @@ static int	total_cost(t_node *n)
 	ca = n->cost_a;
 	cb = n->cost_b;
 	if (ca >= 0 && cb >= 0)
-		return (ca > cb ? ca : cb);
+	{
+		if (ca > cb)
+			return (ca);
+		return (cb);
+	}
 	if (ca <= 0 && cb <= 0)
-		return (abs_val(ca) > abs_val(cb) ? abs_val(ca) : abs_val(cb));
+	{
+		if (abs_val(ca) > abs_val(cb))
+			return (abs_val(ca));
+		return (abs_val(cb));
+	}
 	return (abs_val(ca) + abs_val(cb));
-}
-
-static t_node	*cheapest(t_node *b)
-{
-	t_node	*cur;
-	t_node	*best;
-	int		best_cost;
-
-	cur = b;
-	best = NULL;
-	best_cost = INT_MAX;
-	while (cur)
-	{
-		if (total_cost(cur) < best_cost)
-		{
-			best_cost = total_cost(cur);
-			best = cur;
-		}
-		cur = cur->next;
-	}
-	return (best);
-}
-
-static void	do_rotations(t_node **a, t_node **b, int *ca, int *cb)
-{
-	while (*ca > 0 && *cb > 0)
-	{
-		rr(a, b);
-		(*ca)--;
-		(*cb)--;
-	}
-	while (*ca < 0 && *cb < 0)
-	{
-		rrr(a, b);
-		(*ca)++;
-		(*cb)++;
-	}
-}
-
-static void	do_move(t_node **a, t_node **b, t_node *node)
-{
-	int	ca;
-	int	cb;
-
-	ca = node->cost_a;
-	cb = node->cost_b;
-	do_rotations(a, b, &ca, &cb);
-	while (cb > 0)
-	{
-		rb(b);
-		cb--;
-	}
-	while (cb < 0)
-	{
-		rrb(b);
-		cb++;
-	}
-	while (ca > 0)
-	{
-		ra(a);
-		ca--;
-	}
-	while (ca < 0)
-	{
-		rra(a);
-		ca++;
-	}
-	pa(a, b);
-}
-
-static void	rotate_min(t_node **a)
-{
-	int		size;
-	int		pos;
-	t_node	*cur;
-
-	size = stack_size(*a);
-	pos = 0;
-	cur = *a;
-	while (cur->index != 0)
-	{
-		pos++;
-		cur = cur->next;
-	}
-	if (pos <= size / 2)
-		while (pos-- > 0)
-			ra(a);
-	else
-	{
-		pos = size - pos;
-		while (pos-- > 0)
-			rra(a);
-	}
-}
-
-static void	push_to_b(t_node **a, t_node **b)
-{
-	int	size;
-	int	threshold;
-
-	size = stack_size(*a);
-	threshold = size - 3;
-	while (stack_size(*a) > 3)
-	{
-		if ((*a)->index < threshold)
-			pb(a, b);
-		else
-			ra(a);
-	}
-}
-
-void	turk_sort(t_node **a, t_node **b)
-{
-	t_node	*node;
-
-	push_to_b(a, b);
-	sort_three(a);
-	while (*b)
-	{
-		set_positions(*a, *b);
-		set_target(*b, *a);
-		set_costs(*b, stack_size(*a), stack_size(*b));
-		node = cheapest(*b);
-		do_move(a, b, node);
-	}
-	rotate_min(a);
 }

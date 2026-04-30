@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:33:24 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/17 19:26:36 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/04/30 16:48:00 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,6 @@ void	print_op(char *str)
 		i++;
 	write(1, str, i);
 	write(1, "\n", 1);
-}
-
-void	error_exit(t_node **a, t_node **b)
-{
-	if (a)
-		free_stack(a);
-	if (b)
-		free_stack(b);
-	write(2, "Error\n", 6);
-	exit(1);
 }
 
 t_node	*new_node(int value)
@@ -82,15 +72,4 @@ void	free_stack(t_node **stack)
 		free(*stack);
 		*stack = tmp;
 	}
-}
-
-int	is_sorted(t_node *stack)
-{
-	while (stack && stack->next)
-	{
-		if (stack->value > stack->next->value)
-			return (0);
-		stack = stack->next;
-	}
-	return (1);
 }
