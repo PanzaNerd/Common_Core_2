@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/30 16:54:16 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/30 17:08:07 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/01 20:34:52 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,24 @@ static void	push_to_b(t_node **a, t_node **b)
 }
 
 void	turk_sort(t_node **a, t_node **b)
-{
+{cb = b;
+	while (cb)
+	{
+		best = NULL;
+		ca = a;
+		while (ca)
+		{
+			if (ca->index > cb->index)
+				if (!best || ca->index < best->index)
+					best = ca;
+			ca = ca->next;
+		}
+		if (!best)
+			best = find_min(a);
+		cb->target_pos = best->pos;
+		cb = cb->next;
+	}
+}
 	t_node	*node;
 
 	push_to_b(a, b);
