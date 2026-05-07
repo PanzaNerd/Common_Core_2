@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/30 16:54:16 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/01 20:34:52 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/07 17:31:38 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,38 +40,33 @@ static void	rotate_min(t_node **a)
 static void	push_to_b(t_node **a, t_node **b)
 {
 	int	size;
-	int	threshold;
+	int	chunks;
+	int	chunk_size;
+	int	pushed;
 
 	size = stack_size(*a);
-	threshold = size - 3;
+	if (size <= 100)
+		chunks = 5;
+	else
+		chunks = 11;
+	chunk_size = size / chunks;
+	pushed = 0;
 	while (stack_size(*a) > 3)
 	{
-		if ((*a)->index < threshold)
+		if ((*a)->index <= pushed + chunk_size)
+		{
 			pb(a, b);
+			if ((*b)->index < pushed - chunk_size / 2)
+				rb(b);
+			pushed++;
+		}
 		else
 			ra(a);
 	}
 }
 
 void	turk_sort(t_node **a, t_node **b)
-{cb = b;
-	while (cb)
-	{
-		best = NULL;
-		ca = a;
-		while (ca)
-		{
-			if (ca->index > cb->index)
-				if (!best || ca->index < best->index)
-					best = ca;
-			ca = ca->next;
-		}
-		if (!best)
-			best = find_min(a);
-		cb->target_pos = best->pos;
-		cb = cb->next;
-	}
-}
+{
 	t_node	*node;
 
 	push_to_b(a, b);
