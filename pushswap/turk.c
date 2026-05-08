@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:34:35 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/30 18:34:47 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/08 14:43:00 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,22 +84,22 @@ static int	abs_val(int n)
 
 int	total_cost(t_node *n)
 {
-	int	ca;
-	int	cb;
+	int	csa;
+	int	csb;
 
-	ca = n->cost_a;
-	cb = n->cost_b;
-	if (ca >= 0 && cb >= 0)
+	csa = n->cost_a;
+	csb = n->cost_b;
+	if (csa >= 0 && csb >= 0)
 	{
-		if (ca > cb)
-			return (ca);
-		return (cb);
+		if (csa > csb)
+			return (csa);
+		return (csb);
 	}
-	if (ca <= 0 && cb <= 0)
+	if (csa <= 0 && csb <= 0)
 	{
-		if (abs_val(ca) > abs_val(cb))
-			return (abs_val(ca));
-		return (abs_val(cb));
+		if (abs_val(csa) > abs_val(csb))
+			return (abs_val(csa));
+		return (abs_val(csb));
 	}
-	return (abs_val(ca) + abs_val(cb));
+	return (abs_val(csa) + abs_val(csb));
 }

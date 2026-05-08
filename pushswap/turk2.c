@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/30 16:53:20 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/30 17:29:09 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/08 17:24:06 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,21 +30,21 @@ t_node	*find_min(t_node *a)
 
 t_node	*cheapest(t_node *b)
 {
-	t_node	*cur;
+	t_node	*cb;
 	t_node	*best;
 	int		best_cost;
 
-	cur = b;
+	cb = b;
 	best = NULL;
 	best_cost = INT_MAX;
-	while (cur)
+	while (cb)
 	{
-		if (total_cost(cur) < best_cost)
+		if (total_cost(cb) < best_cost)
 		{
-			best_cost = total_cost(cur);
-			best = cur;
+			best_cost = total_cost(cb);
+			best = cb;
 		}
-		cur = cur->next;
+		cb = cb->next;
 	}
 	return (best);
 }
