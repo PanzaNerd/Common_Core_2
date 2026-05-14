@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/30 16:54:16 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/07 17:31:38 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/11 17:54:18 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,23 +40,23 @@ static void	rotate_min(t_node **a)
 static void	push_to_b(t_node **a, t_node **b)
 {
 	int	size;
-	int	chunks;
-	int	chunk_size;
+	int	groups;
+	int	group_size;
 	int	pushed;
 
 	size = stack_size(*a);
 	if (size <= 100)
-		chunks = 5;
+		groups = 5;
 	else
-		chunks = 11;
-	chunk_size = size / chunks;
+		groups = 11;
+	group_size = size / groups;
 	pushed = 0;
 	while (stack_size(*a) > 3)
 	{
-		if ((*a)->index <= pushed + chunk_size)
+		if ((*a)->index <= pushed + group_size)
 		{
 			pb(a, b);
-			if ((*b)->index < pushed - chunk_size / 2)
+			if ((*b)->index < pushed - group_size / 2)
 				rb(b);
 			pushed++;
 		}

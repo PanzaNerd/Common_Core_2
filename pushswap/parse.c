@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:20:31 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/04/17 19:24:05 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/12 17:54:46 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,22 +90,22 @@ void	parse_args(int ac, char **av, t_node **a)
 
 void	assign_index(t_node *a)
 {
-	t_node	*cur;
-	t_node	*inner;
+	t_node	*ca;
+	t_node	*ca2;
 	int		idx;
 
-	cur = a;
-	while (cur)
+	ca = a;
+	while (ca)
 	{
 		idx = 0;
-		inner = a;
-		while (inner)
+		ca2 = a;
+		while (ca2)
 		{
-			if (inner->value < cur->value)
+			if (ca2->value < ca->value)
 				idx++;
-			inner = inner->next;
+			ca2 = ca2->next;
 		}
-		cur->index = idx;
-		cur = cur->next;
+		ca->index = idx;
+		ca = ca->next;
 	}
 }

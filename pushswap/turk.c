@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/07 23:34:35 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/08 14:43:00 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/12 23:45:09 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,15 @@ void	set_positions(t_node *a, t_node *b)
 	i = 0;
 	while (a)
 	{
-		a->pos = i++;
+		a->pos = i;
+		i++;
 		a = a->next;
 	}
 	i = 0;
 	while (b)
 	{
-		b->pos = i++;
+		b->pos = i;
+		i++;
 		b = b->next;
 	}
 }
