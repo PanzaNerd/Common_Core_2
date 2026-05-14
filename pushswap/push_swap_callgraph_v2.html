@@ -1,0 +1,317 @@
+
+<style>
+  .wrap { display: flex; gap: 16px; padding: 1rem 0; }
+  .left { flex: 0 0 420px; overflow-x: auto; }
+  .right {
+    flex: 1;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 200px;
+  }
+  .right .fn-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 10px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    padding-bottom: 8px;
+  }
+  .right .fn-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+  .right .hint {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 12px;
+    font-style: italic;
+  }
+  .ng { cursor: pointer; }
+  .ng rect { transition: opacity 0.15s; }
+  .ng:hover rect { opacity: 0.75; }
+
+  /* colori espliciti light/dark */
+  .b-purple rect { fill: #CECBF6; stroke: #534AB7; }
+  .b-purple text { fill: #3C3489; }
+  .b-blue rect { fill: #B5D4F4; stroke: #185FA5; }
+  .b-blue text { fill: #0C447C; }
+  .b-teal rect { fill: #9FE1CB; stroke: #0F6E56; }
+  .b-teal text { fill: #085041; }
+  .b-coral rect { fill: #F5C4B3; stroke: #993C1D; }
+  .b-coral text { fill: #712B13; }
+  .b-gray rect { fill: #D3D1C7; stroke: #5F5E5A; }
+  .b-gray text { fill: #444441; }
+
+  @media (prefers-color-scheme: dark) {
+    .b-purple rect { fill: #3C3489; stroke: #AFA9EC; }
+    .b-purple text { fill: #CECBF6; }
+    .b-blue rect { fill: #0C447C; stroke: #85B7EB; }
+    .b-blue text { fill: #B5D4F4; }
+    .b-teal rect { fill: #085041; stroke: #5DCAA5; }
+    .b-teal text { fill: #9FE1CB; }
+    .b-coral rect { fill: #712B13; stroke: #F0997B; }
+    .b-coral text { fill: #F5C4B3; }
+    .b-gray rect { fill: #444441; stroke: #B4B2A9; }
+    .b-gray text { fill: #D3D1C7; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="left">
+    <svg width="420" viewBox="0 0 420 980" role="img">
+      <title>Grafo chiamate push_swap</title>
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- MAIN -->
+      <g class="ng b-purple" onclick="show('main')">
+        <rect x="150" y="20" width="120" height="36" rx="8" stroke-width="0.5"/>
+        <text x="210" y="38" text-anchor="middle" dominant-baseline="central" style="font-size:13px;font-weight:500">main</text>
+      </g>
+
+      <!-- frecce main -->
+      <line x1="185" y1="56" x2="100" y2="100" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="210" y1="56" x2="210" y2="100" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="230" y1="56" x2="290" y2="100" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="240" y1="56" x2="350" y2="100" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+
+      <!-- LIVELLO 1 -->
+      <g class="ng b-blue" onclick="show('parse_args')">
+        <rect x="30" y="100" width="110" height="36" rx="8" stroke-width="0.5"/>
+        <text x="85" y="118" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">parse_args</text>
+      </g>
+      <g class="ng b-gray" onclick="show('stack_size')">
+        <rect x="155" y="100" width="100" height="36" rx="8" stroke-width="0.5"/>
+        <text x="205" y="118" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">stack_size</text>
+      </g>
+      <g class="ng b-gray" onclick="show('is_sorted')">
+        <rect x="270" y="100" width="90" height="36" rx="8" stroke-width="0.5"/>
+        <text x="315" y="118" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">is_sorted</text>
+      </g>
+      <g class="ng b-blue" onclick="show('assign_index')">
+        <rect x="370" y="100" width="40" height="36" rx="8" stroke-width="0.5"/>
+        <text x="390" y="118" text-anchor="middle" dominant-baseline="central" style="font-size:10px;font-weight:500">idx</text>
+      </g>
+
+      <!-- frecce parse_args -->
+      <line x1="60" y1="136" x2="40" y2="180" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="80" y1="136" x2="110" y2="180" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="100" y1="136" x2="180" y2="180" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="115" y1="136" x2="250" y2="180" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+
+      <!-- LIVELLO 2 -->
+      <g class="ng b-teal" onclick="show('is_valid')">
+        <rect x="10" y="180" width="80" height="34" rx="8" stroke-width="0.5"/>
+        <text x="50" y="197" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">is_valid</text>
+      </g>
+      <g class="ng b-teal" onclick="show('ft_atol')">
+        <rect x="95" y="180" width="80" height="34" rx="8" stroke-width="0.5"/>
+        <text x="135" y="197" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">ft_atol</text>
+      </g>
+      <g class="ng b-teal" onclick="show('has_dup')">
+        <rect x="180" y="180" width="80" height="34" rx="8" stroke-width="0.5"/>
+        <text x="220" y="197" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">has_dup</text>
+      </g>
+      <g class="ng b-teal" onclick="show('push_node')">
+        <rect x="265" y="180" width="90" height="34" rx="8" stroke-width="0.5"/>
+        <text x="310" y="197" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">push_node</text>
+      </g>
+
+      <line x1="310" y1="214" x2="310" y2="248" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <g class="ng b-teal" onclick="show('new_node')">
+        <rect x="265" y="248" width="90" height="34" rx="8" stroke-width="0.5"/>
+        <text x="310" y="265" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">new_node</text>
+      </g>
+
+      <!-- SEPARATORE -->
+      <line x1="10" y1="310" x2="410" y2="310" stroke="var(--color-text-tertiary)" stroke-width="0.5" stroke-dasharray="4 4"/>
+      <text x="210" y="324" text-anchor="middle" style="font-size:11px;fill:var(--color-text-tertiary)">se size &gt; 3</text>
+
+      <line x1="210" y1="56" x2="210" y2="338" stroke="var(--color-text-tertiary)" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+
+      <!-- TURK_SORT -->
+      <g class="ng b-purple" onclick="show('turk_sort')">
+        <rect x="130" y="338" width="160" height="36" rx="8" stroke-width="0.5"/>
+        <text x="210" y="356" text-anchor="middle" dominant-baseline="central" style="font-size:13px;font-weight:500">turk_sort</text>
+      </g>
+
+      <line x1="155" y1="374" x2="55" y2="418" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="175" y1="374" x2="130" y2="418" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="200" y1="374" x2="200" y2="418" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="225" y1="374" x2="270" y2="418" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="245" y1="374" x2="330" y2="418" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="260" y1="374" x2="385" y2="418" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+
+      <!-- LIVELLO TURK -->
+      <g class="ng b-blue" onclick="show('push_to_b')">
+        <rect x="10" y="418" width="85" height="34" rx="8" stroke-width="0.5"/>
+        <text x="52" y="435" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">push_to_b</text>
+      </g>
+      <g class="ng b-blue" onclick="show('sort_three')">
+        <rect x="100" y="418" width="80" height="34" rx="8" stroke-width="0.5"/>
+        <text x="140" y="435" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">sort_three</text>
+      </g>
+      <g class="ng b-blue" onclick="show('set_positions')">
+        <rect x="185" y="418" width="80" height="34" rx="8" stroke-width="0.5"/>
+        <text x="225" y="435" text-anchor="middle" dominant-baseline="central" style="font-size:10px;font-weight:500">set_pos</text>
+      </g>
+      <g class="ng b-blue" onclick="show('set_target')">
+        <rect x="270" y="418" width="75" height="34" rx="8" stroke-width="0.5"/>
+        <text x="307" y="435" text-anchor="middle" dominant-baseline="central" style="font-size:10px;font-weight:500">set_target</text>
+      </g>
+      <g class="ng b-blue" onclick="show('set_costs')">
+        <rect x="350" y="418" width="30" height="34" rx="8" stroke-width="0.5"/>
+        <text x="365" y="435" text-anchor="middle" dominant-baseline="central" style="font-size:9px;font-weight:500">cost</text>
+      </g>
+      <g class="ng b-blue" onclick="show('cheapest')">
+        <rect x="386" y="418" width="30" height="34" rx="8" stroke-width="0.5"/>
+        <text x="401" y="435" text-anchor="middle" dominant-baseline="central" style="font-size:9px;font-weight:500">chp</text>
+      </g>
+
+      <line x1="307" y1="452" x2="307" y2="490" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <g class="ng b-teal" onclick="show('find_min')">
+        <rect x="265" y="490" width="84" height="34" rx="8" stroke-width="0.5"/>
+        <text x="307" y="507" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">find_min</text>
+      </g>
+
+      <line x1="401" y1="452" x2="401" y2="490" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <g class="ng b-teal" onclick="show('total_cost')">
+        <rect x="358" y="490" width="84" height="34" rx="8" stroke-width="0.5"/>
+        <text x="400" y="507" text-anchor="middle" dominant-baseline="central" style="font-size:10px;font-weight:500">total_cost</text>
+      </g>
+      <line x1="400" y1="524" x2="400" y2="558" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <g class="ng b-teal" onclick="show('abs_val')">
+        <rect x="358" y="558" width="84" height="34" rx="8" stroke-width="0.5"/>
+        <text x="400" y="575" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500">abs_val</text>
+      </g>
+
+      <!-- SEPARATORE 2 -->
+      <line x1="10" y1="622" x2="410" y2="622" stroke="var(--color-text-tertiary)" stroke-width="0.5" stroke-dasharray="4 4"/>
+      <text x="210" y="636" text-anchor="middle" style="font-size:11px;fill:var(--color-text-tertiary)">do_move + rotate_min</text>
+
+      <line x1="170" y1="374" x2="130" y2="650" stroke="var(--color-text-tertiary)" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+      <line x1="250" y1="374" x2="300" y2="650" stroke="var(--color-text-tertiary)" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+
+      <!-- DO_MOVE + ROTATE_MIN -->
+      <g class="ng b-coral" onclick="show('do_move')">
+        <rect x="50" y="650" width="150" height="36" rx="8" stroke-width="0.5"/>
+        <text x="125" y="668" text-anchor="middle" dominant-baseline="central" style="font-size:13px;font-weight:500">do_move</text>
+      </g>
+      <g class="ng b-coral" onclick="show('rotate_min')">
+        <rect x="220" y="650" width="150" height="36" rx="8" stroke-width="0.5"/>
+        <text x="295" y="668" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">rotate_min</text>
+      </g>
+
+      <line x1="95" y1="686" x2="55" y2="730" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="120" y1="686" x2="140" y2="730" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="150" y1="686" x2="230" y2="730" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="260" y1="686" x2="295" y2="730" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="330" y1="686" x2="360" y2="730" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+
+      <!-- OPERAZIONI -->
+      <g class="ng b-gray" onclick="show('do_rotations')">
+        <rect x="10" y="730" width="100" height="34" rx="8" stroke-width="0.5"/>
+        <text x="60" y="747" text-anchor="middle" dominant-baseline="central" style="font-size:10px;font-weight:500">do_rotations</text>
+      </g>
+      <g class="ng b-gray" onclick="show('do_single')">
+        <rect x="115" y="730" width="105" height="34" rx="8" stroke-width="0.5"/>
+        <text x="167" y="747" text-anchor="middle" dominant-baseline="central" style="font-size:10px;font-weight:500">do_single_rot.</text>
+      </g>
+      <g class="ng b-gray" onclick="show('pa')">
+        <rect x="225" y="730" width="50" height="34" rx="8" stroke-width="0.5"/>
+        <text x="250" y="747" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">pa</text>
+      </g>
+      <g class="ng b-gray" onclick="show('ra')">
+        <rect x="280" y="730" width="45" height="34" rx="8" stroke-width="0.5"/>
+        <text x="302" y="747" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">ra</text>
+      </g>
+      <g class="ng b-gray" onclick="show('rra')">
+        <rect x="330" y="730" width="45" height="34" rx="8" stroke-width="0.5"/>
+        <text x="352" y="747" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">rra</text>
+      </g>
+
+      <line x1="40" y1="764" x2="40" y2="808" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      <line x1="80" y1="764" x2="110" y2="808" stroke="var(--color-text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+
+      <g class="ng b-gray" onclick="show('rr')">
+        <rect x="10" y="808" width="55" height="34" rx="8" stroke-width="0.5"/>
+        <text x="37" y="825" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">rr</text>
+      </g>
+      <g class="ng b-gray" onclick="show('rrr')">
+        <rect x="75" y="808" width="55" height="34" rx="8" stroke-width="0.5"/>
+        <text x="102" y="825" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500">rrr</text>
+      </g>
+
+      <!-- LEGENDA -->
+      <rect x="10" y="870" width="12" height="12" rx="3" class="b-purple" style="fill:#CECBF6;stroke:#534AB7"/>
+      <text x="28" y="876" dominant-baseline="central" style="font-size:10px;fill:var(--color-text-secondary)">principale</text>
+      <rect x="95" y="870" width="12" height="12" rx="3" style="fill:#B5D4F4;stroke:#185FA5"/>
+      <text x="113" y="876" dominant-baseline="central" style="font-size:10px;fill:var(--color-text-secondary)">algoritmo</text>
+      <rect x="175" y="870" width="12" height="12" rx="3" style="fill:#9FE1CB;stroke:#0F6E56"/>
+      <text x="193" y="876" dominant-baseline="central" style="font-size:10px;fill:var(--color-text-secondary)">supporto</text>
+      <rect x="250" y="870" width="12" height="12" rx="3" style="fill:#F5C4B3;stroke:#993C1D"/>
+      <text x="268" y="876" dominant-baseline="central" style="font-size:10px;fill:var(--color-text-secondary)">mosse</text>
+      <rect x="315" y="870" width="12" height="12" rx="3" style="fill:#D3D1C7;stroke:#5F5E5A"/>
+      <text x="333" y="876" dominant-baseline="central" style="font-size:10px;fill:var(--color-text-secondary)">atomica</text>
+
+      <text x="210" y="910" text-anchor="middle" style="font-size:11px;fill:var(--color-text-tertiary)">← clicca una funzione →</text>
+    </svg>
+  </div>
+
+  <div class="right" id="info-panel">
+    <div class="fn-name" id="info-name">Seleziona una funzione</div>
+    <div class="fn-desc" id="info-desc">Clicca su qualsiasi nodo del grafo per vedere la spiegazione dettagliata qui.</div>
+    <div class="hint" id="info-hint"></div>
+  </div>
+</div>
+
+<script>
+const D = {
+  main: { name:"main", desc:"Punto di ingresso. Controlla che ci siano argomenti (ac >= 2), chiama parse_args per costruire lo stack A, poi decide quale algoritmo usare in base alla dimensione: sort_two (2 elementi), sort_three (3 elementi), turk_sort (4+). Alla fine libera la memoria con free_stack.", hint:"File: main.c" },
+  parse_args: { name:"parse_args", desc:"Legge gli argomenti dal fondo verso l'inizio e costruisce lo stack A. Per ogni argomento chiama is_valid → ft_atol → has_dup → push_node. Se uno fallisce → stampa 'Error' su stderr → exit(1). Parte dal fondo perché push_node aggiunge in cima — così il primo argomento finisce in cima allo stack.", hint:"File: parse.c" },
+  stack_size: { name:"stack_size", desc:"Scorre tutta la linked list contando i nodi uno per uno. Ritorna il numero totale di elementi. Usata in main per sapere quanti elementi ci sono, e da turk_sort per decidere quanti pb fare.", hint:"File: utils.c" },
+  is_sorted: { name:"is_sorted", desc:"Scorre la lista e controlla che ogni nodo abbia valore minore del successivo. Se trova un'inversione ritorna 0 (non ordinato). Se arriva in fondo ritorna 1 (ordinato). Usata nel main per uscire subito se la lista è già ordinata — nessuna mossa stampata.", hint:"File: utils2.c" },
+  assign_index: { name:"assign_index", desc:"Per ogni nodo, conta quanti altri nodi hanno valore minore — quello è il suo indice (rango). Usa due cursori annidati: cur scorre ogni nodo, inner scorre tutta la lista per contare. Il minimo ha sempre index=0, il massimo index=n-1. Serve perché il Turk lavora con posizioni relative, non valori assoluti.", hint:"File: parse.c" },
+  is_valid: { name:"is_valid", desc:"Controlla che la stringa sia un numero valido. Salta il segno (- o +) se presente, poi verifica che ogni carattere sia tra '0' e '9'. Se trova qualcosa di strano ritorna 0 → parse_args chiama error_exit.", hint:"File: parse.c" },
+  ft_atol: { name:"ft_atol", desc:"Converte una stringa in long (non int) per poter rilevare overflow. Costruisce il numero cifra per cifra. Se il risultato supera INT_MAX o scende sotto INT_MIN, ritorna un valore volutamente fuori range che parse_args intercetta e tratta come errore.", hint:"File: parse.c" },
+  has_dup: { name:"has_dup", desc:"Scorre tutta la linked list corrente. Se trova un nodo con lo stesso valore di val, ritorna 1 (duplicato trovato) → error_exit. Se arriva in fondo senza trovarlo, ritorna 0 (nessun duplicato). Chiamata prima di ogni push_node.", hint:"File: parse.c" },
+  push_node: { name:"push_node", desc:"Crea un nuovo nodo con new_node e lo mette in cima allo stack. Il nuovo nodo punta al vecchio top (*stack), poi il puntatore dello stack viene aggiornato al nuovo nodo. Prende ** perché deve modificare il puntatore stesso.", hint:"File: utils.c" },
+  new_node: { name:"new_node", desc:"Alloca un nuovo nodo con malloc. Inizializza value con il numero passato e tutti gli altri campi (index, pos, target_pos, cost_a, cost_b) a 0, next a NULL. Se malloc fallisce, exit(1). Chiamata ogni volta che si aggiunge un elemento allo stack.", hint:"File: utils.c" },
+  turk_sort: { name:"turk_sort", desc:"Orchestratore dell'algoritmo Turk. In ordine: 1) push_to_b — svuota A in B tranne 3 elementi, 2) sort_three — ordina i 3 rimasti in A, 3) loop su B: set_positions → set_target → set_costs → cheapest → do_move finché B è vuoto, 4) rotate_min — porta il minimo in cima.", hint:"File: turk3.c" },
+  push_to_b: { name:"push_to_b", desc:"Spinge elementi da A a B usando una finestra scorrevole. La finestra è pushed + group_size. Ad ogni push, pushed aumenta di 1 allargando la finestra di 1 — così tutti gli elementi vengono prima o poi catturati. Se l'indice è nella metà bassa della finestra fa rb per pre-organizzare B con gli indici alti in cima.", hint:"File: turk3.c" },
+  sort_three: { name:"sort_three", desc:"Ordina 3 elementi con massimo 2-3 mosse. Tutti i casi possibili sono hardcodati con if/else. Usa gli indici (non i valori) per evitare overflow con INT_MAX e INT_MIN. Se i 3 elementi sono già in ordine non fa niente.", hint:"File: sort.c" },
+  set_positions: { name:"set_positions", desc:"Scorre A e B e assegna a ogni nodo la sua posizione fisica corrente: pos=0 per il top, pos=1 per il secondo, ecc. Chiamata ogni iterazione del loop perché le posizioni cambiano dopo ogni do_move. Serve a set_costs per calcolare le rotazioni.", hint:"File: turk.c" },
+  set_target: { name:"set_target", desc:"Per ogni elemento di B trova il suo successore immediato in A — il più piccolo tra tutti i nodi di A con indice maggiore. L'elemento di B andrà inserito davanti a lui. Se non esiste successore (è il massimo attuale) → find_min → target è il minimo di A, l'elemento va in cima circolarmente.", hint:"File: turk.c" },
+  set_costs: { name:"set_costs", desc:"Calcola cost_b (rotazioni per portare l'elemento in cima a B) e cost_a (rotazioni per portare il target in cima ad A). Il segno indica la direzione: positivo = ra/rb in avanti, negativo = rra/rrb al contrario. Prima metà dello stack → vai avanti, seconda metà → torna indietro.", hint:"File: turk.c" },
+  cheapest: { name:"cheapest", desc:"Scorre tutti gli elementi di B e trova quello con total_cost minore. Inizia con best_cost=INT_MAX così qualsiasi costo reale sarà minore. Ritorna il puntatore al nodo più economico da inserire in A.", hint:"File: turk2.c" },
+  find_min: { name:"find_min", desc:"Scorre tutta la lista A e ritorna il nodo con index più basso — il minimo assoluto. Usata da set_target quando un elemento di B è il massimo attuale e non ha successori in A: in quel caso il target è il minimo, l'elemento si inserisce circolarmente.", hint:"File: turk2.c" },
+  total_cost: { name:"total_cost", desc:"Calcola il costo totale di un inserimento. Se cost_a e cost_b hanno lo stesso segno → si usano rr/rrr → costo = max dei due (risparmio di mosse). Se hanno segni opposti → mosse separate → costo = somma dei valori assoluti.", hint:"File: turk.c" },
+  abs_val: { name:"abs_val", desc:"Ritorna il valore assoluto di un numero. Se n < 0 ritorna -n, altrimenti ritorna n. Usata da total_cost per confrontare i costi senza preoccuparsi del segno — il segno indica la direzione, il valore assoluto indica quante mosse.", hint:"File: turk.c" },
+  do_move: { name:"do_move", desc:"Esegue l'inserimento dell'elemento più economico. Legge cost_a e cost_b dal nodo scelto da cheapest. Prima chiama do_rotations (rotazioni simultanee rr/rrr), poi do_single_rotations (rotazioni rimanenti su A e B separatamente), infine pa per spostare l'elemento in cima ad A.", hint:"File: turk2.c" },
+  rotate_min: { name:"rotate_min", desc:"Alla fine, quando B è vuoto, trova il nodo con index=0 (il minimo assoluto) scorrendo A e conta la sua posizione. Se è nella prima metà usa ra, nella seconda usa rra — sceglie sempre la direzione più corta per portarlo in cima.", hint:"File: turk3.c" },
+  do_rotations: { name:"do_rotations", desc:"Esegue le rotazioni simultanee quando cost_a e cost_b hanno lo stesso segno. Usa rr se entrambi positivi, rrr se entrambi negativi. Ad ogni rr/rrr decrementa/incrementa entrambi i contatori. Risparmia mosse rispetto a fare ra e rb separatamente.", hint:"File: turk2.c" },
+  do_single: { name:"do_single_rotations", desc:"Esegue le rotazioni rimanenti su A e B separatamente dopo do_rotations. rb/rrb per B fino a cb=0, ra/rra per A fino a ca=0. Il contatore viene incrementato o decrementato ad ogni mossa — quando raggiunge 0 si ferma.", hint:"File: turk2.c" },
+  pa: { name:"pa", desc:"Prende il top di B e lo mette in cima ad A. Operazione atomica: stacca il primo nodo di B (src), lo ricollega come nuovo top di A (dst). Stampa 'pa' su stdout.", hint:"File: operations2.c" },
+  ra: { name:"ra", desc:"Rotate A: il top di A va in fondo. Il secondo elemento diventa il nuovo top. Implementata con rotate() — trova l'ultimo nodo, stacca il primo, lo attacca dopo l'ultimo. Stampa 'ra'.", hint:"File: operations2.c" },
+  rra: { name:"rra", desc:"Reverse rotate A: il fondo di A va in cima. L'ultimo elemento diventa il nuovo top. Implementata con rev_rotate() — trova penultimo e ultimo, stacca l'ultimo, lo mette prima del vecchio top. Stampa 'rra'.", hint:"File: operations3.c" },
+  rr: { name:"rr", desc:"ra e rb eseguiti insieme in una sola mossa. Usato da do_rotations quando cost_a e cost_b sono entrambi positivi. Risparmia una mossa rispetto a fare ra e rb separatamente. Stampa 'rr'.", hint:"File: operations3.c" },
+  rrr: { name:"rrr", desc:"rra e rrb eseguiti insieme in una sola mossa. Usato da do_rotations quando cost_a e cost_b sono entrambi negativi. Risparmia una mossa rispetto a fare rra e rrb separatamente. Stampa 'rrr'.", hint:"File: operations3.c" }
+};
+
+function show(k) {
+  const d = D[k];
+  if (!d) return;
+  document.getElementById('info-name').textContent = d.name;
+  document.getElementById('info-desc').textContent = d.desc;
+  document.getElementById('info-hint').textContent = d.hint || '';
+}
+</script>
