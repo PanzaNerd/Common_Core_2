@@ -1,32 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstr.c                                        :+:      :+:    :+:   */
+/*   ft_strcpy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/20 19:32:28 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/20 19:39:01 by mpanzani         ###   ########.fr       */
+/*   Created: 2026/05/21 13:07:50 by mpanzani          #+#    #+#             */
+/*   Updated: 2026/05/21 13:33:19 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
+#include <stdio.h>
 
-void	ft_putstr(char *str)
+char	*ft_strcpy(char *s1, char *s2)
 {
-	int i = 0;
-	
-	while(str[i])
+	int	i = 0;
+
+	while(s2[i])
 	{
-		write(1, &str[i], 1);
+		s1[i] = s2[i];
 		i++;
 	}
+	s1[i] = '\0';
+	return(s1);
 }
 
-int	main(void)
+int main(void)
 {
-	char str[]= "krankenwagen";
-	
-	ft_putstr(str);
-	return(0);
+	char src[]= "CIAO ANIMALE";
+	char dst[50]= "pangrattato";
+
+	printf("PRIMA\nsrc:%s\ndst:%s\n", src, dst);
+	ft_strcpy(dst, src);
+	printf("DOPO\nsrc:%s\ndst:%s\n", src, dst);
 }
