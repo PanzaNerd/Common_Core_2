@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rot13.c                                            :+:      :+:    :+:   */
+/*   union.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/27 15:54:39 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/27 17:20:10 by mpanzani         ###   ########.fr       */
+/*   Created: 2026/05/27 20:44:39 by mpanzani          #+#    #+#             */
+/*   Updated: 2026/05/27 21:24:20 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,38 @@
 
 int main(int ac, char **av)
 {
-    int i = 0;
-
-    if (ac != 2)
+	int i = 0;
+	int j = 0;
+	int x = 0;
+	char printed[256];
+	
+	if(ac != 3)
+	{
+		write(1, "\n", 1);
+		return(0);
+	}
+	while(x < 256)
+	{
+		printed[x] = 0;
+		x++;
+	}
+	while (av[1][i])
     {
-        write(1, "\n", 1);
-        return (0);
-    }
-    while (av[1][i])
-    {
-        if (av[1][i] >= 'a' && av[1][i] <= 'm')
-            av[1][i] = av[1][i] + 13;
-        else if (av[1][i] >= 'n' && av[1][i] <= 'z')
-            av[1][i] = av[1][i] - 13;
-        else if (av[1][i] >= 'A' && av[1][i] <= 'M')
-            av[1][i] = av[1][i] + 13;
-        else if (av[1][i] >= 'N' && av[1][i] <= 'Z')
-            av[1][i] = av[1][i] - 13;
-        write(1, &av[1][i], 1);
+        if (printed[av[1][i]] == 0)
+        {
+            printed[av[1][i]] = 1;
+            write(1, &av[1][i], 1);
+        }
         i++;
+    }
+    while (av[2][j])
+    {
+        if (printed[av[2][j]] == 0)
+        {
+            printed[av[2][j]] = 1;
+            write(1, &av[2][j], 1);
+        }
+        j++;
     }
     write(1, "\n", 1);
     return (0);
