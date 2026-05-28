@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/21 16:17:31 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/21 16:25:38 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/28 16:46:41 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,15 @@
 void	print_bits(unsigned char octet)
 {
 	int				i;
-	unsigned char	check;
+	unsigned char	mask;
 	char			bit;
 
 	i = 8;
 	while (i > 0)
 	{
 		i--;
-		check = 1 << i;
-		if (octet & check)
+		mask = 1 << i;
+		if (octet & mask)
 			bit = '1';
 		else
 			bit = '0';

@@ -1,41 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*   ft_list_size.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/21 16:02:04 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/28 14:45:48 by mpanzani         ###   ########.fr       */
+/*   Created: 2026/05/28 16:11:52 by mpanzani          #+#    #+#             */
+/*   Updated: 2026/05/28 16:24:10 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef FT_LIST_SIZE_H
+# define FT_LIST_SIZE_H
+
 #include <stdio.h>
+#include <stdlib.h>
 
-int	ft_atoi(char *str)
+typedef struct    s_list
 {
-	int result = 0;
-	int sign = 1;
-	int i = 0;
-	
-	while(str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-		i++;
-	if(str[i] == '-')
-		sign = -1;
-	if(str[i] == '-' || str[i] == '+')
-		i++;
-	while(str[i] >= '0' && str[i] <= '9')
-	{
-		result = result * 10 + (str[i] - '0');
-		i++;
-	}
-	return(result * sign);
-}
+    struct s_list *next;
+    void          *data;
+}                 t_list;
 
-int main(void)
-{
-	char str[]= "    	-123";
+int	ft_list_size(t_list *begin_list);
 
-	printf("%d\n", ft_atoi(str));
-	return(0);
-}
+#endif
