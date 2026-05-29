@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/28 16:10:50 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/28 16:24:32 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/05/29 16:58:59 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ int	main(void)
     b.next = &c;
     c.next = NULL;
 
-    printf("size: %d\n", ft_list_size(&a));  // 3
-    printf("size: %d\n", ft_list_size(&b));  // 2
-    printf("size: %d\n", ft_list_size(NULL)); // 0
+    printf("size: %d\n", ft_list_size(&a));
+    printf("size: %d\n", ft_list_size(&b));
+    printf("size: %d\n", ft_list_size(NULL));
     return (0);
 }
