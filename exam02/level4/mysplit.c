@@ -1,49 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   hidenp.c                                           :+:      :+:    :+:   */
+/*   split.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/02 18:02:13 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/06/02 18:21:53 by mpanzani         ###   ########.fr       */
+/*   Created: 2026/06/02 20:19:10 by mpanzani          #+#    #+#             */
+/*   Updated: 2026/06/02 20:29:53 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include <stdio.h>
 
-int main(int ac, char **av)
+char    **ft_split(char *str)
 {
-	int i;
-	int j;
-	int x;
 	
-	if(ac != 3)
+}
+
+int main (void)
+{
+	char **str;
+	int i = 0;
+
+	str = ft_split(" hello 	 world foo  ");
+	
+	while(str[i])
 	{
-		write(1, "\n",1);
-		return(0);
-	}
-	i = 0;
-	j = 0;
-	while(av[2][i])
-	{
-		if(av[2][i] == av[1][j])
-		{
-			j++;
-		}
+		printf("%s\n", str[i]);
 		i++;
 	}
-	x = 0;
-	while(av[1][x])
-	{
-		x++;
-	}
-	if(x == j)
-	{
-		write(1, "1\n", 2);
-	}
-	else
-		write(1, "0\n", 2);
-	return(0);
 }
