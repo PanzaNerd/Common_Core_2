@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 19:47:33 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/06/03 20:13:46 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/03 20:37:57 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,21 @@ size_t ft_strspn(const char *s, const char *accept)
 
 	while(s[i])
 	{
-		if(s[i] == accept[j])
+		
+		j = 0;
+		while(accept[j])
 		{
+			if(s[i] == accept[j])
+				j++;
 			i++;
 		}
-		j++;
 	}
-	return(i);
+	return(j);
 }
 
 int main(void)
 {
-	char s[] = "ammutolisciti";
+	char s[] = "ammuscitolisciti";
 	char accept[] = "sci";
 
 	printf("%lu\n", ft_strspn(s, accept));
