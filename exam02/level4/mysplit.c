@@ -1,32 +1,58 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   split.c                                            :+:      :+:    :+:   */
+/*   mysplit.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/02 20:19:10 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/06/02 20:29:53 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/03 23:38:36 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdlib.h>
 #include <stdio.h>
 
-char    **ft_split(char *str)
+char *ft_strncpy(char *s1, char *s2, int n)
 {
-	
+	int i = -1;
+
+	while (++i < n && s2[i])
+		s1[i] = s2[i];
+	s1[i] = '\0';
+	return (s1);
 }
 
-int main (void)
+char	**mysplit(char *str)
 {
-	char **str;
 	int i = 0;
-
-	str = ft_split(" hello 	 world foo  ");
-	
-	while(str[i])
+	int j = 0;
+	int k = 0;
+	int wc = 0;
+	while (str[i])
 	{
-		printf("%s\n", str[i]);
-		i++;
+		while (str[i] && (str[i] == ' ' || str[i] == '\t' || str[i] == '\n'))
+			i++;
+		if (str[i])
+			wc++;
+		while (str[i] && (str[i] != ' ' && str[i] != '\t' && str[i] != '\n'))
+			i++;
 	}
+	char **out = (char **)malloc(sizeof(char *) * (wc + 1));
+	i = 0;
+	while (str[i])
+	{
+		while (str[i] && (str[i] == ' ' || str[i] == '\t' || str[i] == '\n'))
+			i++;
+		j = i;
+		while (str[i] && (str[i] != ' ' && str[i] != '\t' && str[i] != '\n'))
+			i++;
+		if (i > j)
+		{
+			out[k] = (char *)malloc(sizeof(char) * ((i - j) + 1));
+			ft_strncpy(out[k++], &str[j], i - j);
+		}
+	}
+	out[k] = NULL;
+	return (out);
 }

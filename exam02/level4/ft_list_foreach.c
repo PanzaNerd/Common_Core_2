@@ -6,19 +6,15 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 21:47:32 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/06/03 22:13:48 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/03 23:32:30 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_list_foreach.h"
 
-char ft_toupper(char *a)
+void stampa(void *data)
 {
-	while(*a)
-	{
-		*a = *a - 32;
-		*a++;
-	}
+	printf("%s\n", (char *)data);
 }
 
 void	ft_list_foreach(t_list *begin_list, void (*f)(void *))
@@ -47,8 +43,6 @@ int main(void)
 	b.next = &c;
 	c.next = NULL;
 
-	printf("%s\n", ft_list_foreach(&a, ft_toupper));
-    printf("%s: %d\n", ft_list_foreach(&b, ft_toupper));
-    printf("%s\n", ft_list_foreach(NULL, ft_toupper));
+	ft_list_foreach(&a, stampa);
     return (0);
 }
