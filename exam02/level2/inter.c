@@ -36,9 +36,9 @@ int main(int ac, char **av)
         j = 0;
         while (av[2][j] && av[2][j] != av[1][i])
             j++;
-        if (av[2][j] == av[1][i] && printed[av[1][i]] == 0)
+        if (av[2][j] == av[1][i] && printed[(unsigned char)av[1][i]] == 0)
         {
-            printed[av[1][i]] = 1;
+            printed[(unsigned char)av[1][i]] = 1;
             write(1, &av[1][i], 1);
         }
         i++;
