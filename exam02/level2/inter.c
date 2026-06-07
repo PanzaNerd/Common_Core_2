@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   inter.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
+/*   By: matthias <matthias@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/27 18:36:53 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/27 20:26:24 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/04 21:17:38 by matthias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,16 @@ int main(int ac, char **av)
     while (av[1][i])
     {
         j = 0;
-        while (av[2][j] && av[2][j] != av[1][i])
-            j++;
-        if (av[2][j] == av[1][i] && printed[(unsigned char)av[1][i]] == 0)
-        {
-            printed[(unsigned char)av[1][i]] = 1;
-            write(1, &av[1][i], 1);
-        }
-        i++;
+		while(av[2][j])
+		{
+        	if (av[2][j] == av[1][i] && printed[(unsigned char)av[1][i]] == 0)
+        	{
+            	printed[(unsigned char)av[1][i]] = 1;
+            	write(1, &av[1][i], 1);
+        	}
+        	i++;
+		}
+		j++;
     }
     write(1, "\n", 1);
     return (0);
