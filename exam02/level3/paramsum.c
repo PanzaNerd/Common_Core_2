@@ -1,41 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lcm.c                                              :+:      :+:    :+:   */
+/*   paramsum.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/07 18:51:47 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/06/08 16:44:35 by mpanzani         ###   ########.fr       */
+/*   Created: 2026/06/08 18:42:53 by mpanzani          #+#    #+#             */
+/*   Updated: 2026/06/08 19:17:59 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
+#include <unistd.h>
 
-unsigned int	pgcd(unsigned int a, unsigned int b)
+void ft_putnbr(int n)
 {
-	while (b != 0)
-	{
-		unsigned int tmp = b;
-		b = a % b;
-		a = tmp;
-	}
-	return (a);
+	char c;
+
+	if(n > 9)
+		ft_putnbr(n/10);
+	c = (n % 10) + '0';
+	write(1, &c, 1);
 }
 
-unsigned int    lcm(unsigned int a, unsigned int b)
+int main(int ac, char **av)
 {
-	if (a == 0 || b == 0)
-		return (0);
-	return (a * b / pgcd(a, b));
-}
-
-int main(void)
-{
-	unsigned int a = 2;
-	unsigned int b = 3;
+	int n = 0;
 	
-	printf("%d\n", lcm(a, b));
+	if(ac < 2)
+	{
+		write(1, "0\n", 2);
+		return(0);
+	}
+	else
+	{
+		while(av[n])
+			n++;
+		ft_putnbr(n - 1);
+	}
+	write(1, "\n", 1);
 	return(0);
 }
-
