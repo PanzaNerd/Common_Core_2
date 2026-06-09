@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/27 22:12:18 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/28 13:53:39 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/09 15:45:17 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,36 +14,34 @@
 
 int main(int ac, char **av)
 {
-	int i = 0;
 	int n = 1;
-	int new_word = 1;
+	int i;
 
-	if(ac == 1)
+	if (ac == 1)
 	{
 		write(1, "\n", 1);
-		return(0);
+		return (0);
 	}
-	while(n < ac)
+	while (n < ac)
 	{
 		i = 0;
-		new_word = 1;
-		while(av[n][i])
+		while (av[n][i])
 		{
-			if(av[n][i] == ' ' || av[n][i] == '\t')
-				new_word = 1;
-			else if(new_word == 1)
+			if (av[n][i] >= 'a' && av[n][i] <= 'z')
+				av[n][i] = av[n][i] + 32;
+
+			if (i > 0 && (av[n][i - 1] >= 'a' && av[n][i - 1] <= 'z'
+				|| av[n][i - 1] >= 'A' && av[n][i - 1] <= 'Z'))
 			{
-				if (av[n][i] >= 'a' && av[n][i] <= 'z')
-                    av[n][i] = av[n][i] - 32;
-                new_word = 0;
+				if (av[n][i] >= 'A' && av[n][i] <= 'Z')
+					av[n][i] = av[n][i] + 32;
 			}
-			else if (av[n][i] >= 'A' && av[n][i] <= 'Z')
-                av[n][i] = av[n][i] + 32;
-            write(1, &av[n][i], 1);
-            i++;
+
+			write(1, &av[n][i], 1);
+			i++;
 		}
 		write(1, "\n", 1);
-        n++;
+		n++;
 	}
-	return(0);
+	return (0);
 }

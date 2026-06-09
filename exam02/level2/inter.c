@@ -6,7 +6,7 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/27 18:36:53 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/06/07 18:47:37 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/09 18:01:33 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int main(int ac, char **av)
 	}
     i = 0;
     while (av[1][i])
-    {
+    {printed[(unsigned char)av[1][i]] = 
         j = 0;
 		while(av[2][j])
 		{
