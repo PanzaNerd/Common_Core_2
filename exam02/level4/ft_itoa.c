@@ -1,63 +1,69 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   itoa.c                                             :+:      :+:    :+:   */
+/*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
+/*   By: matthias <matthias@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/21 15:27:07 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/21 15:48:45 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/11 17:05:14 by matthias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include <stdio.h>
 
-static int	count_digits(int n)
+int count_digits(long num)
 {
-	int				count;
-	long int		num;
+	int len = 0;
 
-	num = n;
-	count = 0;
+	//se il numero è negativo, rendiamolo positivo.(len include anche il segno)
 	if (num <= 0)
 	{
-		count++;
-		num = -num;
+		len = 1;
+		num = - num;
 	}
+
 	while (num > 0)
 	{
 		num = num / 10;
-		count++;
+		len++;
 	}
-	return (count);
+	return (len);
 }
 
-char	*ft_itoa(int n)
+char *ft_itoa(int nbr)
 {
-	char		*str;
-	int			len;
-	long int	num;
+	long  num = nbr;
+	int   len;
+	char *arr;
 
-	num = n;
-	len = count_digits(n);
-	str = (char *)malloc(sizeof(char) * (len + 1));
-	if (!str)
+	// 1. conta + alloca + termina
+	len = count_digits(num);
+	arr = malloc(len + 1);
+	if (!arr)
 		return (NULL);
-	str[len] = '\0';
+	arr[len] = '\0';
+
+	// 2. gestisci segno e zero
+	num = nbr;
 	if (num < 0)
 	{
-		str[0] = '-';
-		num = -num;
+		arr[0] = '-';
+		num = - num;
 	}
+	
 	if (num == 0)
-		str[0] = '0';
+		arr[0] = '0';
+
+	// 3. riempi all'indietro
 	while (num > 0)
 	{
-		str[--len] = (num % 10) + '0';
+		len--;
+		arr[len] = (num % 10) + '0';
 		num = num / 10;
 	}
-	return (str);
+	return (arr);
 }
 
 int main(void)
@@ -69,6 +75,6 @@ int main(void)
 		printf("La stringa che rappresenta %d e': %s\n", number, str);
 		free(str);
 	}
-	return 0;
+	return(0);
 }
 
