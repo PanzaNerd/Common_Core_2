@@ -6,13 +6,11 @@
 /*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/21 16:45:45 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/21 16:47:02 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/11 20:27:03 by mpanzani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
-
-void	print_bits(unsigned char octet);
 
 void print_bits(unsigned char octet)
 {
