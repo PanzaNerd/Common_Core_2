@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   swap_bits.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
+/*   By: matthias <matthias@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/21 16:42:30 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/21 16:43:33 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/06/25 16:27:07 by matthias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
-
-void	print_bits(unsigned char octet);
 
 void print_bits(unsigned char octet)
 {
@@ -41,5 +39,6 @@ int	main(void)
 	write(1, "\n", 1);
 	print_bits(result);
 	write(1, "\n", 1);
+	
 	return (0);
 }
