@@ -2,3 +2,7 @@ materiale/
 __pycache__/
 *.pyc
 .DS_Store
+*.pdf
+*.tgz
+*.whl
+python/AMAZEING/output_validator.py
