@@ -65,7 +65,10 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 		top = ""
 		for x in range(gen.width):
 			if (gen.grid[y][x] & N) != 0:
-				top = top + "+---"
+				if (x, y) in gen.forty_two and (x, y - 1) in gen.forty_two:
+					top = top + FORTY_TWO_BG + "+---" + wall_color
+				else:
+					top = top + "+---"
 			else:
 				top = top + "+   "
 		print(top + "+")
@@ -73,7 +76,10 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 		middle = ""
 		for x in range(gen.width):
 			if (gen.grid[y][x] & W) != 0:
-				middle = middle + "|"
+				if (x, y) in gen.forty_two and (x - 1, y) in gen.forty_two:
+					middle = middle + FORTY_TWO_BG + "|" + wall_color
+				else:
+					middle = middle + "|"
 			else:
 				middle = middle + " "
 			if (x, y) in gen.forty_two:
@@ -87,13 +93,19 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 			else:
 				middle = middle + "   "
 		if (gen.grid[y][gen.width - 1] & E) != 0:
-			middle = middle + "|"
+			if (gen.width - 1, y) in gen.forty_two and (gen.width - 2, y) in gen.forty_two:
+				middle = middle + FORTY_TWO_BG + "|" + wall_color
+			else:
+				middle = middle + "|"
 		print(middle)
 
 	bottom = ""
 	for x in range(gen.width):
 		if (gen.grid[gen.height - 1][x] & S) != 0:
-			bottom = bottom + "+---"
+			if (x, gen.height - 1) in gen.forty_two and (x, gen.height - 2) in gen.forty_two:
+				bottom = bottom + FORTY_TWO_BG + "+---" + wall_color
+			else:
+				bottom = bottom + "+---"
 		else:
 			bottom = bottom + "+   "
 	print(bottom + "+")
