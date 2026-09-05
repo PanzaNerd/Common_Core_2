@@ -6,3 +6,7 @@ __pycache__/
 *.tgz
 *.whl
 python/AMAZEING/output_validator.py
+
+dist/
+build/
+*.egg-info/
