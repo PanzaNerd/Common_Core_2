@@ -17,7 +17,7 @@ carattere blocco '█': il labirinto 20x15 occupa 41 colonne, cosi' entra
 in qualsiasi terminale senza andare a capo.
 """
 
-from mazegen import E, N, S, W, MazeGenerator
+from mazegen import N, W, MazeGenerator
 
 RED: str = "\033[31m"
 GREEN: str = "\033[32m"
