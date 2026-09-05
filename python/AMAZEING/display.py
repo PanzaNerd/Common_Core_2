@@ -20,6 +20,7 @@ YELLOW: str = "\033[33m"
 BLUE: str = "\033[34m"
 MAGENTA: str = "\033[35m"
 CYAN: str = "\033[36m"
+FORTY_TWO_BG: str = "\033[47m"
 RESET: str = "\033[0m"
 CLEAR: str = "\033[2J\033[H"
 
@@ -53,7 +54,8 @@ def run(gen: MazeGenerator) -> None:
 
 def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 	"""Disegna il labirinto in ASCII: '+' e '---' per i muri orizzontali,
-	'|' per i verticali. I = entrata, O = uscita, '.' = percorso."""
+	'|' per i verticali. I = entrata, O = uscita, '.' = percorso,
+	sfondo bianco = celle del pattern "42"."""
 	path: list[tuple[int, int]] = []
 	if show_path:
 		path = gen.solve()
@@ -74,7 +76,9 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 				middle = middle + "|"
 			else:
 				middle = middle + " "
-			if (x, y) == gen.entry:
+			if (x, y) in gen.forty_two:
+				middle = middle + FORTY_TWO_BG + "   " + wall_color
+			elif (x, y) == gen.entry:
 				middle = middle + YELLOW + " I " + wall_color
 			elif (x, y) == gen.exit:
 				middle = middle + YELLOW + " O " + wall_color

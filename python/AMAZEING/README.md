@@ -103,9 +103,11 @@ file or the output format, and can be imported in any future project.
 
 ## Team and project management
 
+Roles: both team members took part in every role — design, parsing,
+generation, output writing, display and testing.
+
 This project was carried out entirely together by mpanzani and roblomba:
-both worked on every part (parsing, generation, output, display) and
-studied the code step by step as a pair.
+both worked on every part and studied the code step by step as a pair.
 
 Anticipated planning and how it evolved: we started with a split of
 responsibilities, then switched to working on everything together so that
