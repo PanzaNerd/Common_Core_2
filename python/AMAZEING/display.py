@@ -83,7 +83,7 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 			else:
 				middle = middle + " "
 			if (x, y) in gen.forty_two:
-				middle = middle + FORTY_TWO_BG + "   " + wall_color
+				middle = middle + FORTY_TWO_BG + "###" + wall_color
 			elif (x, y) == gen.entry:
 				middle = middle + YELLOW + " I " + wall_color
 			elif (x, y) == gen.exit:
