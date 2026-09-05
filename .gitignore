@@ -10,3 +10,5 @@ python/AMAZEING/output_validator.py
 dist/
 build/
 *.egg-info/
+
+.venv/
