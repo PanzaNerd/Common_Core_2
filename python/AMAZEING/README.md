@@ -20,13 +20,13 @@ Generate a maze (writes the output file, then opens the interactive display):
 
 	python3 a_maze_ing.py config.txt
 
-Interactive display keys:
+Interactive display menu:
 
 | Key | Action                    |
 |-----|---------------------------|
-| r   | regenerate a new maze     |
-| p   | show/hide shortest path   |
-| c   | change wall colours       |
+| 1   | regenerate a new maze     |
+| 2   | show/hide shortest path   |
+| 3   | change wall colours       |
 | q   | quit                      |
 
 Development targets:

@@ -35,25 +35,31 @@ WALL_COLORS: list[str] = [BLACK, RED, BLUE, MAGENTA, CYAN]
 
 
 def run(gen: MazeGenerator) -> None:
-	"""Loop interattivo: mostra il labirinto e reagisce ai tasti.
+	"""Mostra il labirinto con un menu numerato.
 
-	Tasti: r = rigenera, p = mostra/nascondi percorso, c = cambia colore
-	dei muri, q = esci.
+	1 = rigenera il labirinto, 2 = mostra/nascondi il percorso,
+	3 = cambia il colore dei muri, q = esci.
 	"""
 	show_path = False
 	color_index = 0
 	while True:
 		print(CLEAR)
+		print("===== A-MAZE-ING =====")
 		_print_maze(gen, show_path, WALL_COLORS[color_index])
-		print("r = rigenera | p = percorso on/off | c = colore | q = esci")
-		cmd = input("> ").strip().lower()
-		if cmd == "r":
+		print("+--------------------------------------+")
+		print("| 1) Rigenera labirinto                |")
+		print("| 2) Mostra/nascondi percorso          |")
+		print("| 3) Cambia colore dei muri            |")
+		print("| q) Esci                              |")
+		print("+--------------------------------------+")
+		cmd = input("Scelta > ").strip().lower()
+		if cmd == "1":
 			gen.generate(perfect=gen.perfect, entry=gen.entry,
 			             exit=gen.exit, with_42=True)
 			show_path = False
-		elif cmd == "p":
+		elif cmd == "2":
 			show_path = not show_path
-		elif cmd == "c":
+		elif cmd == "3":
 			color_index = (color_index + 1) % len(WALL_COLORS)
 		elif cmd == "q":
 			break
