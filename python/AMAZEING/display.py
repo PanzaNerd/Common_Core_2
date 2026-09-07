@@ -27,6 +27,8 @@ CYAN: str = "\033[36m"
 NORMAL: str = ""
 BRICK: str = "█"
 DOT: str = "·"
+GRAY_BG: str = "\033[48;5;240m"
+NO_BG: str = "\033[49m"
 RESET: str = "\033[0m"
 CLEAR: str = "\033[2J\033[H"
 
@@ -70,8 +72,9 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 	"""Disegna il labirinto minimale: 1 cella = 1 carattere.
 
 	Muri '─' e '│' con incroci '┼'. Il pattern "42" e' una griglia di
-	mattoncini '█' nel colore di default del terminale (resta tale
-	anche cambiando il colore dei muri). I = entrata, O = uscita,
+	mattoncini '█' su fondo grigio medio: il blocco contrasta sempre
+	(chiaro su terminale scuro, scuro su terminale chiaro) e i
+	mattoncini restano leggibili. I = entrata, O = uscita,
 	percorso = catena di punti '·' verdi.
 	"""
 	path: list[tuple[int, int]] = []
@@ -115,7 +118,7 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 				else:
 					line = line + " "
 			if (x, y) in gen.forty_two:
-				line = line + NORMAL + BRICK + wall_color
+				line = line + GRAY_BG + BRICK + NO_BG + wall_color
 			elif (x, y) == gen.entry:
 				line = line + NORMAL + "I" + wall_color
 			elif (x, y) == gen.exit:
