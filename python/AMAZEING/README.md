@@ -22,12 +22,12 @@ Generate a maze (writes the output file, then opens the interactive display):
 
 Interactive display menu:
 
-| Key | Action                    |
-|-----|---------------------------|
-| 1   | regenerate a new maze     |
-| 2   | show/hide shortest path   |
-| 3   | change wall colours       |
-| q   | quit                      |
+| Key | Action                 |
+|-----|------------------------|
+| 1   | regenerate a new maze  |
+| 2   | show/hide shortest path |
+| 3   | change wall colour     |
+| q   | quit                   |
 
 Development targets:
 
