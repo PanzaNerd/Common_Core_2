@@ -25,9 +25,7 @@ BLUE: str = "\033[34m"
 MAGENTA: str = "\033[35m"
 CYAN: str = "\033[36m"
 NORMAL: str = ""
-BRICK: str = "█"
 DOT: str = "·"
-BG_42: str = "\033[48;5;252m"
 NO_BG: str = "\033[49m"
 RESET: str = "\033[0m"
 CLEAR: str = "\033[2J\033[H"
@@ -35,6 +33,10 @@ CLEAR: str = "\033[2J\033[H"
 # colori dei muri ciclabili con '3' (visibili su sfondo chiaro e scuro;
 # il verde NON c'e': e' riservato alla catena del percorso)
 WALL_COLORS: list[str] = [RED, BLUE, MAGENTA, CYAN]
+
+# stessi colori come SFONDI: riempiono le celle del pattern "42",
+# cosi' il 42 e' un blocco uniforme dello stesso colore dei muri
+WALL_BGS: list[str] = ["\033[41m", "\033[44m", "\033[45m", "\033[46m"]
 
 
 def run(gen: MazeGenerator) -> None:
@@ -49,7 +51,8 @@ def run(gen: MazeGenerator) -> None:
 		print(CLEAR)
 		print("===== A-MAZE-ING =====")
 		print()
-		_print_maze(gen, show_path, WALL_COLORS[color_index])
+		_print_maze(gen, show_path, WALL_COLORS[color_index],
+		            WALL_BGS[color_index])
 		print("+--------------------------------------+")
 		print("| 1) Regenerate maze                   |")
 		print("| 2) Show/hide path                    |")
@@ -69,14 +72,15 @@ def run(gen: MazeGenerator) -> None:
 			break
 
 
-def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
+def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str,
+                wall_bg: str) -> None:
 	"""Disegna il labirinto minimale: 1 cella = 1 carattere.
 
 	Muri '─' e '│' con incroci giusti ('┼', '┬', '┴', '├', '┤', '┌',
-	'┐', '└', '┘'). Il pattern "42" e' una griglia di mattoncini '█':
-	il fondo quasi-bianco sta SOLO dietro i mattoncini, non nelle
-	altre celle. I = entrata, O = uscita, percorso = catena di punti
-	'·' verdi.
+	'┐', '└', '┘'). Le celle del pattern "42" sono quadratini PIENI
+	dello stesso colore dei muri: con i muri interni dello stesso
+	colore il 42 appare come un blocco unico e uniforme. I = entrata,
+	O = uscita, percorso = catena di punti '·' verdi.
 	"""
 	path: list[tuple[int, int]] = []
 	if show_path:
@@ -120,7 +124,7 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 				else:
 					line = line + " "
 			if (x, y) in gen.forty_two:
-				line = line + BG_42 + BRICK + NO_BG + wall_color
+				line = line + wall_bg + " " + NO_BG + wall_color
 			elif (x, y) == gen.entry:
 				line = line + NORMAL + "I" + wall_color
 			elif (x, y) == gen.exit:
