@@ -33,7 +33,9 @@ E: int = 2   # moneta del muro EST
 S: int = 4   # moneta del muro SUD
 W: int = 8   # moneta del muro OVEST
 
-# Disegno della cifra "4" (3 colonne x 4 righe):
+# Disegno della cifra "4" (3 colonne x 6 righe):
+#   # . #
+#   # . #
 #   # . #
 #   # . #
 #   # # #
@@ -41,20 +43,26 @@ W: int = 8   # moneta del muro OVEST
 FOUR: list[tuple[int, int]] = [
 	(0, 0), (2, 0),
 	(0, 1), (2, 1),
-	(0, 2), (1, 2), (2, 2),
-	(2, 3),
+	(0, 2), (2, 2),
+	(0, 3), (2, 3),
+	(0, 4), (1, 4), (2, 4),
+	(2, 5),
 ]
 
-# Disegno della cifra "2" (3 colonne x 4 righe):
+# Disegno della cifra "2" (3 colonne x 6 righe):
 #   # # #
+#   . . #
+#   . . #
 #   . . #
 #   # # #
 #   # # #
 TWO: list[tuple[int, int]] = [
 	(0, 0), (1, 0), (2, 0),
 	(2, 1),
-	(0, 2), (1, 2), (2, 2),
-	(0, 3), (1, 3), (2, 3),
+	(2, 2),
+	(2, 3),
+	(0, 4), (1, 4), (2, 4),
+	(0, 5), (1, 5), (2, 5),
 ]
 
 
@@ -168,10 +176,10 @@ class MazeGenerator:
 		self.has_42 = False
 		if not with_42:
 			return
-		if self.width < 9 or self.height < 6:
+		if self.width < 9 or self.height < 8:
 			return
 		start_x = (self.width - 7) // 2
-		start_y = (self.height - 4) // 2
+		start_y = (self.height - 6) // 2
 		pattern: list[tuple[int, int]] = []
 		for dx, dy in FOUR:
 			pattern.append((start_x + dx, start_y + dy))

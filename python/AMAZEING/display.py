@@ -73,8 +73,8 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 	una sagoma compatta di mattoncini '█' nel colore di default del
 	terminale (resta tale anche cambiando il colore dei muri, cosi' si
 	legge sempre, su sfondo chiaro o scuro). I = entrata, O = uscita,
-	percorso = linea verde continua di 'o' che attraversa anche le
-	aperture tra le celle.
+	percorso = catena di 'x' verdi, una per cella attraversata e una
+	per ogni apertura attraversata: si legge sempre a colpo d'occhio.
 	"""
 	path: list[tuple[int, int]] = []
 	if show_path:
@@ -104,14 +104,14 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 					top = top + "-"
 			else:
 				if (x, y) in path_h:
-					top = top + GREEN + "-" + wall_color
+					top = top + GREEN + "x" + wall_color
 				else:
 					top = top + " "
 			if (x, y) in gen.forty_two or (x + 1, y) in gen.forty_two:
 				top = top + NORMAL + "+" + wall_color
 			else:
 				top = top + "+"
-		print(top)
+		print(wall_color + top)
 
 		middle = ""
 		for x in range(gen.width):
@@ -122,7 +122,7 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 					middle = middle + "|"
 			else:
 				if (x, y) in path_v:
-					middle = middle + GREEN + "|" + wall_color
+					middle = middle + GREEN + "x" + wall_color
 				else:
 					middle = middle + " "
 			if (x, y) in gen.forty_two:
@@ -132,11 +132,11 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 			elif (x, y) == gen.exit:
 				middle = middle + NORMAL + "O" + wall_color
 			elif (x, y) in path:
-				middle = middle + GREEN + "o" + wall_color
+				middle = middle + GREEN + "x" + wall_color
 			else:
 				middle = middle + " "
 		middle = middle + "|"
-		print(middle)
+		print(wall_color + middle)
 
 	bottom = "+"
 	for x in range(gen.width):
@@ -151,5 +151,5 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 			bottom = bottom + NORMAL + "+" + wall_color
 		else:
 			bottom = bottom + "+"
-	print(bottom)
+	print(wall_color + bottom)
 	print(RESET)
