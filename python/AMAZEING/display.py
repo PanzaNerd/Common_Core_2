@@ -25,11 +25,14 @@ YELLOW: str = "\033[33m"
 BLUE: str = "\033[34m"
 MAGENTA: str = "\033[35m"
 CYAN: str = "\033[36m"
-FORTY_TWO: str = "\033[97m"
+BLACK: str = "\033[30m"
+GRAY: str = "\033[37m"
+WHITE_BG: str = "\033[47m"
 RESET: str = "\033[0m"
 CLEAR: str = "\033[2J\033[H"
 
-WALL_COLORS: list[str] = [RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN]
+# colori dei muri ciclabili con 'c' (leggibili su sfondo chiaro)
+WALL_COLORS: list[str] = [BLACK, RED, BLUE, MAGENTA, CYAN, GREEN]
 
 
 def run(gen: MazeGenerator) -> None:
@@ -58,23 +61,25 @@ def run(gen: MazeGenerator) -> None:
 
 
 def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
-	"""Disegna il labirinto con il carattere blocco '█'.
+	"""Disegna il labirinto con il carattere blocco '█' su sfondo chiaro.
 
-	I muri sono blocchi pieni, i passaggi spazi vuoti. Le celle del
-	pattern "42" sono riempite con un blocco bianco brillante (cosi'
-	il 42 e' ben visibile come silhouette piena). I = entrata,
-	O = uscita, . = percorso.
+	Stile del rendering di default del subject: sfondo bianco, muri
+	scuri, pattern "42" come silhouette grigia compatta. I = entrata
+	(blu), O = uscita (rossa), . = percorso (verde).
 	"""
 	path: list[tuple[int, int]] = []
 	if show_path:
 		path = gen.solve()
 
-	print(wall_color)
+	print(WHITE_BG + wall_color)
 	for y in range(gen.height):
 		top = "█"
 		for x in range(gen.width):
 			if (gen.grid[y][x] & N) != 0:
-				top = top + "██"
+				if (x, y) in gen.forty_two and (x, y - 1) in gen.forty_two:
+					top = top + GRAY + "██" + wall_color
+				else:
+					top = top + "██"
 			else:
 				top = top + " █"
 		print(top)
@@ -82,15 +87,18 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 		middle = ""
 		for x in range(gen.width):
 			if (gen.grid[y][x] & W) != 0:
-				middle = middle + "█"
+				if (x, y) in gen.forty_two and (x - 1, y) in gen.forty_two:
+					middle = middle + GRAY + "█" + wall_color
+				else:
+					middle = middle + "█"
 			else:
 				middle = middle + " "
 			if (x, y) in gen.forty_two:
-				middle = middle + FORTY_TWO + "█" + wall_color
+				middle = middle + GRAY + "█" + wall_color
 			elif (x, y) == gen.entry:
-				middle = middle + YELLOW + "I" + wall_color
+				middle = middle + BLUE + "I" + wall_color
 			elif (x, y) == gen.exit:
-				middle = middle + YELLOW + "O" + wall_color
+				middle = middle + RED + "O" + wall_color
 			elif (x, y) in path:
 				middle = middle + GREEN + "." + wall_color
 			else:
