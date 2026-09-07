@@ -73,28 +73,14 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 	"""Disegna il labirinto minimale: 1 cella = 1 carattere.
 
 	Muri '─' e '│' con incroci giusti ('┼', '┬', '┴', '├', '┤', '┌',
-	'┐', '└', '┘'). Il pattern "42" e' un blocco unico: TUTTA l'area
-	coperta dalle due cifre (buchi e spazio tra 4 e 2 compresi) ha il
-	fondo quasi-bianco, con i mattoncini '█' sopra. I = entrata,
-	O = uscita, percorso = catena di punti '·' verdi.
+	'┐', '└', '┘'). Il pattern "42" e' una griglia di mattoncini '█':
+	il fondo quasi-bianco sta SOLO dietro i mattoncini, non nelle
+	altre celle. I = entrata, O = uscita, percorso = catena di punti
+	'·' verdi.
 	"""
 	path: list[tuple[int, int]] = []
 	if show_path:
 		path = gen.solve()
-
-	x_min = gen.width
-	x_max = -1
-	y_min = gen.height
-	y_max = -1
-	for cell in gen.forty_two:
-		if cell[0] < x_min:
-			x_min = cell[0]
-		if cell[0] > x_max:
-			x_max = cell[0]
-		if cell[1] < y_min:
-			y_min = cell[1]
-		if cell[1] > y_max:
-			y_max = cell[1]
 
 	path_n: list[tuple[int, int]] = []
 	path_w: list[tuple[int, int]] = []
@@ -133,11 +119,8 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 					line = line + GREEN + DOT + wall_color
 				else:
 					line = line + " "
-			if gen.has_42 and x_min <= x <= x_max and y_min <= y <= y_max:
-				if (x, y) in gen.forty_two:
-					line = line + BG_42 + BRICK + NO_BG + wall_color
-				else:
-					line = line + BG_42 + " " + NO_BG + wall_color
+			if (x, y) in gen.forty_two:
+				line = line + BG_42 + BRICK + NO_BG + wall_color
 			elif (x, y) == gen.entry:
 				line = line + NORMAL + "I" + wall_color
 			elif (x, y) == gen.exit:
