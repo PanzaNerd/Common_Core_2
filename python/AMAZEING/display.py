@@ -48,6 +48,7 @@ def run(gen: MazeGenerator) -> None:
 	while True:
 		print(CLEAR)
 		print("===== A-MAZE-ING =====")
+		print()
 		_print_maze(gen, show_path, WALL_COLORS[color_index])
 		print("+--------------------------------------+")
 		print("| 1) Regenerate maze                   |")
@@ -96,8 +97,9 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 			path_w.append((x1, y1))
 
 	for y in range(gen.height):
-		wall = "┼"
+		wall = ""
 		for x in range(gen.width):
+			wall = wall + _junction(gen, x, y)
 			if (gen.grid[y][x] & N) != 0:
 				wall = wall + "─"
 			else:
@@ -105,7 +107,7 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 					wall = wall + GREEN + DOT + wall_color
 				else:
 					wall = wall + " "
-			wall = wall + "┼"
+		wall = wall + _junction(gen, gen.width, y)
 		print(wall_color + wall)
 
 		line = ""
@@ -130,12 +132,68 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 		line = line + "│"
 		print(wall_color + line)
 
-	bottom = "┼"
+	bottom = ""
 	for x in range(gen.width):
+		bottom = bottom + _junction(gen, x, gen.height)
 		if (gen.grid[gen.height - 1][x] & S) != 0:
 			bottom = bottom + "─"
 		else:
 			bottom = bottom + " "
-		bottom = bottom + "┼"
+	bottom = bottom + _junction(gen, gen.width, gen.height)
 	print(wall_color + bottom)
 	print(RESET)
+
+
+def _junction(gen: MazeGenerator, x: int, y: int) -> str:
+	"""Carattere del nodo della griglia alla colonna x della linea di muro y.
+
+	Guarda se dal nodo partono muri verso sinistra, destra, sopra e
+	sotto e sceglie il glifo giusto ('┼', '┬', '┴', '├', '┤', '┌',
+	'┐', '└', '┘', '─', '│'). Per la linea di fondo (y == height)
+	guarda i muri S dell'ultima riga.
+	"""
+	if y < gen.height:
+		left = x > 0 and (gen.grid[y][x - 1] & N) != 0
+		right = x < gen.width and (gen.grid[y][x] & N) != 0
+		if x < gen.width:
+			up = y > 0 and (gen.grid[y - 1][x] & W) != 0
+			down = (gen.grid[y][x] & W) != 0
+		else:
+			up = y > 0
+			down = True
+	else:
+		left = x > 0 and (gen.grid[gen.height - 1][x - 1] & S) != 0
+		right = x < gen.width and (gen.grid[gen.height - 1][x] & S) != 0
+		if x < gen.width:
+			up = (gen.grid[gen.height - 1][x] & W) != 0
+		else:
+			up = True
+		down = False
+
+	if up and down and left and right:
+		return "┼"
+	if up and down and left:
+		return "┤"
+	if up and down and right:
+		return "├"
+	if left and right and up:
+		return "┴"
+	if left and right and down:
+		return "┬"
+	if left and right:
+		return "─"
+	if up and down:
+		return "│"
+	if left and up:
+		return "┘"
+	if left and down:
+		return "┐"
+	if right and up:
+		return "└"
+	if right and down:
+		return "┌"
+	if left or right:
+		return "─"
+	if up or down:
+		return "│"
+	return " "
