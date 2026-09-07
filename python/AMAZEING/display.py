@@ -10,14 +10,14 @@
 #                                                                              #
 # **************************************************************************** #
 
-"""Visualizzazione del labirinto nel terminale (box-drawing, interattivo).
+"""Visualizzazione del labirinto nel terminale (ASCII minimale, interattivo).
 
-Muri continui in box-drawing: '───' orizzontali, '│' verticali, ogni
-incrocio marcato con '┼'. Ogni cella occupa 3 colonne: un labirinto
-20x15 e' largo 61 caratteri.
+Ogni cella occupa UN carattere e ogni muro UN carattere '#' (solo
+ASCII di base: identico in qualsiasi terminale). Un labirinto 20x15 e'
+largo 41 caratteri.
 """
 
-from mazegen import N, S, W, MazeGenerator
+from mazegen import E, N, S, MazeGenerator
 
 RED: str = "\033[31m"
 GREEN: str = "\033[32m"
@@ -67,85 +67,71 @@ def run(gen: MazeGenerator) -> None:
 
 
 def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
-	"""Disegna il labirinto in box-drawing con muri continui.
+	"""Disegna il labirinto minimale: 1 cella = 1 carattere.
 
-	Muri orizzontali '───', verticali '│', incroci '┼'. Il pattern
-	"42" e' un blocco pieno di mattoncini '█' nel colore di default
-	del terminale (resta tale anche cambiando il colore dei muri).
-	I = entrata, O = uscita, percorso = catena di punti '·' verdi.
+	Muri '#' di un solo carattere. Il pattern "42" e' una griglia di
+	mattoncini '█' nel colore di default del terminale (resta tale
+	anche cambiando il colore dei muri). I = entrata, O = uscita,
+	percorso = catena di punti '·' verdi.
 	"""
 	path: list[tuple[int, int]] = []
 	if show_path:
 		path = gen.solve()
 
-	path_h: list[tuple[int, int]] = []
-	path_v: list[tuple[int, int]] = []
+	path_n: list[tuple[int, int]] = []
+	path_e: list[tuple[int, int]] = []
 	for i in range(len(path) - 1):
 		x1, y1 = path[i]
 		x2, y2 = path[i + 1]
 		if y2 == y1 - 1:
-			path_h.append((x1, y1))
+			path_n.append((x1, y1))
 		elif y2 == y1 + 1:
-			path_h.append((x2, y2))
+			path_n.append((x2, y2))
 		elif x2 == x1 + 1:
-			path_v.append((x2, y2))
+			path_e.append((x1, y1))
 		else:
-			path_v.append((x1, y1))
+			path_e.append((x2, y2))
 
 	for y in range(gen.height):
-		top = ""
+		wall = "#"
 		for x in range(gen.width):
 			if (gen.grid[y][x] & N) != 0:
-				if (x, y) in gen.forty_two or (x, y - 1) in gen.forty_two:
-					top = top + NORMAL + BRICK * 4 + wall_color
-				else:
-					top = top + "┼───"
+				wall = wall + "#"
 			else:
-				if (x, y) in path_h:
-					top = top + "┼" + GREEN + DOT + "  " + wall_color
+				if (x, y) in path_n:
+					wall = wall + GREEN + DOT + wall_color
 				else:
-					top = top + "┼   "
-		print(wall_color + top + "┼")
+					wall = wall + " "
+			wall = wall + "#"
+		print(wall_color + wall)
 
-		middle = ""
+		line = "#"
 		for x in range(gen.width):
-			if (gen.grid[y][x] & W) != 0:
-				if (x, y) in gen.forty_two or (x - 1, y) in gen.forty_two:
-					middle = middle + NORMAL + BRICK + wall_color
-				else:
-					middle = middle + "│"
-			else:
-				if (x, y) in path_v:
-					middle = middle + GREEN + DOT + wall_color
-				else:
-					middle = middle + " "
 			if (x, y) in gen.forty_two:
-				middle = middle + NORMAL + BRICK + BRICK + wall_color
+				line = line + NORMAL + BRICK + wall_color
 			elif (x, y) == gen.entry:
-				middle = middle + NORMAL + "I " + wall_color
+				line = line + NORMAL + "I" + wall_color
 			elif (x, y) == gen.exit:
-				middle = middle + NORMAL + "O " + wall_color
+				line = line + NORMAL + "O" + wall_color
 			elif (x, y) in path:
-				middle = middle + GREEN + DOT + DOT + wall_color
+				line = line + GREEN + DOT + wall_color
 			else:
-				middle = middle + "  "
-		if (gen.width - 1, y) in gen.forty_two:
-			middle = middle + NORMAL + BRICK + wall_color
-		else:
-			middle = middle + "│"
-		print(wall_color + middle)
+				line = line + " "
+			if (gen.grid[y][x] & E) != 0:
+				line = line + "#"
+			else:
+				if (x, y) in path_e:
+					line = line + GREEN + DOT + wall_color
+				else:
+					line = line + " "
+		print(wall_color + line)
 
-	bottom = ""
+	bottom = "#"
 	for x in range(gen.width):
 		if (gen.grid[gen.height - 1][x] & S) != 0:
-			if (x, gen.height - 1) in gen.forty_two or (x, gen.height - 2) in gen.forty_two:
-				bottom = bottom + NORMAL + BRICK * 4 + wall_color
-			else:
-				bottom = bottom + "┼───"
+			bottom = bottom + "#"
 		else:
-			if (x, gen.height - 1) in path_h:
-				bottom = bottom + "┼" + GREEN + DOT + "  " + wall_color
-			else:
-				bottom = bottom + "┼   "
-	print(wall_color + bottom + "┼")
+			bottom = bottom + " "
+		bottom = bottom + "#"
+	print(wall_color + bottom)
 	print(RESET)
