@@ -10,18 +10,17 @@
 #                                                                              #
 # **************************************************************************** #
 
-"""Visualizzazione del labirinto nel terminale (a blocchi, interattivo).
+"""Visualizzazione del labirinto nel terminale (ASCII sottile, interattivo).
 
-Ogni cella occupa 2 colonne di caratteri e i muri sono disegnati con il
-carattere blocco '█': il labirinto 20x15 occupa 41 colonne, cosi' entra
-in qualsiasi terminale senza andare a capo.
+I muri sono disegnati con il carattere '#' (un solo carattere, visibile
+in qualsiasi terminale e con qualsiasi font). Ogni cella occupa 2
+colonne: un labirinto 20x15 e' largo 41 caratteri.
 """
 
-from mazegen import N, W, MazeGenerator
+from mazegen import N, S, W, MazeGenerator
 
 RED: str = "\033[31m"
 GREEN: str = "\033[32m"
-YELLOW: str = "\033[33m"
 BLUE: str = "\033[34m"
 MAGENTA: str = "\033[35m"
 CYAN: str = "\033[36m"
@@ -61,12 +60,12 @@ def run(gen: MazeGenerator) -> None:
 
 
 def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
-	"""Disegna il labirinto con il carattere blocco '█' su sfondo chiaro.
+	"""Disegna il labirinto in ASCII sottile su sfondo chiaro.
 
-	Stile del rendering di default del subject: sfondo bianco, muri
-	scuri, pattern "42" come silhouette nera compatta. I = entrata
-	(blu), O = uscita (rossa), percorso = striscia verde continua
-	(attraversa anche le aperture tra le celle).
+	I muri sono '#', i passaggi spazi vuoti. Il pattern "42" e' una
+	silhouette nera compatta (resta nera anche cambiando il colore dei
+	muri, cosi' si legge sempre). I = entrata, O = uscita, percorso =
+	striscia verde continua (attraversa anche le aperture tra le celle).
 	"""
 	path: list[tuple[int, int]] = []
 	if show_path:
@@ -88,45 +87,52 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 
 	print(WHITE_BG + wall_color)
 	for y in range(gen.height):
-		top = "█"
+		top = "#"
 		for x in range(gen.width):
 			if (gen.grid[y][x] & N) != 0:
-				if (x, y) in gen.forty_two and (x, y - 1) in gen.forty_two:
-					top = top + BLACK + "██" + wall_color
+				if (x, y) in gen.forty_two or (x, y - 1) in gen.forty_two:
+					top = top + BLACK + "#" + wall_color
 				else:
-					top = top + "██"
+					top = top + "#"
 			else:
 				if (x, y) in path_h:
-					top = top + GREEN + "█" + wall_color + "█"
+					top = top + GREEN + "#" + wall_color
 				else:
-					top = top + " █"
+					top = top + " "
 		print(top)
 
 		middle = ""
 		for x in range(gen.width):
 			if (gen.grid[y][x] & W) != 0:
-				if (x, y) in gen.forty_two and (x - 1, y) in gen.forty_two:
-					middle = middle + BLACK + "█" + wall_color
+				if (x, y) in gen.forty_two or (x - 1, y) in gen.forty_two:
+					middle = middle + BLACK + "#" + wall_color
 				else:
-					middle = middle + "█"
+					middle = middle + "#"
 			else:
 				if (x, y) in path_v:
-					middle = middle + GREEN + "█" + wall_color
+					middle = middle + GREEN + "#" + wall_color
 				else:
 					middle = middle + " "
 			if (x, y) in gen.forty_two:
-				middle = middle + BLACK + "█" + wall_color
+				middle = middle + BLACK + "#" + wall_color
 			elif (x, y) == gen.entry:
 				middle = middle + BLACK + "I" + wall_color
 			elif (x, y) == gen.exit:
 				middle = middle + BLACK + "O" + wall_color
 			elif (x, y) in path:
-				middle = middle + GREEN + "█" + wall_color
+				middle = middle + GREEN + "#" + wall_color
 			else:
 				middle = middle + " "
-		middle = middle + "█"
 		print(middle)
 
-	bottom = "█" + "██" * gen.width
+	bottom = "#"
+	for x in range(gen.width):
+		if (gen.grid[gen.height - 1][x] & S) != 0:
+			if (x, gen.height - 1) in gen.forty_two or (x, gen.height - 2) in gen.forty_two:
+				bottom = bottom + BLACK + "#" + wall_color
+			else:
+				bottom = bottom + "#"
+		else:
+			bottom = bottom + " "
 	print(bottom)
 	print(RESET)
