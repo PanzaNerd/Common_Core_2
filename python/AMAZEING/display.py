@@ -30,8 +30,9 @@ WHITE_BG: str = "\033[47m"
 RESET: str = "\033[0m"
 CLEAR: str = "\033[2J\033[H"
 
-# colori dei muri ciclabili con 'c' (leggibili su sfondo chiaro)
-WALL_COLORS: list[str] = [BLACK, RED, BLUE, MAGENTA, CYAN, GREEN]
+# colori dei muri ciclabili con 'c' (leggibili su sfondo chiaro;
+# il verde NON c'e': e' riservato alla striscia del percorso)
+WALL_COLORS: list[str] = [BLACK, RED, BLUE, MAGENTA, CYAN]
 
 
 def run(gen: MazeGenerator) -> None:
@@ -116,9 +117,9 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 			if (x, y) in gen.forty_two:
 				middle = middle + BLACK + "█" + wall_color
 			elif (x, y) == gen.entry:
-				middle = middle + BLUE + "I" + wall_color
+				middle = middle + BLACK + "I" + wall_color
 			elif (x, y) == gen.exit:
-				middle = middle + RED + "O" + wall_color
+				middle = middle + BLACK + "O" + wall_color
 			elif (x, y) in path:
 				middle = middle + GREEN + "█" + wall_color
 			else:
