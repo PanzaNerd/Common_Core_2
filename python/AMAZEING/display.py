@@ -10,12 +10,11 @@
 #                                                                              #
 # **************************************************************************** #
 
-"""Visualizzazione del labirinto nel terminale (ASCII classico, interattivo).
+"""Visualizzazione del labirinto nel terminale (box-drawing, interattivo).
 
-Muri spessi e continui: '###' orizzontali, '#' verticali, ogni angolo
-marcato con '+'. Solo caratteri ASCII di base: identici in qualsiasi
-terminale e con qualsiasi font. Ogni cella occupa 3 colonne: un
-labirinto 20x15 e' largo 61 caratteri.
+Muri continui in box-drawing: '───' orizzontali, '│' verticali, ogni
+incrocio marcato con '┼'. Ogni cella occupa 3 colonne: un labirinto
+20x15 e' largo 61 caratteri.
 """
 
 from mazegen import N, S, W, MazeGenerator
@@ -27,6 +26,7 @@ MAGENTA: str = "\033[35m"
 CYAN: str = "\033[36m"
 NORMAL: str = ""
 BRICK: str = "█"
+DOT: str = "·"
 RESET: str = "\033[0m"
 CLEAR: str = "\033[2J\033[H"
 
@@ -67,12 +67,12 @@ def run(gen: MazeGenerator) -> None:
 
 
 def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
-	"""Disegna il labirinto in ASCII classico con muri spessi.
+	"""Disegna il labirinto in box-drawing con muri continui.
 
-	Muri orizzontali '###', verticali '#', angoli '+'. Il pattern "42"
-	e' un blocco pieno di mattoncini '█' nel colore di default del
-	terminale (resta tale anche cambiando il colore dei muri). I =
-	entrata, O = uscita, percorso = catena di 'x' verdi.
+	Muri orizzontali '───', verticali '│', incroci '┼'. Il pattern
+	"42" e' un blocco pieno di mattoncini '█' nel colore di default
+	del terminale (resta tale anche cambiando il colore dei muri).
+	I = entrata, O = uscita, percorso = catena di punti '·' verdi.
 	"""
 	path: list[tuple[int, int]] = []
 	if show_path:
@@ -97,15 +97,15 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 		for x in range(gen.width):
 			if (gen.grid[y][x] & N) != 0:
 				if (x, y) in gen.forty_two or (x, y - 1) in gen.forty_two:
-					top = top + NORMAL + BRICK + BRICK + BRICK + wall_color
+					top = top + NORMAL + BRICK * 4 + wall_color
 				else:
-					top = top + "+##"
+					top = top + "┼───"
 			else:
 				if (x, y) in path_h:
-					top = top + "+" + GREEN + "xx" + wall_color
+					top = top + "┼" + GREEN + DOT + "  " + wall_color
 				else:
-					top = top + "+  "
-		print(wall_color + top + "+")
+					top = top + "┼   "
+		print(wall_color + top + "┼")
 
 		middle = ""
 		for x in range(gen.width):
@@ -113,10 +113,10 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 				if (x, y) in gen.forty_two or (x - 1, y) in gen.forty_two:
 					middle = middle + NORMAL + BRICK + wall_color
 				else:
-					middle = middle + "#"
+					middle = middle + "│"
 			else:
 				if (x, y) in path_v:
-					middle = middle + GREEN + "x" + wall_color
+					middle = middle + GREEN + DOT + wall_color
 				else:
 					middle = middle + " "
 			if (x, y) in gen.forty_two:
@@ -126,23 +126,26 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 			elif (x, y) == gen.exit:
 				middle = middle + NORMAL + "O " + wall_color
 			elif (x, y) in path:
-				middle = middle + GREEN + "xx" + wall_color
+				middle = middle + GREEN + DOT + DOT + wall_color
 			else:
 				middle = middle + "  "
 		if (gen.width - 1, y) in gen.forty_two:
 			middle = middle + NORMAL + BRICK + wall_color
 		else:
-			middle = middle + "#"
+			middle = middle + "│"
 		print(wall_color + middle)
 
 	bottom = ""
 	for x in range(gen.width):
 		if (gen.grid[gen.height - 1][x] & S) != 0:
 			if (x, gen.height - 1) in gen.forty_two or (x, gen.height - 2) in gen.forty_two:
-				bottom = bottom + NORMAL + BRICK + BRICK + BRICK + wall_color
+				bottom = bottom + NORMAL + BRICK * 4 + wall_color
 			else:
-				bottom = bottom + "+##"
+				bottom = bottom + "┼───"
 		else:
-			bottom = bottom + "+  "
-	print(wall_color + bottom + "+")
+			if (x, gen.height - 1) in path_h:
+				bottom = bottom + "┼" + GREEN + DOT + "  " + wall_color
+			else:
+				bottom = bottom + "┼   "
+	print(wall_color + bottom + "┼")
 	print(RESET)
