@@ -12,10 +12,10 @@
 
 """Visualizzazione del labirinto nel terminale (ASCII classico, interattivo).
 
-I muri orizzontali sono '-', i verticali '|', gli incroci '+': caratteri
-ASCII presenti in qualsiasi terminale e con qualsiasi font. Lo sfondo
-non viene forzato: vale il tema del terminale. Ogni cella occupa 2
-colonne: un labirinto 20x15 e' largo 41 caratteri.
+Muri spessi e continui: '###' orizzontali, '#' verticali, ogni angolo
+marcato con '+'. Solo caratteri ASCII di base: identici in qualsiasi
+terminale e con qualsiasi font. Ogni cella occupa 3 colonne: un
+labirinto 20x15 e' largo 61 caratteri.
 """
 
 from mazegen import N, S, W, MazeGenerator
@@ -31,7 +31,7 @@ RESET: str = "\033[0m"
 CLEAR: str = "\033[2J\033[H"
 
 # colori dei muri ciclabili con '3' (visibili su sfondo chiaro e scuro;
-# il verde NON c'e': e' riservato alla linea del percorso)
+# il verde NON c'e': e' riservato alla catena del percorso)
 WALL_COLORS: list[str] = [RED, BLUE, MAGENTA, CYAN]
 
 
@@ -67,14 +67,12 @@ def run(gen: MazeGenerator) -> None:
 
 
 def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
-	"""Disegna il labirinto in ASCII classico.
+	"""Disegna il labirinto in ASCII classico con muri spessi.
 
-	Muri: '-' e '|', incroci '+', passaggi = spazi. Il pattern "42" e'
-	una sagoma compatta di mattoncini '█' nel colore di default del
-	terminale (resta tale anche cambiando il colore dei muri, cosi' si
-	legge sempre, su sfondo chiaro o scuro). I = entrata, O = uscita,
-	percorso = catena di 'x' verdi, una per cella attraversata e una
-	per ogni apertura attraversata: si legge sempre a colpo d'occhio.
+	Muri orizzontali '###', verticali '#', angoli '+'. Il pattern "42"
+	e' un blocco pieno di mattoncini '█' nel colore di default del
+	terminale (resta tale anche cambiando il colore dei muri). I =
+	entrata, O = uscita, percorso = catena di 'x' verdi.
 	"""
 	path: list[tuple[int, int]] = []
 	if show_path:
@@ -95,23 +93,19 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 			path_v.append((x1, y1))
 
 	for y in range(gen.height):
-		top = "+"
+		top = ""
 		for x in range(gen.width):
 			if (gen.grid[y][x] & N) != 0:
 				if (x, y) in gen.forty_two or (x, y - 1) in gen.forty_two:
-					top = top + NORMAL + BRICK + wall_color
+					top = top + NORMAL + BRICK + BRICK + BRICK + wall_color
 				else:
-					top = top + "-"
+					top = top + "+##"
 			else:
 				if (x, y) in path_h:
-					top = top + GREEN + "x" + wall_color
+					top = top + "+" + GREEN + "xx" + wall_color
 				else:
-					top = top + " "
-			if (x, y) in gen.forty_two or (x + 1, y) in gen.forty_two:
-				top = top + NORMAL + BRICK + wall_color
-			else:
-				top = top + "+"
-		print(wall_color + top)
+					top = top + "+  "
+		print(wall_color + top + "+")
 
 		middle = ""
 		for x in range(gen.width):
@@ -119,37 +113,36 @@ def _print_maze(gen: MazeGenerator, show_path: bool, wall_color: str) -> None:
 				if (x, y) in gen.forty_two or (x - 1, y) in gen.forty_two:
 					middle = middle + NORMAL + BRICK + wall_color
 				else:
-					middle = middle + "|"
+					middle = middle + "#"
 			else:
 				if (x, y) in path_v:
 					middle = middle + GREEN + "x" + wall_color
 				else:
 					middle = middle + " "
 			if (x, y) in gen.forty_two:
-				middle = middle + NORMAL + BRICK + wall_color
+				middle = middle + NORMAL + BRICK + BRICK + wall_color
 			elif (x, y) == gen.entry:
-				middle = middle + NORMAL + "I" + wall_color
+				middle = middle + NORMAL + "I " + wall_color
 			elif (x, y) == gen.exit:
-				middle = middle + NORMAL + "O" + wall_color
+				middle = middle + NORMAL + "O " + wall_color
 			elif (x, y) in path:
-				middle = middle + GREEN + "x" + wall_color
+				middle = middle + GREEN + "xx" + wall_color
 			else:
-				middle = middle + " "
-		middle = middle + "|"
+				middle = middle + "  "
+		if (gen.width - 1, y) in gen.forty_two:
+			middle = middle + NORMAL + BRICK + wall_color
+		else:
+			middle = middle + "#"
 		print(wall_color + middle)
 
-	bottom = "+"
+	bottom = ""
 	for x in range(gen.width):
 		if (gen.grid[gen.height - 1][x] & S) != 0:
 			if (x, gen.height - 1) in gen.forty_two or (x, gen.height - 2) in gen.forty_two:
-				bottom = bottom + NORMAL + BRICK + wall_color
+				bottom = bottom + NORMAL + BRICK + BRICK + BRICK + wall_color
 			else:
-				bottom = bottom + "-"
+				bottom = bottom + "+##"
 		else:
-			bottom = bottom + " "
-		if (x, gen.height - 1) in gen.forty_two or (x + 1, gen.height - 1) in gen.forty_two:
-			bottom = bottom + NORMAL + BRICK + wall_color
-		else:
-			bottom = bottom + "+"
-	print(wall_color + bottom)
+			bottom = bottom + "+  "
+	print(wall_color + bottom + "+")
 	print(RESET)

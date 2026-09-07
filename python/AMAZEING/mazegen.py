@@ -33,9 +33,7 @@ E: int = 2   # moneta del muro EST
 S: int = 4   # moneta del muro SUD
 W: int = 8   # moneta del muro OVEST
 
-# Disegno della cifra "4" (3 colonne x 6 righe):
-#   # . #
-#   # . #
+# Disegno della cifra "4" (3 colonne x 4 righe):
 #   # . #
 #   # . #
 #   # # #
@@ -43,40 +41,33 @@ W: int = 8   # moneta del muro OVEST
 FOUR: list[tuple[int, int]] = [
 	(0, 0), (2, 0),
 	(0, 1), (2, 1),
-	(0, 2), (2, 2),
-	(0, 3), (2, 3),
-	(0, 4), (1, 4), (2, 4),
-	(2, 5),
+	(0, 2), (1, 2), (2, 2),
+	(2, 3),
 ]
 
 # Buchi interni della cifra "4" (restano chiusi, cosi' la cifra si
 # legge perfettamente):
 FOUR_HOLES: list[tuple[int, int]] = [
-	(1, 0), (1, 1), (1, 2), (1, 3),
-	(0, 5), (1, 5),
+	(1, 0), (1, 1),
+	(0, 3), (1, 3),
 ]
 
-# Disegno della cifra "2" (3 colonne x 6 righe):
+# Disegno della cifra "2" (3 colonne x 4 righe): lati di 3 caselle che
+# si incrociano a 90 gradi, tutti gli spigoli visibili.
 #   # # #
-#   . . #
-#   . . #
 #   . . #
 #   # # #
 #   # # #
 TWO: list[tuple[int, int]] = [
 	(0, 0), (1, 0), (2, 0),
 	(2, 1),
-	(2, 2),
-	(2, 3),
-	(0, 4), (1, 4), (2, 4),
-	(0, 5), (1, 5), (2, 5),
+	(0, 2), (1, 2), (2, 2),
+	(0, 3), (1, 3), (2, 3),
 ]
 
 # Buchi interni della cifra "2" (restano chiusi):
 TWO_HOLES: list[tuple[int, int]] = [
 	(0, 1), (1, 1),
-	(0, 2), (1, 2),
-	(0, 3), (1, 3),
 ]
 
 
@@ -182,10 +173,10 @@ class MazeGenerator:
 		self.has_42 = False
 		if not with_42:
 			return
-		if self.width < 9 or self.height < 8:
+		if self.width < 9 or self.height < 6:
 			return
 		start_x = (self.width - 7) // 2
-		start_y = (self.height - 6) // 2
+		start_y = (self.height - 4) // 2
 		pattern: list[tuple[int, int]] = []
 		holes: list[tuple[int, int]] = []
 		for dx, dy in FOUR:
