@@ -1,12 +1,4 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    __init__.py                                        :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:36:45 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:36:46 by matthias         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+from .strategies import (AggressiveStrategy, BattleStrategy,
+	DefensiveStrategy, NormalStrategy, StrategyError)
 
+__all__ = ['AggressiveStrategy', 'BattleStrategy', 'DefensiveStrategy', 'NormalStrategy', 'StrategyError']

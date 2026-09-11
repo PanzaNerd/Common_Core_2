@@ -3,24 +3,28 @@
 #                                                         :::      ::::::::    #
 #    ft_custom_errors.py                                :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 10:00:00 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 10:00:00 by matthias         ###   ########.fr        #
+#    Created: 2026/09/02 10:00:00 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/02 10:00:00 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
 class GardenError(Exception):
+
 	def __init__(self, message: str = "Unknown garden error"):
 		super().__init__(message)
 
 
 class PlantError(GardenError):
+
 	def __init__(self, message: str = "Unknown plant error"):
 		super().__init__(message)
 
 
 class WaterError(GardenError):
+
 	def __init__(self, message: str = "Unknown water error"):
 		super().__init__(message)
 

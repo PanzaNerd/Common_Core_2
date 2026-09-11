@@ -3,15 +3,17 @@
 #                                                         :::      ::::::::    #
 #    ft_first_exception.py                              :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/31 16:18:39 by matthias          #+#    #+#              #
-#    Updated: 2026/08/31 16:19:49 by matthias         ###   ########.fr        #
+#    Created: 2026/08/31 16:18:39 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/31 16:19:49 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
 def input_temperature(temp_str: str) -> int:
       return int(temp_str)
+
 
 def test_temperature() -> None:
       print("=== Garden Temperature ===")

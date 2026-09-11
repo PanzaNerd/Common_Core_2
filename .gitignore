@@ -6,9 +6,12 @@ __pycache__/
 *.tgz
 *.whl
 python/AMAZEING/output_validator.py
-
 dist/
 build/
 *.egg-info/
 *.md
 .venv/
+ancient_fragment.txt
+new_fragment.txt
+matrix_analysis.png
+matrix_env/

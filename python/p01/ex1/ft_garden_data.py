@@ -3,14 +3,16 @@
 #                                                         :::      ::::::::    #
 #    ft_garden_data.py                                  :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/27 18:21:32 by matthias          #+#    #+#              #
-#    Updated: 2026/08/27 18:37:16 by matthias         ###   ########.fr        #
+#    Created: 2026/08/27 18:21:32 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/27 18:37:16 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
 class Plant:
+
 	def __init__(self, name: str, height: float, age: int) -> None:
 		self.name = name
 		self.height = height

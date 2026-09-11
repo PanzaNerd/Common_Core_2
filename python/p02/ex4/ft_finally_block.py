@@ -6,16 +6,19 @@
 #    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/09/02 12:00:00 by matthias          #+#    #+#              #
-#    Updated: 2026/09/10 18:35:30 by mpanzani         ###   ########.fr        #
+#    Updated: 2026/09/11 17:45:13 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
 class GardenError(Exception):
+
 	def __init__(self, message: str = "Unknown garden error"):
 		super().__init__(message)
 
 
 class PlantError(GardenError):
+
 	def __init__(self, message: str = "Unknown plant error"):
 		super().__init__(message)
 

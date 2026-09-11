@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    higher_magic.py                                    :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:37:33 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:37:34 by matthias         ###   ########.fr        #
+#    Created: 2026/09/02 18:37:33 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/02 18:37:34 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

@@ -3,12 +3,13 @@
 #                                                         :::      ::::::::    #
 #    ft_raise_exception.py                              :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/31 17:06:11 by matthias          #+#    #+#              #
-#    Updated: 2026/08/31 17:07:25 by matthias         ###   ########.fr        #
+#    Created: 2026/08/31 17:06:11 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/31 17:07:25 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
 
 def input_temperature(temp_str: str) -> int:
       temperature = int(temp_str)
@@ -17,6 +18,7 @@ def input_temperature(temp_str: str) -> int:
       if temperature < 0:
               raise ValueError(f"{temperature}°C is too cold for plants (min 0°C)")
       return temperature
+
 
 def test_temperature() -> None:
       print("=== Garden Temperature Checker ===")

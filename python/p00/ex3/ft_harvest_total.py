@@ -3,12 +3,13 @@
 #                                                         :::      ::::::::    #
 #    ft_harvest_total.py                                :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/12 15:52:36 by matthias          #+#    #+#              #
-#    Updated: 2026/08/12 16:00:19 by matthias         ###   ########.fr        #
+#    Created: 2026/08/12 15:52:36 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/12 16:00:19 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
 
 def ft_harvest_total():
 	day1 = int(input("Day 1 harvest: "))

@@ -3,14 +3,16 @@
 #                                                         :::      ::::::::    #
 #    ft_plant_types.py                                  :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/28 13:10:00 by matthias          #+#    #+#              #
-#    Updated: 2026/08/28 18:37:53 by matthias         ###   ########.fr        #
+#    Created: 2026/08/28 13:10:00 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/28 18:37:53 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
 class Plant:
+
 	def __init__(self, name: str, height: float, age: int) -> None:
 		self.name = name
 		self._height = height
@@ -27,6 +29,7 @@ class Plant:
 
 
 class Flower(Plant):
+
 	def __init__(self, name: str, height: float, age: int, color: str) -> None:
 		super().__init__(name, height, age)
 		self.color = color
@@ -40,6 +43,7 @@ class Flower(Plant):
 
 
 class Tree(Plant):
+
 	def __init__(self, name: str, height: float, age: int, trunk_diameter: float) -> None:
 		super().__init__(name, height, age)
 		self.trunk_diameter = trunk_diameter
@@ -53,6 +57,7 @@ class Tree(Plant):
 
 
 class Vegetable(Plant):
+
 	def __init__(self, name: str, height: float, age: int, harvest_season: str) -> None:
 		super().__init__(name, height, age)
 		self.harvest_season = harvest_season

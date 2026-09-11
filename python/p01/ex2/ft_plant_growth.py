@@ -3,14 +3,16 @@
 #                                                         :::      ::::::::    #
 #    ft_plant_growth.py                                 :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/27 18:53:24 by matthias          #+#    #+#              #
-#    Updated: 2026/08/27 21:25:13 by matthias         ###   ########.fr        #
+#    Created: 2026/08/27 18:53:24 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/27 21:25:13 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
 class Plant:
+
 	def __init__(self, name: str, height: float, age: int) -> None:
 		self.name = name
 		self.height = height
@@ -25,6 +27,8 @@ class Plant:
 	def show(self) -> None:
 		print(f"{self.name}: {self.height}cm, {self.age_days} days old")
 	
+
+
 if __name__ == "__main__":
 	rose = Plant("Rose", 25, 30)
 	print("=== Garden Plant Growth ===")

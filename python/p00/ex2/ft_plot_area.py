@@ -3,12 +3,13 @@
 #                                                         :::      ::::::::    #
 #    ft_plot_area.py                                    :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/12 15:49:39 by matthias          #+#    #+#              #
-#    Updated: 2026/08/12 15:51:05 by matthias         ###   ########.fr        #
+#    Created: 2026/08/12 15:49:39 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/12 15:51:05 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
 
 def ft_plot_area():
 	length = int(input("Enter length: "))

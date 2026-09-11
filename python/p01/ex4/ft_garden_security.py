@@ -3,14 +3,16 @@
 #                                                         :::      ::::::::    #
 #    ft_garden_security.py                              :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/28 12:40:18 by matthias          #+#    #+#              #
-#    Updated: 2026/08/28 18:37:13 by matthias         ###   ########.fr        #
+#    Created: 2026/08/28 12:40:18 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/28 18:37:13 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
 class Plant:
+
 	def __init__(self, name: str, height: float, age: int) -> None:
 		self.name = name
 		self._height = height

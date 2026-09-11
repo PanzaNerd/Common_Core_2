@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    decorator_mastery.py                               :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:37:58 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:37:59 by matthias         ###   ########.fr        #
+#    Created: 2026/09/02 18:37:58 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/02 18:37:59 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

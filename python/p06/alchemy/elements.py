@@ -1,12 +1,19 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    explosion.py                                       :+:      :+:    :+:    #
+#    elements.py                                   :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:36:20 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:36:21 by matthias         ###   ########.fr        #
+#    Created: 2026/09/11 10:00:00 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/11 10:00:00 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
+def create_earth() -> str:
+	return "Earth element created"
+
+
+def create_air() -> str:
+	return "Air element created"

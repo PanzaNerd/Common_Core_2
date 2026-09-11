@@ -3,12 +3,13 @@
 #                                                         :::      ::::::::    #
 #    ft_different_errors.py                             :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/01 17:47:59 by matthias          #+#    #+#              #
-#    Updated: 2026/09/01 18:38:29 by matthias         ###   ########.fr        #
+#    Created: 2026/09/01 17:47:59 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/01 18:38:29 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
 
 def garden_operations(operation_number: int) -> None:
 	if operation_number == 0:
@@ -19,6 +20,7 @@ def garden_operations(operation_number: int) -> None:
 			open("/non/existent/file")
 	elif operation_number == 3:
 			result = "garden" + 42
+
 
 def test_error_types() -> None:
 	print("=== Garden Error Types Demo ===")
