@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_finally_block.py                                :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/09/02 12:00:00 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 12:00:00 by matthias         ###   ########.fr        #
+#    Updated: 2026/09/10 18:35:30 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
