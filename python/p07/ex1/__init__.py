@@ -1,12 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    __init__.py                                        :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:36:32 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:36:33 by matthias         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+from .factories import HealingCreatureFactory, TransformCreatureFactory
 
+__all__ = ['HealingCreatureFactory', 'TransformCreatureFactory']

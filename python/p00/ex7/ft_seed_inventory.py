@@ -10,6 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
+
 def ft_seed_inventory(seed_type: str, quantity: int, unit: str) -> None:
 	name = seed_type.capitalize()
 	if unit == "packets":

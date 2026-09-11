@@ -10,7 +10,9 @@
 #                                                                              #
 # **************************************************************************** #
 
+
 class Plant:
+
 	def __init__(self, name: str, height: float, age: int) -> None:
 		self.name = name
 		self.height = height
@@ -24,6 +26,7 @@ class Plant:
 
 	def show(self) -> None:
 		print(f"{self.name}: {self.height}cm, {self.age_days} days old")
+
 
 if __name__ == "__main__":
 	plants = [

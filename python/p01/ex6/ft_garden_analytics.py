@@ -10,8 +10,10 @@
 #                                                                              #
 # **************************************************************************** #
 
+
 class Plant:
 	class Stats:
+
 		def __init__(self):
 			self.grows = 0
 			self.ages = 0
@@ -48,6 +50,7 @@ class Plant:
 
 
 class Flower(Plant):
+
 	def __init__(self, name: str, height: float, age: int, color: str) -> None:
 		super().__init__(name, height, age)
 		self.color = color
@@ -65,6 +68,7 @@ class Flower(Plant):
 
 
 class Seed(Flower):
+
 	def __init__(self, name: str, height: float, age: int, color: str) -> None:
 		super().__init__(name, height, age, color)
 		self.seeds = 0
@@ -88,6 +92,7 @@ class Seed(Flower):
 
 class Tree(Plant):
 	class TreeStats(Plant.Stats):
+
 		def __init__(self):
 			super().__init__()
 			self.shades = 0
@@ -111,6 +116,7 @@ class Tree(Plant):
 
 
 class Vegetable(Plant):
+
 	def __init__(self, name: str, height: float, age: int, harvest_season: str) -> None:
 		super().__init__(name, height, age)
 		self.harvest_season = harvest_season
