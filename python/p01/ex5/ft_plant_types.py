@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_plant_types.py                                  :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/28 13:10:00 by matthias          #+#    #+#              #
-#    Updated: 2026/08/28 18:37:53 by matthias         ###   ########.fr        #
+#    Created: 2026/08/28 13:10:00 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/28 18:37:53 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

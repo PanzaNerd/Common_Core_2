@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_different_errors.py                             :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/01 17:47:59 by matthias          #+#    #+#              #
-#    Updated: 2026/09/01 18:38:29 by matthias         ###   ########.fr        #
+#    Created: 2026/09/01 17:47:59 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/01 18:38:29 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

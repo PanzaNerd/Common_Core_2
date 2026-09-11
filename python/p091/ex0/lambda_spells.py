@@ -3,10 +3,12 @@
 #                                                         :::      ::::::::    #
 #    lambda_spells.py                                   :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:37:29 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:37:30 by matthias         ###   ########.fr        #
+#    Created: 2026/09/11 17:37:36 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/11 17:37:37 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
+
 

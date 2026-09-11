@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    capacitor.py                                       :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:36:39 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:36:40 by matthias         ###   ########.fr        #
+#    Created: 2026/09/02 18:36:39 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/02 18:36:40 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

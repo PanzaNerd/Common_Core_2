@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_garden_analytics.py                             :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/28 13:30:00 by matthias          #+#    #+#              #
-#    Updated: 2026/08/28 13:30:00 by matthias         ###   ########.fr        #
+#    Created: 2026/08/28 13:30:00 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/28 13:30:00 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

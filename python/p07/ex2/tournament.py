@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    tournament.py                                      :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:36:49 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:36:50 by matthias         ###   ########.fr        #
+#    Created: 2026/09/02 18:36:49 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/02 18:36:50 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

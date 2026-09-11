@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_seed_inventory.py                               :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/27 14:30:59 by matthias          #+#    #+#              #
-#    Updated: 2026/08/27 14:43:39 by matthias         ###   ########.fr        #
+#    Created: 2026/08/27 14:30:59 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/27 14:43:39 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

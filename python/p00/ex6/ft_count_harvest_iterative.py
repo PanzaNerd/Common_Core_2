@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_count_harvest_iterative.py                      :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/26 22:48:41 by matthias          #+#    #+#              #
-#    Updated: 2026/08/27 14:09:03 by matthias         ###   ########.fr        #
+#    Created: 2026/08/26 22:48:41 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/27 14:09:03 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

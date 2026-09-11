@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_plant_factory.py                                :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/27 21:31:15 by matthias          #+#    #+#              #
-#    Updated: 2026/08/28 17:29:13 by matthias         ###   ########.fr        #
+#    Created: 2026/08/27 21:31:15 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/28 17:29:13 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

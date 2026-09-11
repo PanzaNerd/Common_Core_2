@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_hello_garden.py                                 :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/12 12:46:04 by matthias          #+#    #+#              #
-#    Updated: 2026/08/12 13:04:32 by matthias         ###   ########.fr        #
+#    Created: 2026/08/12 12:46:04 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/12 13:04:32 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

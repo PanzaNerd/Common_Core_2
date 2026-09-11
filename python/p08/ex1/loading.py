@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    loading.py                                    :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/11 10:00:00 by matthias          #+#    #+#              #
-#    Updated: 2026/09/11 10:00:00 by matthias         ###   ########.fr        #
+#    Created: 2026/09/11 10:00:00 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/11 10:00:00 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

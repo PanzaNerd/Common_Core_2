@@ -3,11 +3,10 @@
 #                                                         :::      ::::::::    #
 #    scope_mysteries.py                                 :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/02 18:37:41 by matthias          #+#    #+#              #
-#    Updated: 2026/09/02 18:37:49 by matthias         ###   ########.fr        #
+#    Created: 2026/09/02 18:37:41 by mpanzani          #+#    #+#              #
+#    Updated: 2026/09/02 18:37:49 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
 

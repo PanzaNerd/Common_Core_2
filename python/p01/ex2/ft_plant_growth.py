@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_plant_growth.py                                 :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/27 18:53:24 by matthias          #+#    #+#              #
-#    Updated: 2026/08/27 21:25:13 by matthias         ###   ########.fr        #
+#    Created: 2026/08/27 18:53:24 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/27 21:25:13 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

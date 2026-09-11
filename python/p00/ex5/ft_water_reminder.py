@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    ft_water_reminder.py                               :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: matthias <matthias@student.42.fr>          +#+  +:+       +#+         #
+#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/12 16:08:55 by matthias          #+#    #+#              #
-#    Updated: 2026/08/12 16:53:21 by matthias         ###   ########.fr        #
+#    Created: 2026/08/12 16:08:55 by mpanzani          #+#    #+#              #
+#    Updated: 2026/08/12 16:53:21 by mpanzani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
