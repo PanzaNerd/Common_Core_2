@@ -838,6 +838,43 @@ griglia è almeno 9x6, con almeno una riga libera sopra le cifre:
 Se il labirinto è troppo piccolo (sotto 9x6) il 42 si omette: il main
 stampa un messaggio e il programma CONTINUA.
 
+### Il 42 deve essere perfettamente centrato?
+
+Il subject NON lo chiede: chiede solo che il 42 sia VISIBILE e fatto
+di celle completamente chiuse ("the maze must contain a visible '42'
+drawn by several fully closed cells"). Nessuna regola sulla posizione:
+il centro è una NOSTRA scelta estetica (staccato dai bordi si legge
+meglio).
+
+E comunque il centro perfetto spesso NON esiste: le celle sono intere,
+la mezza cella non esiste. Il 42 è largo 7 colonne: in un labirinto
+largo 12 restano 12 - 7 = 5 colonne libere, che è DISPARI → si
+dividono in 2 a sinistra e 3 a destra (la divisione intera // arrotonda
+per difetto e la cella in più va a destra). In verticale con 9 righe
+invece torna pari: 9 - 5 = 4 → 2 sopra e 2 sotto, centrato esatto.
+Griglia REALE 12x9 generata dal codice (# = mattoncino, . = cella
+libera):
+
+```
+............
+............
+..#.#.###...
+..#.#...#...
+..###.###...
+....#.#.....
+....#.###...
+............
+............
+```
+
+L'unica regola di posizione che conta davvero è quella del bug
+corretto: ALMENO UNA RIGA interamente libera sopra le cifre
+(connettività), più il non coprire entry/exit.
+
+Risposta da evaluation: "Il subject chiede solo un 42 visibile di
+celle chiuse; lo centriamo con la divisione intera, e quando lo spazio
+libero è dispari la cella in più va a destra/sotto."
+
 ### Riepilogo in 4 passi
 
 1. Tutte le celle chiuse (scatole).
