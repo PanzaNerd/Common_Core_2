@@ -8,6 +8,8 @@ Ogni esercizio è raccontato **nell'ordine in cui si esegue il codice**: si part
 
 ## ex0 — ft_hello_garden — la prima funzione
 
+**★ PRIME VOLTE qui:** `print()`, `def` (la prima funzione)
+
 **Cosa chiede:** funzione `ft_hello_garden()` che stampa `Hello, Garden Community!`.
 
 **Esecuzione:** l'evaluator importa la funzione e la chiama → `ft_hello_garden()` → entra nel corpo → `print("Hello, Garden Community!")` → stampa → la funzione finisce. Fine.
@@ -24,6 +26,8 @@ def ft_hello_garden():
 - In Python non serve `main()`: il file si esegue dall'alto in basso
 
 ## ex1 — ft_garden_name — input
+
+**★ PRIME VOLTE qui:** `input()`
 
 **Cosa chiede:** chiedere il nome del giardino e stamparlo con un messaggio fisso.
 
@@ -42,6 +46,8 @@ def ft_garden_name():
 - `+` tra stringhe = concatenazione. `+` tra stringa e numero = TypeError
 
 ## ex2 — ft_plot_area — int() e f-string
+
+**★ PRIME VOLTE qui:** `int()` (conversione), f-string
 
 **Cosa chiede:** chiedere lunghezza e larghezza, stampare l'area (prodotto).
 
@@ -63,6 +69,8 @@ def ft_plot_area():
 
 ## ex3 — ft_harvest_total — somma di 3 input
 
+**★ NIENTE di nuovo:** consolidamento di ex2
+
 **Cosa chiede:** 3 input numerici, stampare la somma.
 
 **Esecuzione:** chiamata → 3 volte: input → int() → salva in day1, day2, day3 → print della somma → fine.
@@ -77,6 +85,8 @@ def ft_harvest_total():
 ```
 
 ## ex4 — ft_plant_age — if/else
+
+**★ PRIME VOLTE qui:** `if`/`else` (condizionali in Python)
 
 **Cosa chiede:** se l'età > 60 stampa "ready to harvest", altrimenti "needs more time".
 
@@ -100,6 +110,8 @@ def ft_plant_age():
 
 ## ex5 — ft_water_reminder — if/else bis
 
+**★ NIENTE di nuovo:** consolidamento di ex4
+
 **Cosa chiede:** se i giorni > 2 stampa "Water the plants!", altrimenti "Plants are fine".
 
 **Esecuzione:** identica a ex4: input → int → confronto → un ramo solo dei due viene eseguito.
@@ -107,6 +119,8 @@ def ft_plant_age():
 **Attenzione:** il subject scrive `Plants are fine` SENZA punto esclamativo.
 
 ## ex6 — ft_count_harvest — for e ricorsione
+
+**★ PRIME VOLTE qui:** `for`, `range()`, ricorsione con funzione helper
 
 **Cosa chiede:** due funzioni (iterativa e ricorsiva) che contano da 1 a N e stampano "Harvest time!".
 
@@ -151,6 +165,8 @@ def print_days(day, total):
 
 ## ex7 — ft_seed_inventory — type hints
 
+**★ PRIME VOLTE qui:** type hints, `elif`, `.capitalize()`
+
 **Cosa chiede:** funzione con firma OBBLIGATA `def ft_seed_inventory(seed_type: str, quantity: int, unit: str) -> None:` che stampa in base all'unità ("packets", "grams", "area", altro → "Unknown unit type"). Nome del seme con la maiuscola.
 
 **Esecuzione:** l'evaluator chiama `ft_seed_inventory("tomato", 15, "packets")` → i 3 valori entrano nei parametri → riga 1: `"tomato".capitalize()` → `"Tomato"` in `name` → la catena if/elif: `unit == "packets"`? SÌ → stampa "Tomato seeds: 15 packets available" → fine. (Con "liters": nessun if scatta → else → "Unknown unit type".)
@@ -180,6 +196,8 @@ def ft_seed_inventory(seed_type: str, quantity: int, unit: str) -> None:
 
 ## ex0 — ft_garden_intro — il main di Python
 
+**★ PRIME VOLTE qui:** `if __name__ == "__main__":`
+
 **Cosa chiede:** primo programma completo con variabili e print, eseguito direttamente.
 
 **Esecuzione:** `python3 ft_garden_intro.py` → Python legge il file dall'alto → riga `if __name__ == "__main__":` → il file è stato eseguito direttamente, quindi `__name__` vale `"__main__"` → la condizione è VERA → si esegue il blocco: 3 assegnazioni (name, height, age) → 5 print in ordine → fine.
@@ -205,6 +223,8 @@ if __name__ == "__main__":
 - Non è una protezione: è un interruttore "eseguito direttamente o importato?"
 
 ## ex1 — ft_garden_data — la prima classe
+
+**★ PRIME VOLTE qui:** `class`, oggetto, `__init__`, `self`, metodo, attributo
 
 **Cosa chiede:** classe `Plant` con attributi name/height/age e metodo `show()`. Creare 3 piante e mostrarle.
 
@@ -250,6 +270,8 @@ if __name__ == "__main__":
 
 ## ex2 — ft_plant_growth — metodi che modificano
 
+**★ PRIME VOLTE qui:** `round()`
+
 **Cosa chiede:** metodi `grow()` e `age()` che modificano la pianta. Simulare una settimana.
 
 **Esecuzione:**
@@ -284,6 +306,8 @@ class Plant:
 
 ## ex3 — ft_plant_factory — lista di oggetti
 
+**★ PRIME VOLTE qui:** lista di oggetti, `end=" "`
+
 **Cosa chiede:** creare 5 piante con caratteristiche diverse e mostrarle tutte.
 
 **Esecuzione:**
@@ -314,6 +338,8 @@ if __name__ == "__main__":
 - `25.0` invece di `25` → il valore è float e si stampa con il decimale
 
 ## ex4 — ft_garden_security — incapsulamento
+
+**★ PRIME VOLTE qui:** incapsulamento con `_`, getter/setter, `return`
 
 **Cosa chiede:** proteggere i dati: attributi con underscore, getter, setter con validazione (niente valori negativi).
 
@@ -360,6 +386,8 @@ class Plant:
 
 ## ex5 — ft_plant_types — ereditarietà
 
+**★ PRIME VOLTE qui:** ereditarietà, `super()`
+
 **Cosa chiede:** Flower (color, bloom), Tree (trunk_diameter, produce_shade), Vegetable (harvest_season, nutritional_value) che EREDITANO da Plant usando `super()`.
 
 **Esecuzione (es. la rosa):**
@@ -395,6 +423,8 @@ class Flower(Plant):
 - I metodi generici di Plant servono sia alle piante semplici sia alle figlie (ereditati o estesi con super)
 
 ## ex6 — ft_garden_analytics — metodi speciali e classi annidate
+
+**★ PRIME VOLTE qui:** `@staticmethod`, `@classmethod`, classe annidata
 
 **Cosa chiede:** staticmethod, classmethod, classe Seed, classe annidata Stats (contatori), TreeStats esteso, funzione esterna display_stats.
 
@@ -452,6 +482,8 @@ class Plant:
 
 ## ex0 — ft_first_exception — try/except
 
+**★ PRIME VOLTE qui:** `import`, `try`/`except`, `as e`, `Exception`
+
 **Cosa chiede:** `input_temperature(temp_str)` che converte stringa→intero; `test_temperature()` che prova input valido ("25") e invalido ("abc") senza far crashare il programma.
 
 **Esecuzione:**
@@ -491,6 +523,8 @@ def test_temperature() -> None:
 
 ## ex1 — ft_raise_exception — raise
 
+**★ PRIME VOLTE qui:** `raise`
+
 **Cosa chiede:** in `input_temperature`, dopo la conversione, se la temperatura è fuori da 0–40 lancia un'eccezione TU con `raise`. Test con "100" e "-50".
 
 **Esecuzione (con "100"):**
@@ -518,6 +552,8 @@ def input_temperature(temp_str: str) -> int:
 - Ex0 vs Ex1: in ex0 gli errori esplodono da soli (incidenti); in ex1 sei TU il guardiano che suona l'allarme
 
 ## ex2 — ft_different_errors — i tipi di errore
+
+**★ PRIME VOLTE qui:** tipi di errore specifici (ValueError ecc.), `else` del try
 
 **Cosa chiede:** `garden_operations(n)` con 4 bombe diverse (una per tipo di errore); `test_error_types()` che le fa esplodere tutte e le cattura ognuna col SUO except specifico. Dimostrare il catch multiplo e l'`else`.
 
@@ -574,6 +610,8 @@ def test_error_types() -> None:
 
 ## ex3 — ft_custom_errors — eccezioni personalizzate
 
+**★ PRIME VOLTE qui:** eccezione custom `class X(Exception)`, parametro con valore di default
+
 **Cosa chiede:** classi `GardenError(Exception)`, `PlantError(GardenError)`, `WaterError(GardenError)` con messaggi di default. Dimostrare che `except GardenError` cattura tutte le figlie.
 
 **Esecuzione:**
@@ -613,6 +651,8 @@ except GardenError as e:
 - L'eccezione custom ha UN solo parametro oltre a self: il messaggio. Flusso: raise crea l'errore → except `as e` lo afferra → print lo mostra
 
 ## ex4 — ft_finally_block — finally
+
+**★ PRIME VOLTE qui:** `finally`, indicizzazione `stringa[0]`, `.isupper()`
 
 **Cosa chiede:** `water_plant(plant_name)` che annaffia solo nomi con la maiuscola (altrimenti lancia la NOSTRA PlantError); `test_watering_system()` che apre/chiude il sistema con try/except/finally. La chiusura deve avvenire SEMPRE, anche con errori.
 
@@ -682,6 +722,8 @@ Più avanti: generatori (ex5) e comprehensions (ex6), che sono la sintassi "cond
 Il modulo ha una regola nuova: **niente file I/O**. Tutti i dati arrivano da riga di comando (`sys.argv`) o da input.
 
 ## ex0 — ft_command_quest — sys.argv (la lista dei parametri)
+
+**★ PRIME VOLTE qui:** `sys`, `sys.argv`, `len()`, lista
 
 **Cosa chiede:** script che mostra i parametri ricevuti da riga di comando. Senza argomenti → messaggio dedicato. Con argomenti → numerati da 1. "Total arguments" conta TUTTO, compreso il nome del programma.
 
@@ -770,6 +812,8 @@ if __name__ == "__main__":
 
 ## ex1 — ft_score_analytics — lista di numeri + try/except
 
+**★ PRIME VOLTE qui:** `.append()`, `sum()`/`max()`/`min()`, slicing `[1:]`, `return` senza valore
+
 **Cosa chiede:** prendere i punteggi da riga di comando, scartare quelli non numerici con un messaggio, e calcolare: numero, totale, media, massimo, minimo, range. Senza punteggi validi → messaggio di usage.
 
 **Obiettivo:** costruire la TUA prima lista (con `.append()`), usare le funzioni built-in `sum()`, `max()`, `min()`, e applicare il try/except di p02 su input reali.
@@ -841,9 +885,15 @@ if __name__ == "__main__":
 
 ## ex2 — ft_coordinate_system — tuple e distanza 3D
 
-**Cosa chiede:** funzione `get_player_pos()` che chiede coordinate `x,y,z`, gestisce gli errori, ritenta finché non sono valide, e RESTITUISCE una **tupla** con le 3 coordinate. Poi: mostra la tupla e ogni coordinata separata, calcola la distanza dal centro (0,0,0), chiede un secondo punto e calcola la distanza tra i due.
+**★ PRIME VOLTE qui:** tupla, `math.sqrt()`, `.split()`, `float()`, unpacking, `while True`, `**`, `continue`/`break`
 
-**Obiettivo:** incontrare la **tupla** — la seconda collezione. È come una lista ma IMMUTABILE: "scritta nella pietra", una volta creata non si cambia. Perfetta per un punto 3D che è un insieme fisso di 3 numeri. In più: `math.sqrt()` per la radice quadrata.
+**Cosa fa DAVVERO il programma (prima cosa da capire):** NON calcola nessun centro e nessuna area. Ci sono solo **DUE PUNTI nello spazio 3D**. Pensa a Minecraft: ogni posizione nel mondo è fatta di 3 numeri — x (est/ovest), y (altezza), z (nord/sud). Un punto = 3 numeri. Il programma fa solo due cose:
+1. Chiede dove sei → punto 1 → calcola quanto disti dal **centro del mondo**, che è il punto FISSO (0, 0, 0) — dove si incrociano gli assi. Il centro NON viene calcolato dai tuoi numeri: è già lì, è l'origine.
+2. Chiede dove sei adesso (ti sei mosso) → punto 2 → calcola quanto distano i due punti tra loro.
+
+La matematica è sempre la stessa, Pitagora in 3D: `radice((x2-x1)² + (y2-y1)² + (z2-z1)²)`. Per il centro, x2=y2=z2=0 → si semplifica in `radice(x² + y² + z²)`.
+
+**Cosa chiede:** funzione `get_player_pos()` che chiede coordinate `x,y,z`, gestisce gli errori, ritenta finché non sono valide, e RESTITUISCE una **tupla** con le 3 coordinate. Poi il main fa i due calcoli sopra.
 
 **Come testare:**
 ```bash
@@ -855,52 +905,67 @@ python3 ft_coordinate_system.py
 #        4,5,6               → distanza tra i punti 4.9244
 ```
 
-**Esecuzione:**
-1. Main → intestazione → `get_player_pos()` → input: l'utente scrive
-2. `raw.split(",")` — **split** spezza la stringa dove trova le virgole: `"1.0 , 2.5, 3.0"` → lista `["1.0 ", " 2.5", " 3.0"]`
-3. `len(parts) != 3`? "hello world" non ha virgole → split dà 1 pezzo → "Invalid syntax" → `continue` = **torna in cima al while**, richiede di nuovo
-4. Loop sui 3 pezzi: `float(part)` converte (float = numero con virgola; accetta anche "4"). Se un pezzo fallisce ("abc") → except stampa `Error on parameter 'abc': could not convert string to float: 'abc'` → `ok = False` → `break` esce dal loop → il `continue` del while fa ritentare tutto
-5. Se tutti e 3 passano → `return (x, y, z)` — le parentesi tonde creano la **TUPLA** e la restituiscono
-6. `x1, y1, z1 = get_player_pos()` — **unpacking**: la tupla si apre nelle 3 variabili (come distribuire 3 carte da un mazzo)
-7. `math.sqrt(x1*x1 + y1*y1 + z1*z1)` — Pitagora in 3D: distanza dal centro. `math.sqrt()` = radice quadrata, dal modulo `math` (importato in cima). `round(d, 4)` = 4 decimali → 4.0311
-8. Secondo punto → distanza tra i due: `sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)` — **`**` è l'elevamento a potenza** (2 al quadrato)
+**La tupla in una riga:** è una collezione come la lista MA **immutabile** — si crea con le parentesi TONDE `(a, b, c)` invece delle quadre, e non ha `append`. Non la cambi: "scritta nella pietra". Analogia: la lista è una SCATOLA a cui continui ad aggiungere fogli (append); la tupla è una BUSTA SIGILLATA con esattamente 3 numeri scritti sopra — non puoi aggiungere, togliere o modificare niente. Un punto 3D è per natura esattamente 3 numeri → la busta sigillata è il contenitore giusto: nessun codice potrà mai aggiungere un 4° numero per sbaglio.
 
-**Codice:**
+**Il `while True` in una riga:** significa "ripeti per sempre". Da solo non finirebbe MAI: si esce solo con `return` o `break`. Analogia: la porta di un locale con la parola d'ordine — chiede, se sbagli chiede di nuovo, non si stanca mai; si apre solo quando dici quella giusta. Qui non sappiamo QUANTE volte l'utente sbaglierà (0, 1, 5?) → "chiedi finché la risposta non è buona". I due modi in cui il giro finisce: `continue` = "risposta sbagliata, torna in cima e richiedi" (skip del resto del giro); `return` = "risposta buona, esci dalla funzione e consegna il risultato" (UNICA uscita normale).
+
+**Esecuzione di `get_player_pos()` riga per riga:**
+
+1. `user_input = input(...)` — chiede e salva TUTTO il testo digitato in UNA stringa. Es. l'utente scrive `1.0 , 2.5, 3.0`
+2. `pieces = user_input.split(",")` — **split** spezza la stringa a ogni virgola → lista `["1.0 ", " 2.5", " 3.0"]`. Se l'utente scrive "hello world" (nessuna virgola) → `["hello world"]` (lista con 1 pezzo)
+3. `if len(pieces) != 3:` — se i pezzi non sono esattamente 3 (virgole mancanti o di troppo) → "Invalid syntax" → `continue` → si ricomincia dall'input
+4. `numbers = []` e `all_valid = True` — si prepara la scatola vuota dei numeri convertiti e la BANDIERINA "tutto valido finché non si dimostra il contrario"
+5. Loop `for piece in pieces:` — un pezzo alla volta:
+   - `float("1.0 ")` → 1.0 → append in `numbers` (float ignora gli spazi ai bordi)
+   - `float(" 2.5")` → 2.5 → append
+   - `float("abc")` → BOOM ValueError → except stampa `Error on parameter 'abc': ...` → `all_valid = False` (bandierina giù) → `break` (si esce subito dal for, tanto è inutile continuare)
+6. `if all_valid:` — se la bandierina è ancora su (tutte e 3 le conversioni riuscite) → `return (numbers[0], numbers[1], numbers[2])` → crea la TUPLA e la restituisce → la funzione FINISCE (il while muore col return)
+7. Se la bandierina è giù → l'if è saltato → si arriva in fondo al while → NUOVO GIRO → si richiede tutto da capo (i vecchi numeri finiscono nella spazzatura)
+
+**Il main poi:**
+1. `x1, y1, z1 = get_player_pos()` — **unpacking**: la tupla restituita si apre e i 3 valori vanno nelle 3 variabili, in ordine (come distribuire 3 carte da un mazzo)
+2. `math.sqrt(x1*x1 + y1*y1 + z1*z1)` — distanza dal centro (0,0,0). `math.sqrt()` = radice quadrata, funzione PREDEFINITA del modulo `math` (importato in cima, come `#include <math.h>` in C). `round(d, 4)` = arrotonda a 4 decimali → 4.0311
+3. Secondo punto → distanza tra i due con la formula completa: `sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)`
+
+**Codice (variabili con nomi che spiegano da sole cosa contengono):**
 ```python
 import math
 
 def get_player_pos() -> tuple[float, float, float]:
 	while True:
-		raw = input("Enter new coordinates as floats in format 'x,y,z': ")
-		parts = raw.split(",")
-		if len(parts) != 3:
+		user_input = input("Enter new coordinates as floats in format 'x,y,z': ")
+		pieces = user_input.split(",")
+		if len(pieces) != 3:
 			print("Invalid syntax")
 			continue
-		values = []
-		ok = True
-		for part in parts:
+		numbers = []
+		all_valid = True
+		for piece in pieces:
 			try:
-				values.append(float(part))
+				numbers.append(float(piece))
 			except ValueError as e:
-				print(f"Error on parameter '{part}': {e}")
-				ok = False
+				print(f"Error on parameter '{piece}': {e}")
+				all_valid = False
 				break
-		if ok:
-			return (values[0], values[1], values[2])
+		if all_valid:
+			return (numbers[0], numbers[1], numbers[2])
 
 def main() -> None:
 	print("=== Game Coordinate System ===")
+
 	print("Get a first set of coordinates")
 	x1, y1, z1 = get_player_pos()
 	print(f"Got a first tuple: {(x1, y1, z1)}")
 	print(f"It includes: X={x1}, Y={y1}, Z={z1}")
-	d = math.sqrt(x1 * x1 + y1 * y1 + z1 * z1)
-	print(f"Distance to center: {round(d, 4)}")
+
+	distance = math.sqrt(x1 * x1 + y1 * y1 + z1 * z1)
+	print(f"Distance to center: {round(distance, 4)}")
 
 	print("Get a second set of coordinates")
 	x2, y2, z2 = get_player_pos()
-	d = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
-	print(f"Distance between the 2 sets of coordinates: {round(d, 4)}")
+
+	distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
+	print(f"Distance between the 2 sets of coordinates: {round(distance, 4)}")
 
 
 if __name__ == "__main__":
@@ -908,13 +973,328 @@ if __name__ == "__main__":
 ```
 
 **Teoria:**
-- **Tupla** = collezione come la lista MA immutabile: si crea con `(a, b, c)` invece di `[a, b, c]`, e non ha `append` — non la cambi. "Scritta nella pietra". Perché usarla: un punto 3D è un insieme fisso di 3 numeri — con la tupla nessuno può modificarlo per sbaglio
-- **Chi è cosa:** `math` → modulo predefinito (importato); `math.sqrt()` → funzione predefinita del modulo math (radice quadrata); `split()` → METODO built-in delle stringhe; `float()` → CLASSE built-in (converte in numero decimale); `continue`/`break`/`while` → parole chiave; `(a, b, c)` → sintassi tupla; `x1, y1, z1 = ...` → unpacking; `**` → operatore potenza; il resto come ex0/ex1
-- **`while True:` + `continue` = il pattern "ritenta finché non va"**: il loop è infinito, si esce solo col `return`. `continue` = salta il resto e torna in cima al loop
-- **`float("4")`** funziona (converte "4" → 4.0): float accetta anche interi scritti come stringa. `float(" 2.5")` ignora gli spazi ai bordi — per questo "1.0 , 2.5, 3.0" funziona
-- **Unpacking `x1, y1, z1 = tupla`**: Python apre la collezione e assegna un elemento a ogni variabile, in ordine. Funziona con tuple E liste
-- **`a ** 2`** = a elevato a 2 (a²). In C: `pow(a, 2)` o `a * a`
-- Distanza tra due punti 3D = estensione di Pitagora: radice di (Δx² + Δy² + Δz²)
+- **Chi è cosa:** `math` → modulo predefinito (importato); `math.sqrt()` → funzione predefinita del modulo math; `split()` → METODO built-in delle stringhe; `float()` → CLASSE built-in; `append()` → metodo built-in delle liste; `continue`/`break`/`while`/`True`/`return` → parole chiave del linguaggio; `(a, b, c)` → sintassi tupla; `x1, y1, z1 = ...` → unpacking; `**` → operatore potenza; `user_input`, `pieces`, `numbers`, `all_valid`, `piece` → variabili NOSTRE coi nomi che spiegano il contenuto; `get_player_pos()`, `main()` → funzioni nostre
+- **Tonde vs quadre (domanda classica da evaluation):** `(1.0, 2.5, 3.0)` con le TONDE CREA la tupla con i VALORI (la busta sigillata vera). `tuple[float, float, float]` con le QUADRE DESCRIVE il TIPO (l'etichetta "busta che contiene 3 decimali") — non crea nulla, è solo annotazione per mypy, a runtime ignorata. Regola tascabile: VALORI dentro → parentesi del contenitore (tonde per tupla, quadre per lista); TIPI dentro → sempre quadre (`tuple[...]`, `list[...]`). In C l'avevi già visto: `int arr[3]` — le quadre descrivono la struttura
+- **La virgola SEPARA, il punto DEI decimali:** non si mischiano. `1,0 ,2.0 ,3,5` → split a ogni virgola → 5 pezzi → "Invalid syntax". Per Python "1,0" è DUE coordinate (x=1, y=0), non "uno virgola zero". Il modo giusto: `1.0, 2.0, 3.5` (3 pezzi, decimali col punto). Gli spazi ai bordi non danno problemi: `float(" 2.0       ")` funziona
+- **`while True:` + `continue` = il pattern "ritenta finché non va"**: loop infinito, unica uscita normale il `return`. `continue` = salta il resto del giro e torna in cima
+- **La bandierina `all_valid`**: parte True, diventa False alla PRIMA conversione fallita. È il modo semplice di dire "ricordati se qualcosa è andato storto lungo il giro". In C: una variabile `int ok = 1;` che metti a 0 sull'errore
+- **`float("4")`** funziona ("4" → 4.0): float accetta anche interi scritti come stringa. **Precisazione:** float NON ripulisce — ignora gli spazi ai bordi e poi prova a convertire tutto il resto: `float(" 1.4 ")` → 1.4 ✓; `float("1.4n")` → ValueError `could not convert string to float: '1.4n'` (la "n" non è un numero) → l'except cattura, bandierina giù, break, si richiede
+- **Unpacking** funziona con tuple E liste: il numero di variabili a sinistra DEVE combaciare col numero di elementi
+- **`a ** 2`** = a elevato a 2 (a²). In C: `pow(a, 2)`
+- Perché la tupla e non la lista: il punto DEVE restare 3 numeri, per sempre. La lista ha append (si allarga), la tupla no — garanzia di sicurezza
+
+---
+
+## ex3 — ft_achievement_tracker — i set
+
+**★ PRIME VOLTE qui:** set, `random.randint()`, `random.sample()`, **dizionario**, `union`/`intersection`/`difference`, **annotazione di variabile** (`nome: Tipo = valore`)
+
+### ★ PRIMA VOLTA: l'annotazione di variabile — i due punti nelle assegnazioni
+
+```python
+all_achievements: set[str] = set()
+```
+
+La riga ha DUE pezzi separati:
+
+- **`all_achievements = set()`** — la parte VERA: crea il set vuoto e lo assegna alla variabile. È questa che gira davvero a runtime
+- **`: set[str]`** — l'ETICHETTA del tipo ("questa variabile conterrà un set di stringhe"), per mypy e per chi legge. **A runtime viene IGNORATA completamente.** È la stessa cosa dei type hints nelle firme `def f(x: str) -> None` (lì i due punti li hai già visti, stesso significato) — qui applicati a una variabile invece che a un parametro
+
+**Perché serve qui:** `all_achievements = set()` parte da un set VUOTO — mypy non può indovinare che tipo di elementi conterrà, quindi protesta finché non metti l'etichetta `set[str]`. Con variabili il cui tipo si capisce da solo (es. `n = random.randint(6, 9)` → int ovvio) l'etichetta non serve e non c'è.
+
+**Regola:** `nome: Tipo = valore` = "dichiara il tipo E assegna il valore". Due punti = dichiarazione, uguale = assegnazione. E `all_achievements` è una variabile NOSTRA: nome scelto da noi, prima di quella riga non esisteva.
+
+**Chiarimento (equivoco classico):** la riga NON va divisa in due istruzioni. `x: set[str] = set()` a runtime è IDENTICA a `x = set()` — l'etichetta è metadata, come un commento. E non confondere le parentesi: `set[str]` con le QUADRE = descrizione del tipo (non esegue nulla — come `tuple[float, float, float]` in ex2); `set(str)` con le TONDE = CHIAMATA ("costruisci un set da str" → errore); `set(str) = set()` = SyntaxError, non si assegna a una chiamata
+
+**L'analogia che spiega tutto: LA PROMESSA.** `x: int = 5` = azione vera (`x = 5`) + promessa (`: int` = "x conterrà un intero"). I due punti sono SOLO la punteggiatura che separa il nome dal tipo (come un modulo cartaceo "Nome: ____", o il `:` di `if x:` e di `def f(x: str)`). Chi controlla la promessa? **Python: NESSUNO** — a runtime la ignora del tutto (demo: prometti int, ci metti una stringa, Python tace). **mypy: il controllore** — programma separato che legge il codice senza eseguirlo e confronta promesse coi fatti ("hai promesso int e messo una stringa" → errore). **Gli umani: i lettori** — vedono `: set[str]` e sanno cosa ci deve stare. Si fanno perché il subject 42 lo impone (mypy all'evaluation). **In C il tipo è LEGGE** (il compilatore rifiuta il resto); **in Python è solo PROMESSA** (ignorata dall'esecuzione)
+
+**Cosa fa il programma:** genera per 4 giocatori (Alice, Bob, Charlie, Dylan) un sacchetto di achievement presi a caso da una lista fissa di 14. Poi calcola con le operazioni dei set: quali achievement esistono in totale, quali hanno TUTTI in comune, quali ha SOLO un giocatore, e cosa manca a ciascuno per averli tutti.
+
+**Il set in una riga:** è una collezione di elementi **UNICI** e **SENZA ORDINE**. Analogia: un sacchetto — se butti dentro due volte lo stesso oggetto, ne resta uno solo; e se agiti il sacchetto l'ordine cambia a ogni stampa (per questo a ogni run l'output esce in ordine diverso). Si crea con le graffe `{a, b, c}` o con `set(...)`.
+
+**Perché il set qui:** gli achievement non devono avere duplicati per definizione — o ce l'hai o non ce l'hai, non "ce l'hai 2 volte". Il set lo garantisce da solo.
+
+### Traccia concreta dei 3 loop (giocatori piccoli: Alice={A,B}, Bob={B,C}, Charlie={C,D})
+
+**Il pattern del loop è SEMPRE lo stesso:** `risultato = set_di_partenza` → `for name in players:` → `risultato = risultato.operazione(players[name])`. Cambia solo l'OPERAZIONE:
+
+**1. UNION = il sacchettone che CRESCE.** Ogni giro butta dentro la roba del giocatore, i doppioni si fondono:
+```
+partenza:  set()
+giro Alice:   union {A,B}  ->  {A,B}
+giro Bob:     union {B,C}  ->  {A,B,C}     (la B si fonde)
+giro Charlie: union {C,D}  ->  {A,B,C,D}
+```
+Ogni riga ha SEMPRE più elementi (o uguali) della precedente. Finale = tutto ciò che ALMENO uno ha.
+
+**2. INTERSECTION = il filtro che RESTRINGE.** Ogni giro tiene SOLO ciò che sta in ENTRAMBI:
+```
+partenza:  {A,B,C,D} (tutti)
+giro Alice:   inter {A,B}  ->  {A,B}
+giro Bob:     inter {B,C}  ->  {B}
+giro Charlie: inter {C,D}  ->  set()   (VUOTO: nessuno li ha tutti)
+```
+Ogni riga ha MENO elementi (o uguali) della precedente. Finale = ciò che è SOPRAVVISSUTO a tutti. Può finire vuoto davvero — per questo il subject dice di tarare i numeri (14 achievement, 6-9 a testa: il comune di solito esce non vuoto).
+
+**3. DIFFERENCE = la SOTTRAzione, calcolo SECCO (non accumulatore).** "I miei MENO i loro", usata in due modi:
+- `only` = Alice `{A,B}` MENO unione degli altri `{B,C,D}` = `{A}` (solo suoi)
+- `missing_achievements` = TOTALE `{A,B,C,D}` MENO quelli di Charlie `{C,D}` = `{A,B}` (i mancanti)
+
+**Da ricordare per l'evaluation:** union e intersection nel loop usano un ACCUMULATORE (la variabile sta a SINISTRA e a DESTRA dell'uguale). La difference è un calcolo in una botta sola: due set, uno meno l'altro.
+
+**Le 3 operazioni (le tre domande sui sacchetti):**
+- **union** — butto tutto nel sacchettone: ogni elemento che sta in almeno un sacchetto (i duplicati si fondono) → "tutti gli achievement distinti"
+- **intersection** — cosa c'è in TUTTI i sacchetti contemporaneamente → "achievement comuni"
+- **difference** — cosa c'è nel primo sacchetto ma NON nell'altro → "solo X ha" e "gli manca"
+
+### ★ PRIMA VOLTA: il DIZIONARIO — introduzione completa
+
+**Il problema che risolve:** finora, per trovare qualcosa, contavi le posizioni: `lista[0]`, `lista[1]`... Ma se la domanda è "quali achievement ha Alice?", la posizione non serve a niente: ti serve il NOME. Il dizionario esiste per rispondere alle domande per nome.
+
+**L'analogia perfetta è il suo stesso nome: il dizionario di carta.** Quando cerchi "cane", non sfogli pagina per pagina contando: vai DIRETTO alla voce (l'ordine alfabetico ti fa saltare le pagine) e leggi la sua definizione. Traduzione esatta:
+
+| Dizionario di carta | Dizionario di Python |
+|---|---|
+| la parola che cerchi | la CHIAVE (`"Alice"`) |
+| la definizione | il VALORE (il suo set di achievement) |
+| sfogliare fino alla voce | `players["Alice"]` |
+
+```python
+players = {"Alice": {"a", "b"}, "Bob": {"c", "d"}}
+players["Alice"]    # → il set di Alice ("cerca la voce Alice, dammi la sua definizione")
+```
+
+**Le 3 regole d'oro:**
+1. **Si apre per CHIAVE, mai per posizione** — `players["Alice"]` sì; `players[0]` ERRORE (non esiste "la voce numero 0")
+2. **Le chiavi sono UNICHE** — due voci "Alice" non convivono: se riassegni, SOVRASCRIVI (una definizione per parola)
+3. **Per trovare non si scorre nulla** — come l'alfabetico, il computer salta dritto alla voce. Per questo il foreword di p03 dice che il contenitore giusto cambia tutto: "c'è già questo elemento?" sul dizionario è istantaneo, sulla lista devi scorrere tutto
+
+**Lista vs dizionario, per non confonderli più:**
+
+| | Lista | Dizionario |
+|---|---|---|
+| Si apre per | posizione: `lista[0]` | nome: `dict["chiave"]` |
+| Analogia | fila numerata di sedie | armadietti con etichette / dizionario di carta |
+
+**Qui in ex3:** `players` = dizionario giocatore → suoi achievement. Il `for` sul dizionario dà le CHIAVI (i nomi), e `players[name]` apre l'armadietto giusto.
+
+**Esecuzione passo per passo:**
+1. Main → intestazione
+2. `players = {"Alice": gen_player_achievements(), ...}` — qui nasce il DIZIONARIO (introduzione completa qui sotto, prima di continuare la traccia)
+3. Dentro `gen_player_achievements()`:
+   - `random.randint(6, 9)` — un numero a caso TRA 6 e 9 (estremi INCLUSI). Modulo `random` (importato in cima): il "dado" di Python
+   - `random.sample(ACHIEVEMENTS, n)` — pesca **n** achievement dalla lista dei 14, SENZA rimetterli dentro (mai duplicati). Come pescare n carte da un mazzo senza reinserirle
+   - `set(...)` — trasforma il risultato in un set → e il set viene restituito col `return`
+4. `for name in players:` — il dizionario si scorre così e a ogni giro `name` è il NOME del giocatore (per i dizionari il for dà le CHIAVI). `players[name]` = il suo set → si stampa
+5. `all_achievements: set[str] = set()` — **variabile-accumulatore**: il sacchettone dove confluiscono gli achievement di TUTTI i giocatori. Parte VUOTO (`set()` e non `{}`, che è il dict vuoto) e cresce a ogni giro con `all_achievements = all_achievements.union(players[name])` — traccia con {A,B}, {B,C}, {C,D}: `set()` → `{A,B}` → `{A,B,C}` (la B si fonde) → `{A,B,C,D}`. ATTENZIONE alla riassegnazione: `union()` NON modifica il set originale, ne restituisce uno NUOVO — senza il `all_achievements =` il risultato andrebbe perso. Alla fine: ogni achievement che ALMENO un giocatore ha, una volta sola ("distinct" = senza doppioni, natura del set)
+6. `common_achievements = set(ACHIEVEMENTS)` — parte da TUTTI e 14, poi `intersection` col set di ogni giocatore → alla fine restano solo quelli che SOPRAVVIVONO in tutti e 4
+7. "Only X has": per ogni giocatore si costruisce `achievements_of_others` = union dei set degli ALTRI tre (loop interno con `other_player`, salta se stesso con `if other_player != name`), poi `players[name].difference(achievements_of_others)` = i suoi meno quelli degli altri
+8. "Missing": `missing_achievements = set(ACHIEVEMENTS).difference(players[name])` = tutti i 14 meno i suoi — variabile fresca a ogni giro
+
+**Perché i numeri sono 14 e 8-11:** il subject dice di tararli perché le risposte escano "probabilmente non vuote". Attenzione, è un tuning VERO, non un dettaglio: con 6-9 su 14 il common usciva VUOTO ~3 volte su 10 (troppo spesso — ogni giocatore copre troppo poco dei 14). Con 8-11 su 14 il common esce non vuoto quasi sempre (verificato: 6 run su 6). "Only X has" può comunque uscire vuoto → si stampa `set()`, ed è ok (anche l'esempio del subject ce l'ha vuoto per 3 giocatori su 4)
+
+**Domanda da evaluation: "come stampa Python un set vuoto, e perché?"** → Stampa `set()`, NON `{}`. Perché `{}` è già occupato: significa DIZIONARIO vuoto. Serviva una scrittura diversa per il set vuoto, e `set()` è l'unica: le graffe con qualcosa dentro (`{1, 2}`) sono un set, le graffe VUOTE sono un dict.
+
+**Come testare:**
+```bash
+cd python/p03/ex2 && cd ../ex3
+python3 ft_achievement_tracker.py
+# riprova più volte: l'ordine degli elementi cambia a ogni run (il set non ha ordine)
+```
+
+**Codice:**
+```python
+import random
+
+ACHIEVEMENTS = [
+	"Crafting Genius", "World Savior", "Master Explorer", "Collector Supreme",
+	"Untouchable", "Boss Slayer", "Strategist", "Unstoppable",
+	"Speed Runner", "Survivor", "Treasure Hunter", "First Steps",
+	"Sharp Mind", "Hidden Path Finder",
+]
+
+def gen_player_achievements() -> set[str]:
+	n = random.randint(6, 9)
+	return set(random.sample(ACHIEVEMENTS, n))
+
+def main() -> None:
+	print("=== Achievement Tracker System ===")
+
+	players = {
+		"Alice": gen_player_achievements(),
+		"Bob": gen_player_achievements(),
+		"Charlie": gen_player_achievements(),
+		"Dylan": gen_player_achievements(),
+	}
+
+	for name in players:
+		print(f"Player {name}: {players[name]}")
+
+	all_achievements: set[str] = set()
+	for name in players:
+		all_achievements = all_achievements.union(players[name])
+	print(f"All distinct achievements: {all_achievements}")
+
+	common = set(ACHIEVEMENTS)
+	for name in players:
+		common = common.intersection(players[name])
+	print(f"Common achievements: {common}")
+
+	for name in players:
+		achievements_of_others: set[str] = set()
+		for other_player in players:
+			if other_player != name:
+				achievements_of_others = achievements_of_others.union(players[other_player])
+		only = players[name].difference(achievements_of_others)
+		print(f"Only {name} has: {only}")
+
+	for name in players:
+		missing = set(ACHIEVEMENTS).difference(players[name])
+		print(f"{name} is missing: {missing}")
+
+
+if __name__ == "__main__":
+	main()
+```
+
+**Teoria:**
+- **Chi è cosa:** `random` → modulo predefinito (importato); `randint()`, `sample()` → funzioni predefinite del modulo random; `set()`, `union()`, `intersection()`, `difference()` → metodi/funzioni predefiniti dei set; `ACHIEVEMENTS`, `players`, `n`, `name`, `other`, `only`, `missing`, `common`, `all_achievements` → variabili nostre; `gen_player_achievements()`, `main()` → funzioni nostre; `{chiave: valore}` → dizionario
+- **Il set è DISORDINATO e SENZA DOPPIONI** — due proprietà da sapere per l'evaluation: non puoi indicizzare (`mio_set[0]` non esiste), e aggiungere un doppione non fa nulla
+- **Set concreto, toccato con mano:**
+  ```python
+  zaino = {1, 2, 3}
+  zaino.add(3)    # butto dentro un 3 che c'è già
+  print(zaino)    # {1, 2, 3} — niente doppioni
+  zaino.add(4)
+  print(zaino)    # {1, 2, 3, 4}
+  ```
+  Confronto con lo stesso contenuto: lista `[3, 1, 2, 3, 1]` = 5 elementi, ordine fisso, doppioni tenuti; set `{3, 1, 2, 3, 1}` = 3 elementi, doppioni via. E l'ordine NON è garantito: con le stringhe, ogni run del programma stampa in ordine diverso (Python riordina i suoi scaffali interni a ogni avvio) — con i numeri piccoli a volte sembra fisso per pura coincidenza
+- `random.randint(a, b)` = dado con estremi inclusi; `random.sample(lista, n)` = pesca n carte senza rimetterle (mai duplicati, è già un campione unico)
+- Le operazioni hanno anche i simboli: `|` = union, `&` = intersection, `-` = difference (come in matematica)
+- **Il pattern "accumulatore"** (usato 3 volte in questo esercizio: `all_achievements`, `achievements_of_others`, `common_achievements`): una variabile che parte vuota (o piena, come `common_achievements` che parte da tutti e 14) e viene AGGIORNATA a ogni giro del for riassegnando a se stessa il risultato: `x = x.operazione(...)`. È lo stesso pattern di `scores = []` + append in ex1, ma con i set
+- **La differenza tra gli accumulatori:** `all_achievements` parte da `set()` e si ALLARGA (union); `common_achievements` parte da TUTTI i 14 e si RESTRINGE (intersection — sopravvive solo ciò che sta ovunque); `achievements_of_others` è temporaneo, ricreato per ogni giocatore (gli altri tre, escluso lui col `if other_player != name`)
+- **Classificazione completa delle variabili di ex3:**
+  | Variabile | Tipo di lavoro | Meccanismo |
+  |---|---|---|
+  | `all_achievements` | accumulatore | vuoto → si riempie (union) |
+  | `achievements_of_others` | accumulatore | vuoto → si riempie (union) |
+  | `common_achievements` | accumulatore | pieno (14) → si restringe (intersection) |
+  | `missing_achievements` | calcolo fresco a ogni giro | 14 MENO i suoi (difference), si stampa, si rifà da zero |
+  | `only` | calcolo fresco a ogni giro | i suoi MENO gli altri (difference), si stampa, si rifà da zero |
+- **Come distinguerli:** l'ACCUMULATORE ha la variabile a SINISTRA e a DESTRA della stessa assegnazione (`x = x.operazione(...)`) ed è dichiarato FUORI dal loop. `missing_achievements` e `only` sono dichiarati DENTRO il loop: a ogni giro nascono, si stampano, e muoiono — il giro dopo ne nasce uno nuovo. `missing_achievements` NON contiene una lista dentro: contiene direttamente i nomi (stringhe) degli achievement mancanti, è un set puro
+- Il for sul dizionario dà le CHIAVI (i nomi dei giocatori) — in ex4 vedremo anche i valori
+- **Dizionario vs lista (per non confonderli mai):** la LISTA si apre per POSIZIONE (`lista[0]` = "il primo"); il DIZIONARIO si apre per ETICHETTA (`players["Alice"]` = "il contenuto sotto l'etichetta Alice"). Analogia: lista = fila numerata di sedie (la 1ª, la 2ª...); dizionario = armadietti con le etichette (apri quello che dice "Alice", non esiste "armadietto numero 2")
+- **La riga `print(f"Player {name}: {players[name]}")` smontata:** nell'f-string ogni graffa viene CALCOLATA e stampata. Giro 1 del for: `name` vale "Alice" → `{name}` stampa Alice → `{players[name]}` calcola `players["Alice"]` (apri l'armadietto Alice) → stampa il suo set. Risultato: `Player Alice: {'...', '...'}`
+- Demo da terminale: `players = {'Alice': {'a','b'}, 'Bob': {'c','d'}}` poi `for name in players: print(name, players[name])` → a ogni giro: etichetta e contenuto
+- L'output cambia a ogni esecuzione: è normale, è il dado
+- **Nota terminale — il `(.venv)` nel prompt:** significa che un ambiente virtuale è ATTIVO in quella finestra: una copia privata di Python in una cartellina, usata perché il Python di sistema del Mac rifiuta pip install (PEP 668). Si esce con `deactivate`, si rientra con `source .venv/bin/activate`. Diventa materia d'esame in p08
+- **Perché le stringhe nel set escono con le virgolette singole:** quando stampi una stringa DA SOLA → niente virgolette; DENTRO un contenitore (lista/set/dict) Python aggiunge le virgolette come ETICHETTA "questo è testo" (così `{1, 'a'}` distingue numeri da testo). Le virgolette NON fanno parte della stringa (prova: `len('Crafting Genius')` = 15). Single è la scelta di default; se il testo contiene un apostrofo, Python passa alle doppie (`["L'uomo"]`). L'f-string `{players[name]}` stampa il set, che mette la cornice a ogni elemento. In C questa cornice non esiste: è un'aggiunta di Python per leggibilità
+
+---
+
+## ex4 — ft_inventory_system — il dizionario protagonista
+
+**★ PRIME VOLTE qui:** metodi `dict.keys()` / `dict.values()`, e soprattutto il dizionario USATO DAVVERO (in ex3 lo abbiamo solo assaggiato)
+
+### Il dizionario (già introdotto in ex3)
+
+Il dizionario l'abbiamo conosciuto in ex3 (`players`): chiave → valore, si apre per nome con `dict["chiave"]`, chiavi uniche, ricerca istantanea. Qui in ex4 lo usiamo DAVVERO per la prima volta: inventario con chiave = nome dell'oggetto, valore = quantità.
+
+### Cosa chiede l'esercizio
+
+1. Prendere i parametri da riga di comando nel formato `nome:quantità` (es. `sword:1 potion:5`)
+2. Scartare quelli invalidi: sintassi sbagliata (niente due punti), quantità non numerica, e parametri RIPETUTI (stesso nome due volte → si tiene il primo)
+3. Riempire un **dizionario**: chiave = nome, valore = quantità (come int, per fare i conti)
+4. Mostrare: l'inventario, la lista dei nomi, la quantità totale, la percentuale di ogni oggetto, il più e il meno abbondante (a parità, il primo della riga di comando)
+5. Aggiungere `magic_item` e rimostrare
+
+### Come testare
+
+```bash
+cd python/p03/ex4
+python3 ft_inventory_system.py sword:1 potion:5 shield:2 armor:3 helmet:1 sword:2 hello key:value
+python3 ft_inventory_system.py                      # inventario vuoto
+```
+
+### Esecuzione (con l'esempio del subject)
+
+1. Main → intestazione → `inventory: dict[str, int] = {}` — il dizionario VUOTO (`{}` vuoto = dict, NON set: ricordalo dall'ex3)
+2. `for arg in sys.argv[1:]:` — un parametro alla volta ("sword:1", "potion:5", ...)
+3. `arg.split(":")` — spezza ai due punti: "sword:1" → `["sword", "1"]`
+4. `len(parts) != 2` → "hello" non ha i due punti → `Error - invalid parameter 'hello'` → `continue` (si passa al prossimo)
+5. `name in inventory` → "sword" è GIÀ una voce? La seconda volta che appare "sword" sì → `Redundant item 'sword' - discarding` → si tiene il primo. (Il controllo "c'è già?" è istantaneo grazie al dizionario — vedi introduzione)
+6. `inventory[name] = int(qty_str)` — CREA la voce: chiave "sword", valore 1. Se la quantità non è un numero ("value") → except → `Quantity error for 'key': invalid literal...`
+7. `names = list(inventory.keys())` — `keys()` dà tutte le CHIAVI (i nomi); `list()` le mette in una lista ordinata come sono stati inseriti → `['sword', 'potion', ...]`
+8. `total = sum(inventory.values())` — `values()` dà tutte le QUANTITÀ; `sum()` le somma → 12
+9. Percentuali: `inventory[name] / total * 100` per ogni nome → `round(x, 1)` → "sword represents 8.3%"
+10. Più/meno abbondante: si parte da `names[0]` e si confronta con `>` e `<` STRETTI — così, a parità di quantità, resta il primo della riga di comando (il `>` non lo sostituisce)
+11. `inventory["magic_item"] = 1` — aggiungere una voce nuova è la STESSA scrittura dell'aggiornare: se la chiave non esiste la crea, se esiste la sovrascrive
+
+### Codice
+
+```python
+import sys
+
+def main() -> None:
+	print("=== Inventory System Analysis ===")
+
+	inventory: dict[str, int] = {}
+	for arg in sys.argv[1:]:
+		parts = arg.split(":")
+		if len(parts) != 2:
+			print(f"Error - invalid parameter '{arg}'")
+			continue
+		name, qty_str = parts
+		if name in inventory:
+			print(f"Redundant item '{name}' - discarding")
+			continue
+		try:
+			inventory[name] = int(qty_str)
+		except ValueError as e:
+			print(f"Quantity error for '{name}': {e}")
+
+	print(f"Got inventory: {inventory}")
+
+	names = list(inventory.keys())
+	print(f"Item list: {names}")
+
+	if len(names) == 0:
+		print("Empty inventory")
+		return
+
+	total = sum(inventory.values())
+	print(f"Total quantity of the {len(names)} items: {total}")
+
+	for name in names:
+		percent = inventory[name] / total * 100
+		print(f"Item {name} represents {round(percent, 1)}%")
+
+	most = names[0]
+	least = names[0]
+	for name in names:
+		if inventory[name] > inventory[most]:
+			most = name
+		if inventory[name] < inventory[least]:
+			least = name
+	print(f"Item most abundant: {most} with quantity {inventory[most]}")
+	print(f"Item least abundant: {least} with quantity {inventory[least]}")
+
+	inventory["magic_item"] = 1
+	print(f"Updated inventory: {inventory}")
+
+
+if __name__ == "__main__":
+	main()
+```
+
+### Teoria
+
+- **Chi è cosa:** `split()` → metodo built-in delle stringhe (già visto in ex2); `keys()`, `values()` → METODI built-in dei dizionari; `list()` → CLASSE built-in (converte in lista); `in` → parola chiave ("questa chiave esiste nel dizionario?"); `{}` vuoto → dizionario vuoto; il resto già visto
+- **`inventory[name] = valore` fa due lavori in uno:** se la chiave esiste → aggiorna; se non esiste → crea. È per questo che l'aggiunta di `magic_item` usa la stessa riga di tutto il resto
+- **`name, qty_str = parts`** — unpacking su una lista di 2 pezzi (come `x1, y1, z1 = tupla` di ex2)
+- **Il controllo del duplicato** (`name in inventory`) è la prima applicazione vera della potenza del dizionario: "questa voce esiste già?" senza scorrere niente
+- **A parità di quantità vince il primo della riga di comando** — ottenuto coi confronti STRETTI `>` e `<`: il pari NON sostituisce mai, quindi resta il primo trovato
+- **Domanda da evaluation:** "perché un dizionario per l'inventario?" → perché le domande dell'inventario sono per NOME ("quante spade?"), e il dizionario risponde per nome all'istante; una lista dovrebbe essere scorsa ogni volta
 
 ---
 
@@ -1051,3 +1431,94 @@ self . stats . grows
 ```
 
 Il punto = "vai dentro". Si legge SEMPRE da sinistra a destra, un passo alla volta.
+
+---
+
+# Registro delle prime volte
+
+Dove è comparso per la prima volta ogni elemento nuovo di Python (per ripassare in ordine):
+
+| Elemento | Prima volta in |
+|---|---|
+| `print()`, `def` | p00 ex0 |
+| `input()` | p00 ex1 |
+| `int()`, f-string, `str` | p00 ex2 |
+| `if`/`else` | p00 ex4 |
+| `for`, `range()`, ricorsione helper | p00 ex6 |
+| type hints, `elif`, `.capitalize()` | p00 ex7 |
+| `if __name__ == "__main__":` | p01 ex0 |
+| classe, oggetto, `__init__`, `self`, metodo, attributo | p01 ex1 |
+| `round()` | p01 ex2 |
+| lista di oggetti, `end=" "` | p01 ex3 |
+| incapsulamento `_`, getter/setter, `return` | p01 ex4 |
+| ereditarietà, `super()` | p01 ex5 |
+| `@staticmethod`, `@classmethod`, classe annidata | p01 ex6 |
+| `import`, `try`/`except`, `as e`, `Exception` | p02 ex0 |
+| `raise` | p02 ex1 |
+| tipi di errore specifici, `else` del try | p02 ex2 |
+| eccezione custom `class X(Exception)`, valore di default di un parametro | p02 ex3 |
+| `finally`, indicizzazione `stringa[0]`, `.isupper()` | p02 ex4 |
+| `sys`, `sys.argv`, `len()`, lista | p03 ex0 |
+| `.append()`, `sum()`/`max()`/`min()`, slicing `[1:]`, `return` senza valore | p03 ex1 |
+| tupla, `math.sqrt()`, `.split()`, `float()`, unpacking, `while True`, `**`, `continue`/`break` | p03 ex2 |
+| set, `random.randint()`, `random.sample()`, **dizionario**, `union`/`intersection`/`difference`, **annotazione di variabile** (`x: Tipo = valore`) | p03 ex3 |
+| (da completare con ex4+) | — |
+
+---
+
+# Guida venv — cos'è e quando serve davvero
+
+
+## In una riga
+
+Un **venv** (virtual environment) è una **copia privata di Python** dentro una cartellina (di solito `.venv`). Quando è attivo, `python3` e `pip` usano QUELLA copia, non quella del sistema. Analogia: un laboratorio personale chiuso a chiave — puoi sporcarlo quanto vuoi senza toccare il laboratorio comune.
+
+## Quando serve DAVVERO nei nostri moduli
+
+| Moduli | Serve il venv? | Perché |
+|---|---|---|
+| p00, p01, p02, p03, p04, p05, p06, p07 | **NO** | usano solo la libreria standard di Python (sys, math, random, abc...) — `python3` di sistema basta |
+| p08 (The Matrix) | **SÌ** | ex1 ha bisogno di pandas/numpy/matplotlib, ex2 di python-dotenv — pacchetti da installare, e il subject chiede di testare dentro/fuori venv |
+| p09 (Cosmic Data) | **SÌ (obbligatorio)** | il subject lo impone: "You must use Virtual environments" + pydantic installato via pip |
+| AMAZEING | **SÌ** | ha il suo `.venv` già creato (perché il Python di sistema del Mac rifiuta `pip install`) |
+
+Regola pratica: **serve il venv solo quando un modulo ha bisogno di pacchetti esterni** (cose da `pip install`). Se il modulo usa solo import standard, no.
+
+## I 4 comandi della vita
+
+```bash
+# 1. CREARE (una volta sola, dentro la cartella del progetto)
+python3 -m venv .venv
+
+# 2. ATTIVARE (ogni volta che apri un terminale nuovo per quel progetto)
+source .venv/bin/activate
+# → il prompt ora mostra (.venv): sei dentro
+
+# 3. INSTALLARE (solo dentro il venv attivo; pip ora funziona)
+pip install pydantic
+
+# 4. USCIRE
+deactivate
+# → il (.venv) sparisce, si torna al Python di sistema
+```
+
+## Cose da sapere per non farsi fregare
+
+- **L'attivazione vale per UNA finestra di terminale.** Apri un'altra finestra? Non è attivo lì. Per questo vedi `(.venv)` in una finestra e non in un'altra
+- **Il venv si riconosce dal prompt:** `(.venv)` prima del nome utente
+- **Ogni progetto ha il SUO venv** — quello di AMAZEING non c'entra con p09. Si crea uno per cartella di progetto
+- **La cartella `.venv` NON va mai pushata su GitHub** (è nel .gitignore, contiene copie giganti di Python — chi corregge se lo ricrea da solo)
+- **Il problema pip del Mac** (errore "externally-managed-environment" / PEP 668) sparisce DENTRO il venv: lì pip è libero di installare
+- **Creare il venv NON lo attiva** — sono due passi separati: `python3 -m venv .venv` crea, `source .venv/bin/activate` accende. Errore classico: creare e poi chiedersi perché pip non va
+- **Se sbagli, si butta via:** `rm -rf .venv` e si ricrea. Non si rompe niente di sistema
+
+## Il comando per i moduli che ne hanno bisogno (p08, p09)
+
+```bash
+cd python/p09              # cartella del modulo
+python3 -m venv .venv      # crea
+source .venv/bin/activate  # attiva
+pip install pydantic       # installa
+python3 ex0/space_station.py   # esegui con python3 (ora è quello del venv)
+deactivate                 # a fine lavoro
+```
