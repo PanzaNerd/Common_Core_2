@@ -18,7 +18,14 @@ letto/elaborato → cosa ne deriva**. Niente codice, illustrazioni semplici.
    - 1.7 Il display interattivo
    - 1.8 Il main e la gestione errori
 2. I moduli
-3. Glossario
+3. Studio del codice (file per file)
+   - L'ordine di studio (perché questo)
+   - 3.1 a_maze_ing.py — il direttore d'orchestra
+   - 3.2 config_parser.py — nasce il Config (in arrivo)
+   - 3.3 mazegen.py — il cuore (in arrivo)
+   - 3.4 output_writer.py — il file di output (in arrivo)
+   - 3.5 display.py — il terminale interattivo (in arrivo)
+4. Glossario
 
 ---
 
@@ -1016,7 +1023,196 @@ file è di tutti e due.
 | a_maze_ing.py | orchestrazione + errori | 1.8 |
 | pacchetto mazegen | modulo riusabile installabile con pip | README |
 
-# 3. Glossario
+# 3. Studio del codice (file per file)
+
+La teoria (parte 1) dice COSA fa il programma. Questa parte dice COME
+lo fa: ogni file viene studiato riga per riga, nell'ORDINE DI
+ESECUZIONE (lo stesso della mappa: input → generazione → percorso →
+output → display). I file si studiano uno alla volta, solo dopo che il
+precedente è chiaro al 100%.
+
+## L'ordine di studio (perché questo)
+
+1. **a_maze_ing.py** — il direttore d'orchestra: piccolo, fa solo
+   chiamare gli altri file nell'ordine giusto. Studiandolo per primo
+   si vede TUTTA la mappa del programma in miniatura.
+2. **config_parser.py** — la PRIMA cosa che il main chiama: nasce il
+   Config.
+3. **mazegen.py** — il cuore: griglia, talpa, piccone, 42, BFS.
+4. **output_writer.py** — scrive il file esadecimale.
+5. **display.py** — il display interattivo.
+
+Per ogni file si risponde a: cos'è → cosa fa nel flusso → esecuzione
+riga per riga (in ordine!) → chi è cosa (predefinito di Python o
+nostro) → analogie col C → risposte pronte per l'evaluation.
+
+---
+
+## 3.1 a_maze_ing.py — il direttore d'orchestra
+
+### Cos'è
+
+Il file principale: quello che si esegue con
+`python3 a_maze_ing.py config.txt`. Fa SOLO il direttore d'orchestra:
+non genera, non scrive, non disegna niente da solo — chiama gli altri
+file (i "musicisti") nell'ordine giusto e protegge tutto dagli errori.
+È l'unico file che si esegue direttamente; gli altri si importano.
+
+### Il flusso in miniatura (le tappe)
+
+1. controlla gli argomenti da terminale (righe 28-30)
+2. tappa A: parse del config, dentro un try (righe 32-39)
+3. tappa B: crea il generatore e genera il labirinto (righe 41-43)
+4. tappa C: trova il percorso (riga 45)
+5. tappa D: scrive il file di output (righe 46-47)
+6. se il 42 manca, avvisa con un messaggio (righe 49-50)
+7. tappa E: apre il display (riga 52)
+8. in fondo: il "pulsante di avvio" (righe 55-63)
+
+### Esecuzione riga per riga
+
+**Righe 1-11: l'header 42.** Solo un commento obbligatorio della
+scuola (login, data): Python lo salta, come /* ... */ in C.
+
+**Righe 13-16: la docstring.** Il primo `"""..."""` dentro un file o
+una funzione non è un semplice commento: è la DOCUMENTAZIONE ufficiale
+di quel file o funzione (si può leggere con help()). Qui dice a cosa
+serve il programma e come si usa.
+
+**Riga 18: `import sys`.** sys è un MODULO PREDEFINITO di Python: una
+libreria già pronta dentro Python, come le librerie standard del C
+(#include <stdlib.h>). Porta con sé due strumenti che servono qui:
+sys.argv (gli argomenti da terminale) e sys.exit (spegnere il
+programma con un codice d'uscita).
+
+**Righe 20-23: gli import dei NOSTRI file.** config_parser, display,
+mazegen, output_writer sono i NOSTRI moduli: gli altri file .py della
+cartella del progetto. `import` = "aggancia quel file: da ora posso
+usare le sue funzioni e classi". In C si fa con #include + compilazione
+di più file .c; in Python basta scrivere il nome del file senza .py.
+
+**Riga 26: `def main():`** NOSTRA funzione. Il nome main è una
+convenzione (non è obbligatorio come in C). `-> None` è il type hint:
+la funzione non restituisce niente (come void in C), serve a mypy e al
+lettore.
+
+**Righe 28-30: il controllo degli argomenti.**
+- `len(sys.argv)` — sys.argv è la LISTA di tutto ciò che è stato
+  scritto da terminale: argv[0] = nome del programma, argv[1] = primo
+  argomento (il config). È l'argc/argv del C. len() è una funzione
+  predefinita che conta gli elementi di una lista.
+- `!= 2` — devono esserci ESATTAMENTE 2 elementi: nome del programma
+  + file di config. Se l'utente scrive solo `python3 a_maze_ing.py`
+  (1 elemento) o troppa roba (3+), si entra nell'if.
+- `print(...)` — predefinita, come printf. La f davanti alla stringa
+  (f-string) è la "stringa coi buchi": le parti tra { } vengono
+  riempite coi valori al momento dell'esecuzione (in C: printf("%s"),
+  ma qui si scrive il nome della variabile direttamente nel buco).
+- `sys.exit(1)` — spegne il programma SUBITO. Il numero è il codice
+  d'uscita: 0 = tutto ok, 1 = errore (come return 1 dal main in C).
+
+**Righe 32-39: tappa A protetta dal try.**
+- `try:` apre la RETE DI SICUREZZA: esegui quello che segue, e se
+  salta fuori un errore non crashare, vai alla rete giusta. In C non
+  esiste: gli errori si controllavano a mano con if e return.
+- `config = config_parser.parse_config(sys.argv[1])` — chiama la
+  NOSTRA funzione parse_config (file 2, prossimo studio) passandole il
+  percorso del config; lei restituisce un oggetto Config: la scatola
+  coi parametri validati (width, height, entry, ...).
+- `except config_parser.ConfigError as e:` — la PRIMA rete: se
+  parse_config alza ConfigError (NOSTRA eccezione = "il config ha un
+  contenuto sbagliato"), si cattura qui. `as e` dà un nome all'errore
+  per poterlo stampare. Messaggio chiaro + uscita con codice 1.
+- `except OSError:` — la SECONDA rete: OSError è un'eccezione
+  PREDEFINITA di Python per i problemi di sistema, come "il file non
+  esiste" (open fallisce dentro parse_config). Messaggio + uscita 1.
+  Il subject chiede esattamente questo: mai crashare, sempre un
+  messaggio chiaro.
+
+**Righe 41-43: tappa B (in breve, studiata nel file 3).**
+- `gen = mazegen.MazeGenerator(...)` — crea un oggetto della NOSTRA
+  classe MazeGenerator: il "laboratorio" con larghezza, altezza e
+  seed. `config.width` = il campo width della scatola Config (il
+  punto è l'accesso ai campi, come struct.field in C).
+- `gen.generate(perfect=..., entry=..., exit=...)` — genera il
+  labirinto. I nomi con = sono gli ARGOMENTI CHIAVE: i valori si
+  passano per nome e l'ordine non conta (in C non esistono). Al
+  ritorno, gen.grid contiene la griglia.
+
+**Riga 45: tappa C.** `path = gen.solve()` — il BFS (capitolo 1.5)
+trova il percorso più corto e lo restituisce come lista di celle.
+
+**Righe 46-47: tappa D.** `output_writer.write_output_file(...)` —
+scrive il file di output (capitolo 1.6, file 4).
+
+**Righe 49-50: il messaggio del 42.** Se `gen.has_42` è False (maze
+troppo piccolo, sotto 9x6), il main stampa il messaggio richiesto dal
+subject e il programma CONTINUA lo stesso.
+
+**Riga 52: tappa E.** `display.run(gen)` — apre il display
+interattivo (capitolo 1.7, file 5).
+
+**Righe 55-63: il pulsante di avvio e l'ultima rete.**
+- `if __name__ == "__main__":` — il trucco più famoso di Python.
+  __name__ è una variabile PREDEFINITA che Python riempie da solo con
+  il nome del file. Quando il file viene ESEGUITO da terminale,
+  Python la riempie con la stringa "__main__" → la condizione è vera
+  → main() parte. Quando invece il file viene IMPORTATO da un altro
+  file, contiene "a_maze_ing" → main() NON parte. Serve per poter
+  riusare il file senza eseguirlo per sbaglio. In C il problema non
+  esiste: main() è l'unico punto d'ingresso per costruzione del
+  linguaggio.
+- `try: main()` con `except KeyboardInterrupt:` — il Ctrl+C (il
+  SIGINT del C): stampa una riga vuota ed esce con codice 0 (l'utente
+  ha chiuso lui: non è un errore). Senza questa rete, Ctrl+C
+  lascerebbe il traceback brutto sullo schermo.
+- `except Exception:` — l'ULTIMA rete: qualunque errore non previsto
+  viene comunque catturato: messaggio chiaro e uscita 1. Mai crash,
+  mai traceback, come chiede il subject.
+
+### Chi è cosa
+
+| Nome | Predefinito o nostro |
+|------|----------------------|
+| sys | predefinito (modulo della libreria standard) |
+| len, print | predefinite (funzioni built-in) |
+| __name__ | predefinita (variabile speciale di Python) |
+| KeyboardInterrupt, OSError, Exception | predefinite (eccezioni) |
+| ConfigError | NOSTRA (definita in config_parser.py) |
+| parse_config, write_output_file, run | NOSTRE funzioni |
+| MazeGenerator, Config | NOSTRE classi |
+| main, gen, config, path, e | NOSTRI (funzione, oggetti, variabili) |
+
+### Analogie col C
+
+| Python | C |
+|--------|---|
+| import sys | #include <stdlib.h> |
+| sys.argv | argv |
+| len(sys.argv) != 2 | argc != 2 |
+| print(f"...{x}...") | printf |
+| sys.exit(1) | exit(1) / return 1 |
+| try/except | non esiste (errori a mano con if) |
+| config.width | struct.field |
+| if __name__ == "__main__" | non serve: main() è già l'ingresso |
+
+### Risposte pronte per l'evaluation
+
+- "Da dove parte il programma?" Dal fondo: il blocco
+  if __name__ == "__main__" chiama main().
+- "Perché controlli len(sys.argv) != 2?" Perché servono esattamente
+  il nome del programma + il file di config: con un numero diverso di
+  argomenti si stampa l'uso corretto e si esce con codice 1.
+- "Perché try/except?" Il subject vieta i crash: ogni errore
+  prevedibile ha la sua rete con messaggio chiaro, e l'ultimo except
+  Exception copre tutto il resto. Ctrl+C è trattato a parte con
+  codice 0.
+- "Il main genera il labirinto?" No: chiama solo i moduli
+  nell'ordine giusto (parse → generate → solve → write → display).
+
+---
+
+# 4. Glossario
 
 - **nibble:** 4 bit = mezza byte = una cifra esadecimale
 - **BFS:** visita in ampiezza, trova il percorso più corto
