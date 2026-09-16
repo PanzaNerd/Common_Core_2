@@ -987,7 +987,7 @@ if __name__ == "__main__":
 
 ## ex3 — ft_achievement_tracker — i set
 
-**★ PRIME VOLTE qui:** set, `random.randint()`, `random.sample()`, **dizionario**, `union`/`intersection`/`difference`, **annotazione di variabile** (`nome: Tipo = valore`)
+**★ PRIME VOLTE qui:** set, `random.randint()`, `random.sample()`, **dizionario**, `union`/`intersection`/`difference`, **annotazione di variabile** (`nome: Tipo = valore`), **loop annidato** (loop dentro un loop)
 
 ### ★ PRIMA VOLTA: l'annotazione di variabile — i due punti nelle assegnazioni
 
@@ -1041,6 +1041,35 @@ Ogni riga ha MENO elementi (o uguali) della precedente. Finale = ciò che è SOP
 - `missing_achievements` = TOTALE `{A,B,C,D}` MENO quelli di Charlie `{C,D}` = `{A,B}` (i mancanti)
 
 **Da ricordare per l'evaluation:** union e intersection nel loop usano un ACCUMULATORE (la variabile sta a SINISTRA e a DESTRA dell'uguale). La difference è un calcolo in una botta sola: due set, uno meno l'altro.
+
+### ★ PRIMA VOLTA: il loop ANNIDATO (loop dentro un loop) — i blocchi "only" e "missing"
+
+Il for esterno `for name in players:` è la TELECAMERA: punta su UN giocatore alla volta, e tutto il blocco lavora solo su di lui.
+
+**Blocco "only" (con loop INTERNO):** per sapere cosa ha SOLO il giocatore di turno, serve la collezione di TUTTI GLI ALTRI. Il loop interno `for other_player in players:` ripassa tutti e **salta chi è di turno** con `if other_player != name` — il cuore del blocco: "raccogli tutti tranne me". Traccia (Alice={A,B}, Bob={B,C}, Charlie={C,D}):
+```
+GIRO ESTERNO name="Alice":  sacchetto altri = set() (FRESCO)
+  interno: "Alice"  -> != ? NO  -> SALTA
+  interno: "Bob"    -> SÌ -> union {B,C} -> altri={B,C}
+  interno: "Charlie"-> SÌ -> union {C,D} -> altri={B,C,D}
+  solo = {A,B} MENO {B,C,D} = {A}  ->  "Only Alice has: {A}"
+GIRO ESTERNO name="Bob":  sacchetto altri = set() (VUOTO DI NUOVO: ogni giro lo ricrea!)
+  interno: "Alice" -> SÌ -> {A,B}
+  interno: "Bob"   -> NO  -> SALTA
+  interno: "Charlie" -> SÌ -> {A,B,C,D}
+  solo = {B,C} MENO {A,B,C,D} = set()  ->  "Only Bob has: set()"
+```
+Due cose da ricordare: `achievements_of_others` rinasce vuoto a ogni giro ESTERNO (se no, il sacchetto di Bob conterrebbe la roba di Alice), e il costo è 4×4=16 passaggi.
+
+**Perché `other_player` e non `name`:** sono DUE ruoli diversi e devono restare separati. `name` = la variabile del loop ESTERNO (la telecamera: "di CHI stiamo calcolando il 'solo lui'?"); `other_player` = la variabile del loop INTERNO (la torcia che ripassa tutti). Il confronto `if other_player != name:` ha senso SOLO perché i nomi sono diversi: confronta la torcia con la telecamera. Se il loop interno usasse anche `name`, SOVRASCRIVEREBBE quello dell'esterno (perdendo il "chi è di turno") e il confronto `name != name` sarebbe SEMPRE falso → sacchetto vuoto per sempre. È esattamente il C: `for (int i...) { for (int j...) { if (j != i) } }` — due loop, due contatori, ognuno col suo ruolo
+
+**Blocco "missing" (NESSUN loop annidato):** la domanda è "cosa manca a Charlie?" = TUTTI i 14 MENO i suoi. Il totale è già pronto (ACHIEVEMENTS): sottrazione secca, una botta sola:
+```
+name="Alice"   -> {A,B,C,D} MENO {A,B} = {C,D}  -> "Alice is missing: {C,D}"
+name="Bob"     -> {A,B,C,D} MENO {B,C} = {A,D}  -> "Bob is missing: {A,D}"
+name="Charlie" -> {A,B,C,D} MENO {C,D} = {A,B}  -> "Charlie is missing: {A,B}"
+```
+Variabile fresca a ogni giro: nasce, si stampa, si butta.
 
 **Le 3 operazioni (le tre domande sui sacchetti):**
 - **union** — butto tutto nel sacchettone: ogni elemento che sta in almeno un sacchetto (i duplicati si fondono) → "tutti gli achievement distinti"
