@@ -871,9 +871,29 @@ L'unica regola di posizione che conta davvero è quella del bug
 corretto: ALMENO UNA RIGA interamente libera sopra le cifre
 (connettività), più il non coprire entry/exit.
 
+### Attenzione a come si contano le celle (indici da 0)
+
+WIDTH=12 significa 12 CELLE: gli indici delle colonne vanno da 0 a 11.
+L'indice 0 è la PRIMA cella, non una cella in più: l'ultimo indice è
+sempre il numero meno 1 (come in C: int tab[12] va da tab[0] a
+tab[11]). Per avere 13 colonne bisogna scrivere WIDTH=13. Stessa cosa
+per HEIGHT: HEIGHT=9 sono 9 righe, indici da 0 a 8.
+
+### Quando il centro esatto È possibile
+
+Il centro esatto esiste solo se lo spazio libero è PARI. Con WIDTH=13:
+13 - 7 = 6 → 3 a sinistra e 3 a destra, centrato perfetto; con
+HEIGHT=9: 9 - 5 = 4 → 2 sopra e 2 sotto: un 13x9 è centrato in
+entrambe le direzioni (il codice piazza start_x=3 e start_y=2). Con
+12 colonne lo spazio libero è 5, dispari: 2/3 è il meglio possibile.
+Nel display la differenza sembra più grande di quella che è, perché
+ogni cella diventa 2 caratteri + i muri, ma nel conteggio delle CELLE
+(quello che conta per il subject) lo scarto è sempre al massimo 1.
+
 Risposta da evaluation: "Il subject chiede solo un 42 visibile di
-celle chiuse; lo centriamo con la divisione intera, e quando lo spazio
-libero è dispari la cella in più va a destra/sotto."
+celle chiuse, non centrato; lo centriamo con la divisione intera, e
+quando lo spazio libero è dispari la cella in più va a destra/sotto
+(il centro perfetto richiederebbe la mezza cella)."
 
 ### Riepilogo in 4 passi
 
