@@ -18,10 +18,10 @@ letto/elaborato → cosa ne deriva**. Niente codice, illustrazioni semplici.
    - 1.7 Il display interattivo
    - 1.8 Il main e la gestione errori
 2. I moduli
-3. Studio del codice (file per file)
+3. Studio del codice (in ordine di esecuzione)
    - L'ordine di studio (perché questo)
    - 3.1 a_maze_ing.py — il direttore d'orchestra
-   - 3.2 config_parser.py — nasce il Config (in arrivo)
+   - 3.2 config_parser.py — nasce il Config (in corso)
    - 3.3 mazegen.py — il cuore (in arrivo)
    - 3.4 output_writer.py — il file di output (in arrivo)
    - 3.5 display.py — il terminale interattivo (in arrivo)
@@ -1023,13 +1023,15 @@ file è di tutti e due.
 | a_maze_ing.py | orchestrazione + errori | 1.8 |
 | pacchetto mazegen | modulo riusabile installabile con pip | README |
 
-# 3. Studio del codice (file per file)
+# 3. Studio del codice (in ordine di esecuzione)
 
 La teoria (parte 1) dice COSA fa il programma. Questa parte dice COME
-lo fa: ogni file viene studiato riga per riga, nell'ORDINE DI
-ESECUZIONE (lo stesso della mappa: input → generazione → percorso →
-output → display). I file si studiano uno alla volta, solo dopo che il
-precedente è chiaro al 100%.
+lo fa: riga per riga, nell'ORDINE DI ESECUZIONE (lo stesso della
+mappa: input → generazione → percorso → output → display). Si seguono
+le CHIAMATE: quando una riga chiama una funzione di un altro file, ci
+si sposta lì e si resta finché l'esecuzione non torna indietro. Per
+questo 3.1 copre il main solo fino alla tappa A, e 3.2 parte dalla
+chiamata a parse_config.
 
 ## L'ordine di studio (perché questo)
 
@@ -1212,6 +1214,124 @@ interattivo (capitolo 1.7, file 5).
 
 ---
 
+## 3.2 config_parser.py — dalla chiamata del main alla lettura del file
+
+### Cos'è
+
+Il modulo che il main chiama per PRIMO (tappa A, riga 33): legge
+config.txt (righe KEY=VALUE), lo valida e restituisce l'oggetto Config
+coi parametri del labirinto. Studio in ordine di CHIAMATE: entriamo
+qui dalla riga 33 del main e ci restiamo finché parse_config non
+ritorna al main col Config in mano.
+
+### Prima della chiamata: cosa è successo all'import (righe 13-86)
+
+Il file config_parser.py NON nasce alla riga 33 del main: nasce alla
+riga 20, all'import. In quel momento Python ha eseguito il file
+dall'alto in basso e ha PREPARATO le definizioni:
+
+- REQUIRED_KEYS: la lista delle chiavi obbligatorie
+- class ConfigError: la NOSTRA eccezione (la prima rete del main)
+- class Config: la scatola che nascerà alla fine
+- le 4 funzioni di servizio: _parse_int, _parse_bool, _parse_coords,
+  _check_bounds (il trattino basso = convenzione "uso interno del
+  file")
+
+Preparare non è fare: niente di visibile è successo (come dichiarare
+le funzioni in C prima del main). Le funzioni di servizio verranno
+spiegate quando verranno CHIAMATE, nell'ordine di esecuzione.
+
+### Dentro parse_config (righe 88-101)
+
+- La docstring è il contratto: "mi dai il percorso, ti restituisco
+  Config; contenuto sbagliato → ConfigError; file illeggibile → OSError
+  che PROPAGA al chiamante".
+- Riga 101: values, la scatola vuota — chiavi stringhe (WIDTH,
+  HEIGHT...) e valori stringhe (ancora grezzi: "20" come parola, non
+  come numero). Ci finiscono le righe del config NON ancora
+  interpretate.
+
+### Riga 102: ★ PRIMA VOLTA — with e open
+
+- **open(path, "r", encoding="utf-8")** — la fopen del C: chiede al
+  sistema operativo di preparare il file per la lettura e restituisce
+  il MANICO (file object): il biglietto con cui si parla col file. Il
+  contenuto NON viene caricato in memoria. I tre ingredienti: path =
+  quale file (la stringa passata dal main); "r" = modalità sola
+  lettura; encoding="utf-8" = l'etichettatura dei caratteri (argomento
+  chiave, passato per nome).
+- **as f** — il nome del manico (in C: FILE *f = fopen(...)).
+- **with** — la porta che si chiude da sola: alla fine del blocco
+  indentato (righe 103-117) il file viene chiuso SEMPRE, anche se
+  dentro scoppia un errore. Risolve il bug classico del C: dimenticarsi
+  la fclose (o uscire prima per un errore) lascia il file aperto.
+- Il filo col main: se il file non esiste, open fallisce QUI con
+  OSError; parse_config non lo cattura ("propaga") e l'errore risale
+  alla SECONDA rete del try nel main → messaggio + uscita 1.
+
+### Righe 103-106: la lettura riga per riga
+
+- line_no = 0: contatore di righe, per i messaggi d'errore.
+- for line in f: a ogni giro line diventa UNA riga intera del file; il
+  for va a pescare la successiva da solo e si ferma da solo alla fine.
+  Il file non è mai tutto in memoria (una scatola alla volta dal
+  nastro; in C: while con fgets). La riga contiene ANCHE il carattere
+  invisibile di fine riga.
+- line_no = line_no + 1: il contatore sale a ogni giro.
+- stripped = line.strip(): strip è un METODO delle stringhe (un
+  comando che ogni stringa sa fare): toglie gli spazi alle estremità e
+  il fine-riga invisibile. line resta sporca, stripped è la pulita.
+
+### → In arrivo (prossimi passi dello studio)
+
+- Le decisioni del loop: riga vuota o commento → salta; manca l'= →
+  errore; split in chiave e valore; doppione → errore.
+- La validazione: chiavi mancanti, numeri, coordinate, PERFECT,
+  OUTPUT_FILE, SEED.
+- La nascita del Config e il ritorno al main (tappa A completa).
+
+### Chi è cosa (fin qui)
+
+| Nome | Predefinito o nostro |
+|------|----------------------|
+| open | predefinita (funzione built-in) |
+| with, for | predefinite (parole chiave di Python) |
+| strip | predefinito (metodo delle stringhe) |
+| path | NOSTRO (parametro di parse_config) |
+| values, f, line, line_no, stripped | NOSTRE variabili |
+| parse_config, _parse_int, _parse_bool, _parse_coords, _check_bounds | NOSTRE funzioni |
+| REQUIRED_KEYS | NOSTRA costante |
+| ConfigError, Config | NOSTRE classi |
+
+### Analogie col C
+
+| Python | C |
+|--------|---|
+| open(path, "r") | fopen(path, "r") |
+| as f | FILE *f = ... |
+| with | non esiste: fclose a mano (rischio di dimenticarla) |
+| for line in f | while (fgets(...) != NULL) |
+| line.strip() | non esiste: spazi e fine-riga da togliere a mano |
+| encoding="utf-8" | la scelta dell'encoding/locale |
+
+### Risposte pronte per l'evaluation
+
+- "Quando viene eseguito config_parser.py?" All'import (riga 20 del
+  main): Python prepara le definizioni; parse_config viene CHIAMATO
+  alla riga 33 e solo lì parte il suo corpo.
+- "Cosa fa open? Perché gli dai 3 argomenti?" Apre il file in lettura
+  e restituisce il manico. path = quale file, "r" = sola lettura,
+  encoding = etichettatura dei caratteri.
+- "Perché with?" Garantisce la chiusura del file a fine blocco anche
+  in caso di errore: in C la fclose si dimentica facilmente.
+- "Il file viene caricato tutto in memoria?" No: il for legge una riga
+  alla volta.
+- "Dove finisce l'errore se il file non esiste?" open alza OSError;
+  parse_config lo lascia propagare; lo prende la seconda rete del try
+  nel main (messaggio + uscita 1).
+
+---
+
 # 4. Glossario
 
 - **nibble:** 4 bit = mezza byte = una cifra esadecimale
@@ -1221,3 +1341,7 @@ interattivo (capitolo 1.7, file 5).
 - **Config:** oggetto che contiene i parametri validati del labirinto
 - **grid:** la griglia del labirinto, grid[y][x] = numero 0-15 della cella
 - **seed:** punto di partenza della sequenza casuale (riproducibilità)
+- **open():** funzione predefinita: apre un file e restituisce il manico (niente contenuto in memoria)
+- **with:** parola chiave: il file si chiude da solo a fine blocco, anche con errori
+- **manico (file object):** il "biglietto" con cui si parla col file aperto
+- **strip():** metodo delle stringhe: toglie spazi e fine-riga dalle estremità
