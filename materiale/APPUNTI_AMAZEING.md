@@ -886,9 +886,13 @@ Il centro esatto esiste solo se lo spazio libero è PARI. Con WIDTH=13:
 HEIGHT=9: 9 - 5 = 4 → 2 sopra e 2 sotto: un 13x9 è centrato in
 entrambe le direzioni (il codice piazza start_x=3 e start_y=2). Con
 12 colonne lo spazio libero è 5, dispari: 2/3 è il meglio possibile.
-Nel display la differenza sembra più grande di quella che è, perché
-ogni cella diventa 2 caratteri + i muri, ma nel conteggio delle CELLE
-(quello che conta per il subject) lo scarto è sempre al massimo 1.
+Con HEIGHT=10: 10 - 5 = 5, dispari → 2 sopra e 3 sotto: un 13x10 è
+centrato solo in orizzontale. Regola: il centro perfetto in ENTRAMBE
+le direzioni richiede che sia (WIDTH - 7) che (HEIGHT - 5) siano
+PARI. Nel display la differenza sembra più grande di quella che è,
+perché ogni cella diventa 2 caratteri + i muri, ma nel conteggio
+delle CELLE (quello che conta per il subject) lo scarto è sempre al
+massimo 1.
 
 Risposta da evaluation: "Il subject chiede solo un 42 visibile di
 celle chiuse, non centrato; lo centriamo con la divisione intera, e
