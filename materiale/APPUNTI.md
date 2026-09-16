@@ -1120,12 +1120,10 @@ players["Alice"]    # → il set di Alice ("cerca la voce Alice, dammi la sua de
 7. "Only X has": per ogni giocatore si costruisce `achievements_of_others` = union dei set degli ALTRI tre (loop interno con `other_player`, salta se stesso con `if other_player != name`), poi `players[name].difference(achievements_of_others)` = i suoi meno quelli degli altri
 8. "Missing": `missing_achievements = set(ACHIEVEMENTS).difference(players[name])` = tutti i 14 meno i suoi — variabile fresca a ogni giro
 
-**Perché i numeri sono 14 e 10-12 (il tuning del subject):** il subject dice ESATTAMENTE: "Adjust the total number of achievements and how many you pick up for each player, so that all the requested sets are likely to be non-empty". Traduzione: sei TU a scegliere i numeri, ma il risultato deve essere che i set escano PROBABILMENTE non vuoti quando il valutatore lancia il programma. Misurato davvero:
-- 6-9 su 14 → common vuoto ~3 volte su 10 → NON va bene (30% di lanci con common vuoto non è "likely")
-- 8-11 su 14 → ~1 vuoto su 20 (~5%) → al limite
-- **10-12 su 14 → 0 vuoti su 20 run → è questo che il subject intende**
-
-La logica: più achievement peschi per giocatore, più i set si sovrappongono, più il comune è garantito. Il dado resta: matematicamente un vuoto è SEMPRE possibile, ma rarissimo.
+**Perché i numeri sono 14 e 8-11 (il tuning del subject, la versione FINALE):** il subject dice ESATTAMENTE: "Adjust the total number of achievements and how many you pick up for each player, so that all the requested sets are likely to be non-empty". Traduzione: sei TU a scegliere i numeri, ma TUTTI i set richiesti devono uscire PROBABILMENTE non vuoti quando il valutatore lancia il programma. Il tuning è un equilibrio TRA DUE esigenze OPPOSTE:
+- se peschi POCO (6-9) → common vuoto ~30% dei run (male) ma "Only X has" pieno spesso
+- se peschi TANTO (10-12) → common sempre pieno, ma "Only X has" SEMPRE vuoto (tutti hanno tutto: nessuno ha esclusivi — male, il subject vuole vedere anche quelli)
+- **8-11 è il punto d'oro, misurato su 15 run:** common vuoto 0/15 ✓, almeno un "Only X has" non vuoto 12/15 ✓, missing non vuoto SEMPRE (peschi max 11 di 14 → mancano sempre almeno 3) ✓
 
 **Perché l'output NON può essere tale e quale all'esempio del subject:** i set sono CASUALI — ogni lancio esce diverso, e l'esempio del subject è UNA delle esecuzioni possibili (guarda: nell'esempio del subject stesso "Only Alice has: set()" è VUOTO — i vuoti capitano, lì sono normali). Questo esercizio non ha strict output check: l'evaluator guarda che le operazioni (union/intersection/difference) siano giuste e che il tuning rispetti il "likely non-empty".
 
