@@ -170,7 +170,7 @@ cucita dentro e funziona con qualunque misura (minimo 2x2, imposto dal
 parser; massimo nessuno). WIDTH = larghezza (colonne), HEIGHT =
 altezza (righe). All'evaluation il config sarà diverso dal nostro:
 dimensioni, ENTRY, EXIT e PERFECT possono cambiare e il programma deve
-gestirli tutti. Il "42" invece richiede spazio (almeno 9 colonne x 5
+gestirli tutti. Il "42" invece richiede spazio (almeno 9 colonne x 6
 righe): sotto quella taglia viene omesso (messaggio + programma
 continua, il subject lo ammette).
 
@@ -807,7 +807,8 @@ blocca sia la (0,1) sia la (1,1).
 
 OBBLIGATORIO (subject: "the maze must contain a visible '42'"). Le
 celle dei MATTONCINI del disegno "42" sono scatole COMPLETAMENTE chiuse
-(F = tutti i muri) piazzate al CENTRO della griglia. Prima che la talpa
+(F = tutti i muri) piazzate al CENTRO della griglia, ma sempre con
+ALMENO UNA RIGA interamente libera SOPRA le cifre. Prima che la talpa
 parta vengono marcate come "già visitate": per la talpa sono cemento
 armato → non ci scava mai dentro → i mattoncini restano isole chiuse, e
 anche il risolutore (1.5) non ci passa mai. Le celle VUOTE delle cifre
@@ -815,8 +816,20 @@ invece sono celle normali: la generazione ci scava dentro e il percorso
 può passarci — il 42 resta leggibile perché i mattoncini sono blocchi
 pieni. Nel display i mattoncini sono quadratini pieni del colore dei
 muri: il 42 appare come un blocco compatto e le cifre si leggono bene.
-Se il labirinto è troppo piccolo il 42 si omette: il main stampa un
-messaggio e il programma CONTINUA.
+
+Il disegno è 7 colonne x 5 righe, e il codice lo piazza solo se la
+griglia è almeno 9x6, con almeno una riga libera sopra le cifre:
+
+- con SOLO 5 righe le cifre occuperebbero tutta l'altezza: il lato
+  destro del 4 è una colonna piena di mattoncini che andrebbe da bordo
+  a bordo e taglierebbe il labirinto in due parti che non si toccano
+  (se entrata e uscita stanno nelle due parti, il percorso NON esiste);
+- il "buco" in alto del 4 deve toccare celle libere: appiccicato al
+  bordo resterebbe sigillato dai mattoncini e due celle non sarebbero
+  mai raggiunte da nessuno (il subject vieta le celle isolate).
+
+Se il labirinto è troppo piccolo (sotto 9x6) il 42 si omette: il main
+stampa un messaggio e il programma CONTINUA.
 
 ### Riepilogo in 4 passi
 
