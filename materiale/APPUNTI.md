@@ -1091,7 +1091,14 @@ players["Alice"]    # → il set di Alice ("cerca la voce Alice, dammi la sua de
 7. "Only X has": per ogni giocatore si costruisce `achievements_of_others` = union dei set degli ALTRI tre (loop interno con `other_player`, salta se stesso con `if other_player != name`), poi `players[name].difference(achievements_of_others)` = i suoi meno quelli degli altri
 8. "Missing": `missing_achievements = set(ACHIEVEMENTS).difference(players[name])` = tutti i 14 meno i suoi — variabile fresca a ogni giro
 
-**Perché i numeri sono 14 e 10-12:** il subject dice di tararli perché le risposte escano "probabilmente non vuote". Attenzione, è un tuning VERO, non un dettaglio: con 6-9 su 14 il common usciva VUOTO ~3 volte su 10 (ogni giocatore copre troppo poco dei 14). Con 8-11 usciva vuoto ~1 volta su 20 (~5%). Con 10-12 su 14 esce vuoto quasi mai (verificato: 0 su 20 run) — più achievement peschi, più i giocatori si sovrappongono e il comune è garantito. Il dado resta: un vuoto ogni tanto è sempre MATEMATICAMENTE possibile, ma rarissimo. "Only X has" può comunque uscire vuoto → si stampa `set()`, ed è ok (anche l'esempio del subject ce l'ha vuoto per 3 giocatori su 4)
+**Perché i numeri sono 14 e 10-12 (il tuning del subject):** il subject dice ESATTAMENTE: "Adjust the total number of achievements and how many you pick up for each player, so that all the requested sets are likely to be non-empty". Traduzione: sei TU a scegliere i numeri, ma il risultato deve essere che i set escano PROBABILMENTE non vuoti quando il valutatore lancia il programma. Misurato davvero:
+- 6-9 su 14 → common vuoto ~3 volte su 10 → NON va bene (30% di lanci con common vuoto non è "likely")
+- 8-11 su 14 → ~1 vuoto su 20 (~5%) → al limite
+- **10-12 su 14 → 0 vuoti su 20 run → è questo che il subject intende**
+
+La logica: più achievement peschi per giocatore, più i set si sovrappongono, più il comune è garantito. Il dado resta: matematicamente un vuoto è SEMPRE possibile, ma rarissimo.
+
+**Perché l'output NON può essere tale e quale all'esempio del subject:** i set sono CASUALI — ogni lancio esce diverso, e l'esempio del subject è UNA delle esecuzioni possibili (guarda: nell'esempio del subject stesso "Only Alice has: set()" è VUOTO — i vuoti capitano, lì sono normali). Questo esercizio non ha strict output check: l'evaluator guarda che le operazioni (union/intersection/difference) siano giuste e che il tuning rispetti il "likely non-empty".
 
 **Domanda da evaluation: "come stampa Python un set vuoto, e perché?"** → Stampa `set()`, NON `{}`. Perché `{}` è già occupato: significa DIZIONARIO vuoto. Serviva una scrittura diversa per il set vuoto, e `set()` è l'unica: le graffe con qualcosa dentro (`{1, 2}`) sono un set, le graffe VUOTE sono un dict.
 
