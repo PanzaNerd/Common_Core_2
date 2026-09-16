@@ -38,27 +38,27 @@ def main() -> None:
 	for name in players:
 		print(f"Player {name}: {players[name]}")
 
-	all_distinct: set[str] = set()
+	all_achievements: set[str] = set()
 	for name in players:
-		all_distinct = all_distinct.union(players[name])
-	print(f"All distinct achievements: {all_distinct}")
+		all_achievements = all_achievements.union(players[name])
+	print(f"All distinct achievements: {all_achievements}")
 
-	common = set(ACHIEVEMENTS)
+	common_achievements = set(ACHIEVEMENTS)
 	for name in players:
-		common = common.intersection(players[name])
-	print(f"Common achievements: {common}")
+		common_achievements = common_achievements.intersection(players[name])
+	print(f"Common achievements: {common_achievements}")
 
 	for name in players:
-		others: set[str] = set()
-		for other in players:
-			if other != name:
-				others = others.union(players[other])
-		only = players[name].difference(others)
+		achievements_of_others: set[str] = set()
+		for other_player in players:
+			if other_player != name:
+				achievements_of_others = achievements_of_others.union(players[other_player])
+		only = players[name].difference(achievements_of_others)
 		print(f"Only {name} has: {only}")
 
 	for name in players:
-		missing = set(ACHIEVEMENTS).difference(players[name])
-		print(f"{name} is missing: {missing}")
+		missing_achievements = set(ACHIEVEMENTS).difference(players[name])
+		print(f"{name} is missing: {missing_achievements}")
 
 
 if __name__ == "__main__":
