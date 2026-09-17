@@ -8,6 +8,8 @@ Ogni esercizio è raccontato **nell'ordine in cui si esegue il codice**: si part
 
 ## ex0 — ft_hello_garden — la prima funzione
 
+**Cosa fa in concreto:** stampa la scritta "Hello, Garden Community!" sullo schermo. Niente input, niente calcoli: una stampa e fine.
+
 **★ PRIME VOLTE qui:** `print()`, `def` (la prima funzione)
 
 **Cosa chiede:** funzione `ft_hello_garden()` che stampa `Hello, Garden Community!`.
@@ -26,6 +28,8 @@ def ft_hello_garden():
 - In Python non serve `main()`: il file si esegue dall'alto in basso
 
 ## ex1 — ft_garden_name — input
+
+**Cosa fa in concreto:** chiede all'utente di scrivere il nome del giardino, poi stampa tre righe: il nome ricevuto e due messaggi fissi.
 
 **★ PRIME VOLTE qui:** `input()`
 
@@ -46,6 +50,8 @@ def ft_garden_name():
 - `+` tra stringhe = concatenazione. `+` tra stringa e numero = TypeError
 
 ## ex2 — ft_plot_area — int() e f-string
+
+**Cosa fa in concreto:** chiede due numeri (lunghezza e larghezza), li moltiplica tra loro e stampa il prodotto. Tutto qui: niente area reale da disegnare — solo una moltiplicazione.
 
 **★ PRIME VOLTE qui:** `int()` (conversione), f-string
 
@@ -69,6 +75,8 @@ def ft_plot_area():
 
 ## ex3 — ft_harvest_total — somma di 3 input
 
+**Cosa fa in concreto:** chiede tre numeri (i raccolti di tre giorni), li somma e stampa il totale.
+
 **★ NIENTE di nuovo:** consolidamento di ex2
 
 **Cosa chiede:** 3 input numerici, stampare la somma.
@@ -85,6 +93,8 @@ def ft_harvest_total():
 ```
 
 ## ex4 — ft_plant_age — if/else
+
+**Cosa fa in concreto:** chiede un numero (l'età della pianta in giorni) e stampa UNA delle due frasi: sopra 60 "ready to harvest", altrimenti "needs more time".
 
 **★ PRIME VOLTE qui:** `if`/`else` (condizionali in Python)
 
@@ -110,6 +120,8 @@ def ft_plant_age():
 
 ## ex5 — ft_water_reminder — if/else bis
 
+**Cosa fa in concreto:** chiede un numero (giorni dall'ultima annaffiatura) e stampa UNA delle due frasi: sopra 2 "Water the plants!", altrimenti "Plants are fine".
+
 **★ NIENTE di nuovo:** consolidamento di ex4
 
 **Cosa chiede:** se i giorni > 2 stampa "Water the plants!", altrimenti "Plants are fine".
@@ -119,6 +131,8 @@ def ft_plant_age():
 **Attenzione:** il subject scrive `Plants are fine` SENZA punto esclamativo.
 
 ## ex6 — ft_count_harvest — for e ricorsione
+
+**Cosa fa in concreto:** chiede un numero N e stampa un conteggio da "Day 1" a "Day N", poi "Harvest time!" — in DUE versioni: una col ciclo for, una con la ricorsione.
 
 **★ PRIME VOLTE qui:** `for`, `range()`, ricorsione con funzione helper
 
@@ -165,6 +179,8 @@ def print_days(day, total):
 
 ## ex7 — ft_seed_inventory — type hints
 
+**Cosa fa in concreto:** riceve tre valori (nome del seme, quantità, unità di misura) e stampa una frase diversa a seconda dell'unità: "packets", "grams", "area", o "Unknown unit type" per tutto il resto. Il nome viene stampato con la prima lettera maiuscola.
+
 **★ PRIME VOLTE qui:** type hints, `elif`, `.capitalize()`
 
 **Cosa chiede:** funzione con firma OBBLIGATA `def ft_seed_inventory(seed_type: str, quantity: int, unit: str) -> None:` che stampa in base all'unità ("packets", "grams", "area", altro → "Unknown unit type"). Nome del seme con la maiuscola.
@@ -196,6 +212,8 @@ def ft_seed_inventory(seed_type: str, quantity: int, unit: str) -> None:
 
 ## ex0 — ft_garden_intro — il main di Python
 
+**Cosa fa in concreto:** stampa un blocco di testo fisso: tre dati su una pianta (nome, altezza, età) tra due righe di intestazione. Nessun input: tutto è scritto nel codice.
+
 **★ PRIME VOLTE qui:** `if __name__ == "__main__":`
 
 **Cosa chiede:** primo programma completo con variabili e print, eseguito direttamente.
@@ -223,6 +241,8 @@ if __name__ == "__main__":
 - Non è una protezione: è un interruttore "eseguito direttamente o importato?"
 
 ## ex1 — ft_garden_data — la prima classe
+
+**Cosa fa in concreto:** crea 3 "schede pianta" (oggetti) ognuna con nome, altezza ed età, e le stampa una per una con un metodo. Nessun input: i dati sono scritti nel main.
 
 **★ PRIME VOLTE qui:** `class`, oggetto, `__init__`, `self`, metodo, attributo
 
@@ -270,6 +290,8 @@ if __name__ == "__main__":
 
 ## ex2 — ft_plant_growth — metodi che modificano
 
+**Cosa fa in concreto:** simula una settimana di vita di una pianta: per 7 giorni la fa crescere di 0.8cm e invecchiare di 1 giorno, stampando la scheda dopo ogni giorno e la crescita totale alla fine.
+
 **★ PRIME VOLTE qui:** `round()`
 
 **Cosa chiede:** metodi `grow()` e `age()` che modificano la pianta. Simulare una settimana.
@@ -306,6 +328,8 @@ class Plant:
 
 ## ex3 — ft_plant_factory — lista di oggetti
 
+**Cosa fa in concreto:** crea 5 schede pianta con dati diversi, le mette in una lista e le stampa tutte in sequenza con un ciclo for.
+
 **★ PRIME VOLTE qui:** lista di oggetti, `end=" "`
 
 **Cosa chiede:** creare 5 piante con caratteristiche diverse e mostrarle tutte.
@@ -338,6 +362,8 @@ if __name__ == "__main__":
 - `25.0` invece di `25` → il valore è float e si stampa con il decimale
 
 ## ex4 — ft_garden_security — incapsulamento
+
+**Cosa fa in concreto:** simula un sistema di sicurezza sui dati della pianta: i metodi set_height/set_age RIFIUTANO i valori negativi (stampano l'errore e non cambiano niente), mentre accettano quelli validi. Alla fine mostra lo stato della pianta.
 
 **★ PRIME VOLTE qui:** incapsulamento con `_`, getter/setter, `return`
 
@@ -386,6 +412,8 @@ class Plant:
 
 ## ex5 — ft_plant_types — ereditarietà
 
+**Cosa fa in concreto:** crea 3 tipi di piante specializzate (fiore con colore e fioritura, albero con diametro e ombra, verdura con stagione e valore nutrizionale) riusando la classe base, e le fa agire: fiorire, fare ombra, crescere per 20 giorni.
+
 **★ PRIME VOLTE qui:** ereditarietà, `super()`
 
 **Cosa chiede:** Flower (color, bloom), Tree (trunk_diameter, produce_shade), Vegetable (harvest_season, nutritional_value) che EREDITANO da Plant usando `super()`.
@@ -423,6 +451,8 @@ class Flower(Plant):
 - I metodi generici di Plant servono sia alle piante semplici sia alle figlie (ereditati o estesi con super)
 
 ## ex6 — ft_garden_analytics — metodi speciali e classi annidate
+
+**Cosa fa in concreto:** aggiunge a ogni pianta un CONTATORE che tiene traccia di quante volte viene fatta crescere, invecchiare e mostrare; più due funzioni "di classe": una risponde se un'età supera un anno, l'altra crea una pianta anonima. Alla fine mostra le statistiche di ogni pianta.
 
 **★ PRIME VOLTE qui:** `@staticmethod`, `@classmethod`, classe annidata
 
@@ -482,6 +512,8 @@ class Plant:
 
 ## ex0 — ft_first_exception — try/except
 
+**Cosa fa in concreto:** testa una funzione che converte una stringa in numero, prima con un input buono ("25") e poi con uno cattivo ("abc") — e dimostra che col try/except il programma NON crasha.
+
 **★ PRIME VOLTE qui:** `import`, `try`/`except`, `as e`, `Exception`
 
 **Cosa chiede:** `input_temperature(temp_str)` che converte stringa→intero; `test_temperature()` che prova input valido ("25") e invalido ("abc") senza far crashare il programma.
@@ -523,6 +555,8 @@ def test_temperature() -> None:
 
 ## ex1 — ft_raise_exception — raise
 
+**Cosa fa in concreto:** come ex0, ma la funzione ora RIFIUTA anche le temperature fuori da 0-40: le lancia lei stessa come errore, e il programma le cattura e continua.
+
 **★ PRIME VOLTE qui:** `raise`
 
 **Cosa chiede:** in `input_temperature`, dopo la conversione, se la temperatura è fuori da 0–40 lancia un'eccezione TU con `raise`. Test con "100" e "-50".
@@ -552,6 +586,8 @@ def input_temperature(temp_str: str) -> int:
 - Ex0 vs Ex1: in ex0 gli errori esplodono da soli (incidenti); in ex1 sei TU il guardiano che suona l'allarme
 
 ## ex2 — ft_different_errors — i tipi di errore
+
+**Cosa fa in concreto:** mostra 4 errori diversi fatti esplodere A COMANDO (conversione sbagliata, divisione per zero, file inesistente, tipi mescolati) e li cattura uno a uno col loro tipo specifico, dimostrando che il programma sopravvive a tutti.
 
 **★ PRIME VOLTE qui:** tipi di errore specifici (ValueError ecc.), `else` del try
 
@@ -610,6 +646,8 @@ def test_error_types() -> None:
 
 ## ex3 — ft_custom_errors — eccezioni personalizzate
 
+**Cosa fa in concreto:** crea 3 tipi di errore PERSONALIZZATI (giardino, pianta, acqua) come classi, li lancia e li cattura — dimostrando che catturare l'errore-genitore (GardenError) prende anche le figlie.
+
 **★ PRIME VOLTE qui:** eccezione custom `class X(Exception)`, parametro con valore di default
 
 **Cosa chiede:** classi `GardenError(Exception)`, `PlantError(GardenError)`, `WaterError(GardenError)` con messaggi di default. Dimostrare che `except GardenError` cattura tutte le figlie.
@@ -651,6 +689,8 @@ except GardenError as e:
 - L'eccezione custom ha UN solo parametro oltre a self: il messaggio. Flusso: raise crea l'errore → except `as e` lo afferra → print lo mostra
 
 ## ex4 — ft_finally_block — finally
+
+**Cosa fa in concreto:** simula un impianto d'irrigazione: "apre il rubinetto", annaffia alcune piante (solo quelle col nome maiuscolo, le altre scatenano errore) e CHIUDE SEMPRE il rubinetto — anche quando scoppia l'errore a metà.
 
 **★ PRIME VOLTE qui:** `finally`, indicizzazione `stringa[0]`, `.isupper()`
 
@@ -722,6 +762,8 @@ Più avanti: generatori (ex5) e comprehensions (ex6), che sono la sintassi "cond
 Il modulo ha una regola nuova: **niente file I/O**. Tutti i dati arrivano da riga di comando (`sys.argv`) o da input.
 
 ## ex0 — ft_command_quest — sys.argv (la lista dei parametri)
+
+**Cosa fa in concreto:** stampa gli argomenti che gli passi da riga di comando, numerati; se non ne passi nessuno stampa "No arguments provided!".
 
 **★ PRIME VOLTE qui:** `sys`, `sys.argv`, `len()`, lista
 
@@ -811,6 +853,8 @@ if __name__ == "__main__":
 ---
 
 ## ex1 — ft_score_analytics — lista di numeri + try/except
+
+**Cosa fa in concreto:** prende punteggi da riga di comando, scarta quelli non numerici (con messaggio), e sui validi calcola: quanti sono, totale, media, massimo, minimo e range.
 
 **★ PRIME VOLTE qui:** `.append()`, `sum()`/`max()`/`min()`, slicing `[1:]`, `return` senza valore
 
@@ -1229,6 +1273,8 @@ if __name__ == "__main__":
 
 ## ex4 — ft_inventory_system — il dizionario protagonista
 
+**Cosa fa in concreto:** legge oggetti e quantità da riga di comando (formato `nome:quantità`), scarta invalidi e doppioni, e calcola le statistiche dello zaino: lista oggetti, quantità totale, percentuale di ciascuno, più e meno abbondante. Poi aggiunge un "magic_item" e rimostra tutto.
+
 **★ PRIME VOLTE qui:** metodi `dict.keys()` / `dict.values()`, e soprattutto il dizionario USATO DAVVERO (in ex3 lo abbiamo solo assaggiato)
 
 ### Il dizionario (già introdotto in ex3)
@@ -1339,6 +1385,8 @@ if __name__ == "__main__":
 
 ## ex5 — ft_data_stream — i generatori (yield)
 
+**Cosa fa in concreto:** genera 1000 eventi casuali (un giocatore e un'azione) UNO ALLA VOLTA e li stampa; poi crea una lista di 10 eventi e li consuma pescandoli a caso uno per uno finché la lista non è vuota.
+
 **★ PRIME VOLTE qui:** generatore (`yield`), `next()`, `random.choice()`
 
 **Cosa chiede:** un generatore INFINITO `gen_event()` che produce eventi (giocatore, azione) a caso; si leggono 1000 eventi con `next()`, poi si fa una lista di 10 eventi, poi un secondo generatore `consume_event` che pesca a caso dalla lista, toglie l'elemento e lo cede, finché la lista è vuota (usato direttamente nel `for`).
@@ -1360,6 +1408,8 @@ if __name__ == "__main__":
 ---
 
 ## ex6 — ft_data_alchemist — le comprehensions
+
+**Cosa fa in concreto:** da una lista di 9 nomi (alcuni maiuscoli, altri no) crea con le comprehension: la lista di tutti i nomi con la maiuscola, la lista dei soli già maiuscoli, un dizionario nome→punteggio casuale, e il dizionario dei soli punteggi sopra la media.
 
 **★ PRIME VOLTE qui:** list comprehension, dict comprehension
 
@@ -1385,6 +1435,8 @@ if __name__ == "__main__":
 
 ## ex0 — ft_ancient_text — leggere un file
 
+**Cosa fa in concreto:** prende un nome di file da riga di comando, ne legge il contenuto e lo stampa come farebbe il comando `cat`, con una riga di intestazione e una di chiusura; se il file non esiste o è protetto, stampa l'errore senza crashare.
+
 **★ PRIME VOLTE qui:** `open()`, oggetto file, `.read()`, `.close()`, `typing.IO`
 
 **Cosa chiede:** prendere il nome di un file da riga di comando, leggerlo e mostrarlo come farebbe `cat`, con intestazione e chiusura; gestire gli errori (file inesistente, permessi negati) senza crashare.
@@ -1405,6 +1457,8 @@ if __name__ == "__main__":
 
 ## ex1 — ft_archive_creation — scrivere un file
 
+**Cosa fa in concreto:** come ex0, ma poi aggiunge un carattere `#` in coda a ogni riga del contenuto, lo mostra, e chiede il nome di un file su cui SALVARE il risultato (vuoto = non salva).
+
 **★ PRIME VOLTE qui:** `.write()`, modalità "w" di open
 
 **Cosa chiede:** come ex0, ma poi: aggiungere `#` in coda a ogni riga, mostrare il risultato, chiedere il nome del file da salvare (vuoto = non salvare), creare/sovrascrivere il file.
@@ -1423,6 +1477,8 @@ if __name__ == "__main__":
 
 ## ex2 — ft_stream_management — i 3 canali
 
+**Cosa fa in concreto:** come ex1, ma gli errori vanno scritti sul canale di errore (stderr, col prefisso [STDERR]) e la domanda all'utente viene fatta senza usare input(), leggendo direttamente da stdin.
+
 **★ PRIME VOLTE qui:** `sys.stdin`, `sys.stdout`, `sys.stderr`, `.readline()`, `.flush()`
 
 **Cosa chiede:** come ex1, ma: gli errori vanno sul canale di ERRORE (`sys.stderr`, col prefisso `[STDERR]`) e l'input va letto SENZA `input()`, usando `sys.stdin`.
@@ -1439,6 +1495,8 @@ if __name__ == "__main__":
 **Codice:** in `python/p04/ex2/ft_stream_management.py` (già scritto e testato)
 
 ## ex3 — ft_vault_security — il with (context manager)
+
+**Cosa fa in concreto:** fornisce una funzione "cassaforte" che legge o scrive QUALSIASI file e restituisce sempre una coppia (riuscito?, contenuto-o-errore) — col with il file si chiude da solo anche se qualcosa va storto.
 
 **★ PRIME VOLTE qui:** `with` (context manager)
 
@@ -1462,6 +1520,8 @@ if __name__ == "__main__":
 
 ## ex0 — data_processor — le classi astratte (ABC)
 
+**Cosa fa in concreto:** definisce un CONTRATTO (classe astratta) con 3 operazioni che ogni "processore di dati" deve avere, e crea 3 processori concreti: uno per i numeri, uno per i testi, uno per i log. Il main li testa con dati validi e invalidi.
+
 **★ PRIME VOLTE qui:** `ABC`, `@abstractmethod`, `isinstance()`, `all()`, `Any`
 
 **Cosa chiede:** una classe astratta `DataProcessor` che definisce L'INTERFACCIA comune (validate, ingest, output) e 3 classi concrete (NumericProcessor, TextProcessor, LogProcessor) che la implementano per i loro tipi di dati. Il main testa validi/invalidi e l'ingest senza validazione (che deve esplodere).
@@ -1482,6 +1542,8 @@ if __name__ == "__main__":
 
 ## ex1 — data_stream — il router polimorfico
 
+**Cosa fa in concreto:** crea un "centralino" a cui registri i processori di ex0: gli dai una lista di dati MISTI (testi, numeri, log) e lui smista ogni elemento al processore giusto; se nessuno lo vuole, stampa l'errore. Mostra anche le statistiche di ogni processore.
+
 **★ PRIME VOLTE qui:** routing per tipo (nessuna sintassi nuova — il polimorfismo applicato)
 
 **Cosa chiede:** una classe `DataStream` che raccoglie i processor REGISTRATI e, per ogni elemento di uno stream misto, lo manda al processor GIUSTO usando solo `validate()` — senza sapere niente dei tipi concreti.
@@ -1499,6 +1561,8 @@ if __name__ == "__main__":
 **Codice:** in `python/p05/ex1/data_stream.py` (già scritto e testato)
 
 ## ex2 — data_pipeline — i plugin con Protocol
+
+**Cosa fa in concreto:** aggiunge al centralino la parte di USCITA: due "plugin" (uno CSV, uno JSON) che ricevono i dati processati e li stampano formattati; il centralino estrae N pezzi da ogni processore e li passa al plugin scelto.
 
 **★ PRIME VOLTE qui:** `Protocol` (duck typing)
 
@@ -1557,6 +1621,8 @@ if __name__ == "__main__":
 
 ## ex0 — battle — l'abstract factory
 
+**Cosa fa in concreto:** definisce creature di due famiglie (fuoco e acqua, ognuna con versione base ed evoluta) e le crea attraverso FABBRICHE: il main chiede alla fabbrica "dammi la base della famiglia fuoco" senza mai nominare la classe concreta. Poi le fa descrivere, attaccare e combattere.
+
 **★ PRIME VOLTE qui:** pattern abstract factory (niente sintassi nuova: ABC + ereditarietà di p05, composti in un pattern)
 
 **Cosa chiede:** creature di 2 famiglie (Fuoco: Flameling→Pyrodon; Acqua: Aquabub→Torragon) create da FACTORY astratte: `FlameFactory().create_base()` / `create_evolved()`. Il package espone solo le factory.
@@ -1572,6 +1638,8 @@ if __name__ == "__main__":
 **Codice:** in `python/p07/ex0/` (creatures.py, factories.py, __init__.py) + `python/p07/battle.py`
 
 ## ex1 — capacitor — le capability (ereditarietà MULTIPLA)
+
+**Cosa fa in concreto:** aggiunge due "capacità" riusabili (guarire, trasformarsi) che si ATTACCANO alle creature: le creature-guaritrici sanno attaccare E curare; le creature-trasformiste dopo transform() attaccano più forte e con revert() tornano normali.
 
 **★ PRIME VOLTE qui:** ereditarietà multipla (`class Sproutling(Creature, HealCapability)`)
 
@@ -1591,6 +1659,8 @@ if __name__ == "__main__":
 **Codice:** in `python/p07/ex1/` + `python/p07/capacitor.py`
 
 ## ex2 — tournament — lo strategy pattern
+
+**Cosa fa in concreto:** organizza un torneo dove ogni creatura combatte con una STRATEGIA assegnata (normale = solo attacco; aggressiva = trasforma-attacca-ripristina; difensiva = attacca-cura). Se la strategia non è adatta alla creatura, il torneo si ferma con un errore chiaro.
 
 **★ PRIME VOLTE qui:** pattern strategy (ABC + polimorfismo, niente sintassi nuova)
 
@@ -1617,6 +1687,8 @@ if __name__ == "__main__":
 
 ## ex0 — construct — riconoscere il venv
 
+**Cosa fa in concreto:** controlla se il programma sta girando dentro un ambiente virtuale e stampa informazioni diverse nei due casi: dentro, percorso del venv e dei pacchetti; fuori, un avviso e le istruzioni per crearlo.
+
 **★ PRIME VOLTE qui:** `sys.prefix`, `sys.base_prefix`, `sys.executable`, `site.getsitepackages()`, `os.path.basename()`
 
 **Cosa chiede:** un programma che scopre se sta girando DENTRO un ambiente virtuale e mostra le informazioni giuste (dentro: percorso del venv e dei pacchetti; fuori: avviso + istruzioni per crearlo).
@@ -1632,6 +1704,8 @@ if __name__ == "__main__":
 **Codice:** in `python/p08/ex0/construct.py`
 
 ## ex1 — loading — dipendenze e package manager
+
+**Cosa fa in concreto:** controlla se le 4 librerie di analisi dati sono installate; se mancano, stampa le istruzioni per installarle (pip e Poetry); se ci sono, genera 1000 dati casuali con numpy, ne calcola le statistiche e disegna un grafico con matplotlib salvato su file.
 
 **★ PRIME VOLTE qui:** `importlib.metadata.version()`, `requirements.txt`, `pyproject.toml`
 
@@ -1650,6 +1724,8 @@ numpy
 **Codice:** in `python/p08/ex1/` (loading.py + requirements.txt + pyproject.toml)
 
 ## ex2 — oracle — configurazione con .env
+
+**Cosa fa in concreto:** legge la configurazione da variabili d'ambiente (caricate dal file .env) e si comporta in modo diverso tra development (stampa tutto) e production (nasconde la chiave segreta e pretende i dati obbligatori); senza configurazione stampa le istruzioni.
 
 **★ PRIME VOLTE qui:** `python-dotenv` (`load_dotenv()`), `os.getenv()`, file `.env`
 
@@ -1677,6 +1753,8 @@ numpy
 
 ## ex0 — space_station — il primo modello
 
+**Cosa fa in concreto:** definisce un modello di "scheda stazione spaziale" con vincoli su ogni campo (es. equipaggio da 1 a 20) e lo testa due volte: con dati validi (crea e stampa la scheda) e con un campo invalido (mostra il messaggio d'errore di Pydantic).
+
 **Cosa chiede:** modello `SpaceStation` con campi vincolati (station_id 3-10 caratteri, crew_size 1-20, power/oxygen 0-100, last_maintenance datetime, is_operational default True, notes opzionale max 200) + main che crea una stazione valida e ne mostra i campi, poi prova una invalida e mostra l'errore ("Input should be less than or equal to 20").
 
 **Esecuzione:** main → `SpaceStation(station_id="ISS001", ..., last_maintenance=datetime(2024,6,1,10,0,0))` → Pydantic valida OGNI campo → tutto ok → oggetto pronto → stampa i campi → `SpaceStation(crew_size=25, ...)` → Pydantic rifiuta → `except ValidationError as e:` → `e.errors()[0]["msg"]` = il messaggio del primo errore.
@@ -1686,6 +1764,8 @@ numpy
 **Codice:** in `python/p09/ex0/space_station.py`
 
 ## ex1 — alien_contact — validazione custom
+
+**Cosa fa in concreto:** definisce un modello di "rapporto di contatto alieno" con regole di business che i campi da soli non bastano a esprimere (es. i contatti telepatici richiedono almeno 3 testimoni) e lo testa con un rapporto valido e uno che viola le regole.
 
 **★ PRIME VOLTE qui:** `Enum` (ContactType), `@model_validator(mode="after")`
 
@@ -1698,6 +1778,8 @@ numpy
 **Codice:** in `python/p09/ex1/alien_contact.py`
 
 ## ex2 — space_crew — modelli ANNIDATI
+
+**Cosa fa in concreto:** definisce due modelli collegati (membro dell'equipaggio e missione che contiene una LISTA di membri) e valida regole che coinvolgono tutto l'equipaggio: serve un comandante, le missioni lunghe vogliono metà equipaggio esperto. Testa una missione valida e una senza comandante.
 
 **Cosa chiede:** due modelli in relazione: `CrewMember` (membro singolo) e `SpaceMission` che CONTIENE una LISTA di CrewMember (`crew: List[CrewMember]`). Il validator della missione controlla regole che coinvolgono TUTTO l'equipaggio: serve almeno un Commander/Capitano, le missioni lunghe (>365 giorni) vogliono il 50% di esperti (≥5 anni), tutti attivi.
 
