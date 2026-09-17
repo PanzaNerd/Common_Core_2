@@ -1333,6 +1333,382 @@ if __name__ == "__main__":
 
 ---
 
+
+
+---
+
+## ex5 — ft_data_stream — i generatori (yield)
+
+**★ PRIME VOLTE qui:** generatore (`yield`), `next()`, `random.choice()`
+
+**Cosa chiede:** un generatore INFINITO `gen_event()` che produce eventi (giocatore, azione) a caso; si leggono 1000 eventi con `next()`, poi si fa una lista di 10 eventi, poi un secondo generatore `consume_event` che pesca a caso dalla lista, toglie l'elemento e lo cede, finché la lista è vuota (usato direttamente nel `for`).
+
+**Il concetto in una riga:** un generatore è una fabbrica che produce UN valore alla volta, su richiesta — niente lista in memoria. `yield` = "consegna questo valore e METTI IN PAUSA; alla prossima richiesta riparti da qui". Il loop infinito `while True:` con `yield` dentro NON va in crash: produce un valore, si congela, aspetta la prossima richiesta.
+
+**Esecuzione:** main → `stream = gen_event()` (chiamare una funzione con yield NON la esegue: crea la fabbrica) → 1000 volte `next(stream)` = "fabbrica, dammi il prossimo" → ogni volta: tira `random.choice(PLAYERS)` e `random.choice(ACTIONS)` → `yield (name, action)` congela → si stampa → si richiede. Poi `consume_event(event_list)`: `while len(events) > 0:` → pesca `random.choice(events)`, lo toglie con `events.remove(event)`, `yield` lo consegna → il `for event in consume_event(...)` richiede finché non è vuota.
+
+**Come testare:** `cd python/p03/ex5 && python3 ft_data_stream.py` (1000 eventi + lista + consumo)
+
+**Teoria:**
+- **Chi è cosa:** `yield`, `while` → parole chiave; `next()` → funzione built-in ("dammi il prossimo"); `random.choice(lista)` → funzione predefinita del modulo random (pesca UN elemento a caso); `Generator` → tipo predefinito del modulo typing (etichetta); il resto già visto
+- **Differenza funzione vs generatore:** la funzione con `return` fa tutto e consegna TUTTO insieme; il generatore con `yield` consegna UN pezzo, si congela, riparte. Analogia: la funzione è un fornaio che sforna tutti i panini insieme su un vassoio; il generatore è la catena di montaggio — un panino alla volta, su richiesta
+- **Perché serve:** 1000 eventi in una lista = 1000 posti in memoria; col generatore = UN posto alla volta. È il "memory-saving superpower" del subject
+- Il tipo `Generator[tuple[str, str], None, None]` = etichetta: "generatore che cede tuple (str, str)"
+
+**Codice:** in `python/p03/ex5/ft_data_stream.py` (già scritto e testato)
+
+---
+
+## ex6 — ft_data_alchemist — le comprehensions
+
+**★ PRIME VOLTE qui:** list comprehension, dict comprehension
+
+**Cosa chiede:** da una lista di nomi misti (maiuscoli/minuscoli): una lista con TUTTI capitalizzati, una lista con SOLO quelli già maiuscoli; poi un DIZIONARIO nome→punteggio casuale, e un secondo dizionario con solo i punteggi sopra la media — tutto con le comprehensions, una riga sola ciascuna.
+
+**Il concetto in una riga:** la comprehension è il for condensato in UNA riga: `[lavoro(item) for item in collezione if filtro]`. Leggila come una frase: "per ogni item della collezione (che passa il filtro), calcola lavoro(item) e mettilo nella nuova collezione".
+
+**Esecuzione:** main → lista players → `[name.capitalize() for name in players]` = per ogni nome: prima maiuscola → lista nuova → `[name for name in players if name[0].isupper()]` = solo i nomi che PASSANO il filtro → `{name: random.randint(50, 1000) for name in capitalized}` = dict comprehension (chiave: valore per ogni nome) → media = `sum(scores.values()) / len(scores)` → `{name: score for name, score in scores.items() if score > average}` = dict filtrato (★ PRIMA VOLTA: `.items()` — dà le coppie chiave-valore del dizionario).
+
+**Come testare:** `cd python/p03/ex6 && python3 ft_data_alchemist.py` (i punteggi cambiano a ogni run)
+
+**Teoria:**
+- **Forma della comprehension:** `[espressione for elemento in collezione]` — e con filtro: `[espressione for elemento in collezione if condizione]`. Stessa sintassi con `{}` per i dizionari: `{chiave: valore for ...}` e anche per i set: `{x for ...}`
+- **Equivalente col for classico** (il for di 4 righe diventa 1): `risultato = []` → `for x in lista:` → `risultato.append(f(x))` = `[f(x) for x in lista]`
+- Il subject: "Each comprehension should be on a single line"
+- **Chi è cosa:** tutto già visto, tranne `.items()` → metodo built-in dei dizionari (dà le coppie chiave-valore, da spacchettare con `for chiave, valore in ...`)
+
+**Codice:** in `python/p03/ex6/ft_data_alchemist.py` (già scritto e testato)
+
+---
+
+# p04 — Data Archivist (File I/O)
+
+## ex0 — ft_ancient_text — leggere un file
+
+**★ PRIME VOLTE qui:** `open()`, oggetto file, `.read()`, `.close()`, `typing.IO`
+
+**Cosa chiede:** prendere il nome di un file da riga di comando, leggerlo e mostrarlo come farebbe `cat`, con intestazione e chiusura; gestire gli errori (file inesistente, permessi negati) senza crashare.
+
+**Il concetto in una riga:** `open("file", "r")` = l'`fopen` del C: apre il file e ti dà un OGGETTO-file (l'equivalente del `FILE *`). `.read()` = legge TUTTO il contenuto in una stringa. `.close()` = chiude (l'`fclose`). L'oggetto file va SEMPRE chiuso — per ora a mano, in ex3 arriva il `with` che lo fa da solo.
+
+**Esecuzione:** main → senza argomento → usage → `open(filename, "r")` dentro il try: se il file non esiste → OSError (l'errore del C `[Errno 2] No such file or directory`) → except stampa e `return` → se ok: `content = f.read()` (tutto il file in una stringa) → `f.close()` → stampa `"--" + content` → chiusura.
+
+**Come testare:** `cd python/p04/ex0 && python3 ft_ancient_text.py` (usage) · `python3 ft_ancient_text.py foo` (errore) · `python3 ft_ancient_text.py ancient_fragment.txt` (legge)
+
+**Teoria:**
+- **Chi è cosa:** `open()`, `print()`, `len()` → funzioni built-in; `.read()`, `.close()` → METODI built-in dell'oggetto file; `IO` → tipo predefinito del modulo typing (etichetta per l'oggetto file); `sys.argv` → già visto; il resto nostro
+- **Domanda del subject: "che tipo di dato ritorna open()?"** → un OGGETTO FILE (non una stringa!): è l'oggetto che TIENE APERTO il file e ha i metodi read/close/write. In C: il `FILE *`. Il CONTENUTO è `f.read()` (quella sì è una stringa)
+- `open(filename, "r")` — la "r" = modalità lettura (read). In ex1 servirà "w" = scrittura
+- L'errore di un file inesistente è `FileNotFoundError` (sottotipo di OSError) — lo conosci da p02
+
+**Codice:** in `python/p04/ex0/ft_ancient_text.py` (già scritto e testato)
+
+## ex1 — ft_archive_creation — scrivere un file
+
+**★ PRIME VOLTE qui:** `.write()`, modalità "w" di open
+
+**Cosa chiede:** come ex0, ma poi: aggiungere `#` in coda a ogni riga, mostrare il risultato, chiedere il nome del file da salvare (vuoto = non salvare), creare/sovrascrivere il file.
+
+**Esecuzione:** lettura come ex0 → `content.splitlines()` = lista delle righe (★ PRIMA VOLTA: `splitlines()`, separa alle andate a capo) → `[line + "#" for line in lines]` (comprehension di ex6 p03!) → stampa → `input()` chiede il nome → se vuoto: "Not saving data." → altrimenti `open(name, "w")` — **"w" = SCRITTURA: crea il file se non esiste, lo SVUOTA se esiste** → `.write("
+".join(new_lines) + "
+")` (★ PRIMA VOLTA: `"
+".join(lista)` — incolla le stringhe con 
+ in mezzo) → close → messaggio.
+
+**Come testare:** `cd python/p04/ex1 && echo "" | python3 ft_archive_creation.py ancient_fragment.txt` (non salva) · `echo "new_fragment.txt" | python3 ft_archive_creation.py ancient_fragment.txt` (salva) · `cat new_fragment.txt`
+
+**Teoria:** l'oggetto file ha DUE metodi speculari: `.read()` (legge tutto) e `.write(testo)` (scrive il testo). La modalità si sceglie nel secondo parametro di open: "r" legge, "w" scrive (crea/sovrascrive). In C: `fopen(name, "r")` / `fopen(name, "w")` + `fwrite`.
+
+**Codice:** in `python/p04/ex1/ft_archive_creation.py` (già scritto e testato)
+
+## ex2 — ft_stream_management — i 3 canali
+
+**★ PRIME VOLTE qui:** `sys.stdin`, `sys.stdout`, `sys.stderr`, `.readline()`, `.flush()`
+
+**Cosa chiede:** come ex1, ma: gli errori vanno sul canale di ERRORE (`sys.stderr`, col prefisso `[STDERR]`) e l'input va letto SENZA `input()`, usando `sys.stdin`.
+
+**Il concetto in una riga:** ogni programma ha 3 canali predefiniti (i "three sacred channels" del subject): `sys.stdin` (dove arriva quello che scrivi), `sys.stdout` (dove va il print normale), `sys.stderr` (dove vanno gli ERRORI — separato, così i messaggi d'errore non si mischiano all'output "vero"). In C: stdin/stdout/stderr, li conosci.
+
+**Esecuzione:** come ex1, con 2 differenze: `sys.stderr.write(f"[STDERR] ...
+")` al posto del print per gli errori (si scrive sul canale di errore — sul terminale SI VEDE uguale, ma il canale è diverso: chi usa il programma può separarli, es. `2>errori.txt`) → per l'input: `sys.stdout.write("domanda ")` + `sys.stdout.flush()` (spinge subito il testo sullo schermo) + `name = sys.stdin.readline().strip()` (legge UNA riga da stdin; `.strip()` toglie l'andata a capo finale).
+
+**Come testare:** `cd python/p04/ex2 && python3 ft_stream_management.py foo` (errore su stderr) · con un file valido e input piped
+
+**Teoria:** `input()` è solo una comodità costruita SOPRA stdin/stdout: il subject ti fa fare a mano quello che input() fa da solo. `flush()` serve perché l'output è bufferizzato (parte a blocchi): senza flush la domanda potrebbe non apparire prima della risposta.
+
+**Codice:** in `python/p04/ex2/ft_stream_management.py` (già scritto e testato)
+
+## ex3 — ft_vault_security — il with (context manager)
+
+**★ PRIME VOLTE qui:** `with` (context manager)
+
+**Cosa chiede:** funzione `secure_archive(filename, action, content)` che usa il `with` per leggere/scrivere qualunque file e restituisce una tupla `(True/False, contenuto o messaggio d'errore)` — il file si chiude SEMPRE da solo, anche con errori.
+
+**Il concetto in una riga:** `with open(...) as f:` = "apri il file, lavoraci dentro il blocco, e CHIUDILO AUTOMATICAMENTE quando esci — anche se scoppia un errore". È il finally di p02, già costruito per te: niente `f.close()` a mano, impossibile dimenticarlo.
+
+**Esecuzione:** main → 4 dimostrazioni → ogni `secure_archive(...)` fa: `with open(filename, "r") as f:` → `return (True, f.read())` — il with chiude DA SOLO il file prima che il return consegni il valore → se open fallisce: `except OSError as e:` → `return (False, str(e))` (la TUPLA col fallimento — niente crash, come p02 vuole).
+
+**Come testare:** `cd python/p04/ex3 && python3 ft_vault_security.py`
+
+**Teoria:** il `with` funziona con qualunque "risorsa" che va chiusa (file, connessioni). Traduzione C: il `fclose()` che metteresti in ogni ramo d'errore, scritto UNA volta da Python. Il subject (p04): "use of the with statement will be introduced in exercise 3. You must not use it before" — per questo ex0-ex2 chiudono a mano.
+
+**Codice:** in `python/p04/ex3/ft_vault_security.py` (già scritto e testato)
+
+
+
+---
+
+# p05 — Code Nexus (Classi astratte e polimorfismo)
+
+## ex0 — data_processor — le classi astratte (ABC)
+
+**★ PRIME VOLTE qui:** `ABC`, `@abstractmethod`, `isinstance()`, `all()`, `Any`
+
+**Cosa chiede:** una classe astratta `DataProcessor` che definisce L'INTERFACCIA comune (validate, ingest, output) e 3 classi concrete (NumericProcessor, TextProcessor, LogProcessor) che la implementano per i loro tipi di dati. Il main testa validi/invalidi e l'ingest senza validazione (che deve esplodere).
+
+**Il concetto in una riga:** una classe ASTRATTA è un CONTRATTO, non un oggetto: non puoi crearla (`DataProcessor()` → errore), esiste solo per dire alle figlie "TU devi avere questi metodi, io dico il COME si chiamano ma non il cosa fanno" (`@abstractmethod` = metodo dichiarato senza corpo, `...` al posto del codice). Le figlie SONO OBBLIGATE a implementarli, o non si possono creare nemmeno loro. È il "progetto dei progetti" — come il contratto che firmi prima di lavorare: dice i TUOI doveri, non come li svolgi.
+
+**Esecuzione:** main → crea `NumericProcessor()` (funziona: ha implementato validate e ingest) → `numeric.validate(42)` → dentro: `isinstance(42, (int, float))` → True ("42 è un int o un float?") → `numeric.validate("Hello")` → False → `numeric.ingest("foo")` SENZA validazione → dentro ingest: `if not self.validate(data): raise TypeError("Improper numeric data")` → esplode (voluto: il subject vuole l'errore) → `ingest([1,2,3,4,5])` → valida → `_store` trasforma in stringhe e le accoda coi RANK → `output()` estrae il più vecchio (pop(0)) e lo restituisce come tupla `(rank, pezzo)`.
+
+**Come testare:** `cd python/p05/ex0 && python3 data_processor.py`
+
+**Teoria:**
+- **Chi è cosa:** `ABC` → classe predefinita del modulo `abc` (ereditando da lei la classe diventa astratta); `@abstractmethod` → decoratore predefinito del modulo abc (marca il metodo come obbligatorio); `isinstance(x, Tipo)` → funzione built-in ("x è di quel tipo?" — il controllo dei tipi a runtime); `all()` → funzione built-in (True se TUTTI gli elementi sono veri); `Any` → tipo predefinito del modulo typing ("dato di qualunque tipo" — per questo validate accetta qualsiasi cosa); `...` → "qui non c'è codice" (pass)
+- **Polimorfismo (primo assaggio):** `output()` e il meccanismo rank/store stanno nella classe MADRE, le figlie ereditano il lavoro fatto. Le figlie cambiano SOLO validate/ingest: stesso contratto, comportamenti diversi
+- **Il mypy warning voluto:** chiamare `numeric.ingest("foo")` è di proposito un errore di tipo (il subject lo dice: "This will leave you with a mypy warning, on purpose")
+- **`_store` col rank:** ogni pezzo ingerito riceve un NUMERO PROGRESSIVO (il rank) e viene accodato in `(rank, pezzo)`; `output()` toglie il più vecchio (FIFO — coda, come il fuoco di BFS)
+
+**Codice:** in `python/p05/ex0/data_processor.py` (già scritto e testato)
+
+## ex1 — data_stream — il router polimorfico
+
+**★ PRIME VOLTE qui:** routing per tipo (nessuna sintassi nuova — il polimorfismo applicato)
+
+**Cosa chiede:** una classe `DataStream` che raccoglie i processor REGISTRATI e, per ogni elemento di uno stream misto, lo manda al processor GIUSTO usando solo `validate()` — senza sapere niente dei tipi concreti.
+
+**Il concetto in una riga:** il DataStream non conosce NumericProcessor/TextProcessor/LogProcessor: conosce SOLO "una lista di cose che hanno validate() e ingest()". Per ogni elemento: prova i processor in ordine, il PRIMO che dice "sì" se lo prende; se nessuno lo vuole → errore. È il centralino: inoltra la chiamata senza sapere chi risponderà.
+
+**Esecuzione:** main → `stream.register_processor(NumericProcessor())` → `process_stream(batch)` → per ogni elemento: for sui processor → `proc.validate(element)` → il primo True vince (`ingest` + `break`) → se nessuno: "DataStream error" → `print_processors_stats()` legge `total` (conteggio pezzi) e `len(_data)` (rimanenti) di ognuno → poi si registrano Text e Log e si rimanda lo stesso batch (ora ogni elemento trova il suo).
+
+**Come testare:** `cd python/p05/ex1 && python3 data_stream.py`
+
+**Teoria:**
+- **Perché è polimorfismo:** il router chiama SEMPRE lo stesso metodo (`validate`/`ingest`) su oggetti diversi, e ogni oggetto risponde a modo suo. Aggiungere un 4° processor = registrarlo, ZERO modifiche al router — è il vantaggio che il subject chiede di spiegare
+- **Registrare i processor = consegnare il contratto:** il DataStream si fida che qualunque cosa registrata rispetti l'interfaccia di DataProcessor (è per questo che la classe astratta esiste)
+
+**Codice:** in `python/p05/ex1/data_stream.py` (già scritto e testato)
+
+## ex2 — data_pipeline — i plugin con Protocol
+
+**★ PRIME VOLTE qui:** `Protocol` (duck typing)
+
+**Cosa chiede:** un sistema di export a plugin: `ExportPlugin` è un Protocol che dichiara `process_output(data)`; classi CsvPlugin e JsonPlugin lo implementano; `DataStream.output_pipeline(nb, plugin)` consuma nb pezzi da OGNI processor e li passa al plugin scelto.
+
+**Il concetto in una riga:** il Protocol è il contratto PIÙ leggero: "chiunque abbia un metodo `process_output(lista)` può fare il plugin — non deve ereditare da nessuno, basta che abbia il metodo". Duck typing: "se cammina come un'anatra e starnazza come un'anatra, è un'anatra". Il CSV e il JSON non hanno nessun antenato comune: condividono solo la FORMA.
+
+**Esecuzione:** main → registra 3 processor → batch → `output_pipeline(3, CsvPlugin())` → per ogni processor: estrae fino a 3 pezzi (o quanti disponibili) → `plugin.process_output(data)` → il CsvPlugin incolla i valori con la virgola e stampa → secondo batch → `output_pipeline(5, JsonPlugin())` → chiavi `"item_<rank>"` coi rank progressivi (per questo i numeri ripartono da 3: i primi 3 li ha mangiati il CSV).
+
+**Come testare:** `cd python/p05/ex2 && python3 data_pipeline.py`
+
+**Teoria:**
+- **Protocol vs ABC:** la ABC OBBLIGA a ereditare; il Protocol non obbliga a nulla — controlla solo la forma (structural typing). Niente `class CsvPlugin(ExportPlugin)`: basta `def process_output(...)` e mypy lo accetta come plugin
+- **Il rank attraversa tutto il sistema:** `output()` dà `(rank, pezzo)` e il JSON lo usa per le chiavi `item_3`, `item_4`... — il motivo per cui i numeri non ripartono da 0
+
+**Codice:** in `python/p05/ex2/data_pipeline.py` (già scritto e testato)
+
+
+
+---
+
+# p06 — The Codex (Import e moduli)
+
+**Struttura del progetto (il subject la impone):** un package `alchemy/` con sottopackage `grimoire/` e `transmutation/`, un `elements.py` alla radice, e 14 script `ft_*.py` che testano i 4 misteri. Tutto sta in `python/p06/`.
+
+## ★ PRIMA VOLTA — i 4 misteri degli import (tutta la teoria in un colpo)
+
+**Mistero 1 — import vs from:** `import elements` carica TUTTO il modulo e lo usi col punto: `elements.create_fire()`. `from elements import create_water` carica SOLO quella funzione e la chiami DIRETTA: `create_water()`. Stessa roba, due stili: col punto = "cassetta degli attrezzi", senza = "attrezzo in mano".
+
+**Mistero 2 — i package e `__init__.py`:** una cartella con dentro `__init__.py` diventa un PACKAGE importabile col nome della cartella. `__init__.py` gira quando importi il package e decide COSA ESPORRE: nel nostro caso espone `create_air` ma NON `create_earth` — per questo `alchemy.create_earth()` esplode con AttributeError (il "segreto" del subject, voluto). Analogia: `__init__.py` è la vetrina del negozio: la merce che non metti in vetrina non la vendi.
+
+**Mistero 3 — import assoluti vs relativi:** assoluto = percorso completo dalla radice (`from alchemy.elements import create_air`); relativo = percorso DA QUI, coi puntini (`from ..potions import strength_potion` — `..` = cartella superiore, come nei path). Regola del mestiere: dentro un package si preferiscono i relativi (se sposti la cartella non si rompe), fuori gli assoluti.
+
+**Mistero 4 — le dipendenze circolari:** se A importa B e B importa A → `ImportError: cannot import name ... from partially initialized module` (l'esplosione di `ft_kaboom_1`). Il labirinto: A parte, chiede B, B chiede A, A non è finito → cortocircuito. Soluzioni: importare in fondo al file, importare DENTRO le funzioni, o togliere UN lato dell'import (il light_validator non importa dal light_spellbook: il ciclo si spezza — mentre dark_validator e dark_spellbook si importano a vicenda ed esplodono apposta).
+
+## Gli script (tutti testati, l'output è nel subject)
+
+- **ft_alembic_0..5**: i 6 modi di raggiungere elements.py e alchemy — da `import elements` (0) a `from alchemy import create_air` (5). **ft_alembic_4 è volutamente rotto**: `alchemy.create_earth()` → AttributeError (la vetrina non lo espone) — anche mypy dà errore lì, DI PROPOSITO (il subject lo dice)
+- **ft_distillation_0..1**: le pozioni — `alchemy/potions.py` importa i 4 elementi (assoluti) e costruisce le frasi; `__init__.py` le espone con ALIAS: `healing_potion as heal`
+- **ft_transmutation_0..2**: recipes.py usa UN import assoluto (`from elements import create_fire`, `from alchemy.elements import create_air`) e UNO relativo (`from ..potions import strength_potion`) — il subject ne chiede almeno uno per tipo
+- **ft_kaboom_0**: il grimoire LIGHT funziona (il validator ha la sua lista di ingredienti, niente ciclo) → "Spell recorded: Fantasy (Earth, wind and fire - VALID)"
+- **ft_kaboom_1**: il grimoire DARK esplode — dark_spellbook importa dark_validator che importa dark_spellbook → ImportError con traceback (voluto, è la dimostrazione del mistero 4)
+
+**Come testare:** `cd python/p06 && python3 ft_alembic_0.py` ecc. — ogni script si lancia da `python/p06/` (gli import sono relativi a quella cartella).
+
+**Teoria extra:**
+- **Chi è cosa:** `import`, `from`, `as` → parole chiave; `elements.py` / `alchemy/` → moduli e package NOSTRI; `__init__.py` → il file speciale di Python (nome DUNDER riservato) che trasforma la cartella in package; il resto è tutto nostro
+- **L'`__init__.py` del subject "segue le convenzioni usuali"** per flake8/mypy: si usa `__all__` o i commenti noqa — nel nostro c'è `__all__` (lista dei nomi che la vetrina espone)
+- **Come si decide il percorso:** se il file che importa è DENTRO un package → relativi; se è uno script alla radice → assoluti (i relativi non funzionano nemmeno, in uno script eseguito direttamente)
+
+---
+
+# p07 — DataDeck (Design pattern: factory, capability, strategy)
+
+**Struttura:** tre package (`ex0/`, `ex1/`, `ex2/`, ognuno con `__init__.py` che espone SOLO le factory — mai le creature concrete) e tre script alla radice di `python/p07/`: `battle.py`, `capacitor.py`, `tournament.py`. Ogni esercizio costruisce sul precedente.
+
+## ex0 — battle — l'abstract factory
+
+**★ PRIME VOLTE qui:** pattern abstract factory (niente sintassi nuova: ABC + ereditarietà di p05, composti in un pattern)
+
+**Cosa chiede:** creature di 2 famiglie (Fuoco: Flameling→Pyrodon; Acqua: Aquabub→Torragon) create da FACTORY astratte: `FlameFactory().create_base()` / `create_evolved()`. Il package espone solo le factory.
+
+**Il concetto in una riga:** la factory è il negozio di creature: tu chiedi "dammi il mostro BASE della famiglia Fuoco" e il negozio sa quale classe costruire. Chi compra NON conosce i nomi delle classi — conosce solo la factory. Perché: se domani cambi le classi, chi le usa non deve cambiare niente (il segreto della "clean, maintainable code" del subject).
+
+**Esecuzione:** battle.py → `test_factory(FlameFactory())` → `create_base()` → dentro la factory: `return Flameling()` → `describe()` (metodo CONCRETO della madre Creature) e `attack()` (metodo astratto, implementato dalla figlia) → stesso per evolved → `test_battle` fa combattere le due base.
+
+**Come testare:** `cd python/p07 && python3 battle.py`
+
+**Teoria:** `Creature` è astratta (attack senza corpo, `...`); `CreatureFactory` è astratta (create_base/create_evolved senza corpo); le classi concrete implementano tutto. L'`__init__.py` espone `FlameFactory, AquaFactory` — se qualcuno prova `from ex0 import Flameling` → errore: la creatura concreta non è in vetrina (stesso trucco di p06).
+
+**Codice:** in `python/p07/ex0/` (creatures.py, factories.py, __init__.py) + `python/p07/battle.py`
+
+## ex1 — capacitor — le capability (ereditarietà MULTIPLA)
+
+**★ PRIME VOLTE qui:** ereditarietà multipla (`class Sproutling(Creature, HealCapability)`)
+
+**Cosa chiede:** capacità SEPARATE dalle creature (HealCapability, TransformCapability — NON ereditano da Creature!) e creature che ereditano da ENTRAMBE: `class Sproutling(Creature, HealCapability)`. Due nuove famiglie con le loro factory.
+
+**Il concetto in una riga:** una classe può avere DUE genitori: la creatura (cosa È) + la capacità (cosa SA FARE). Il TransformCapability ha uno STATO (`self._transformed`): dopo `transform()` l'`attack()` cambia (colpisce potenziato), dopo `revert()` torna normale — lo stato persiste tra le chiamate perché sta nell'oggetto.
+
+**Esecuzione:** capacitor.py → crea la factory → base → `describe()`, `attack()`, `heal()` → factory transform → `transform()` mette `_transformed = True` → `attack()` ora va nel ramo "boosted" (l'if legge lo stato) → `revert()` lo rimette a False.
+
+**Come testare:** `cd python/p07 && python3 capacitor.py`
+
+**Teoria:**
+- **Perché le capability NON ereditano da Creature:** il subject lo dice — un giorno potrebbero servire a NON-creature (oggetti, carte speciali). Tenerle separate = poterle attaccare a chiunque. È il "design for the future"
+- **Ereditarietà multipla in Python:** `class X(A, B)` — X prende i metodi di entrambi. L'ordine conta per chi "vince" i conflitti; qui non ce ne sono (Creature e le capability non hanno metodi con lo stesso nome)
+- **Lo stato `_transformed`** è il primo esempio di "l'oggetto RICORDA": il metodo transform cambia l'oggetto e l'attacco successivo si comporta diversamente — come il cartellino che resta attaccato
+
+**Codice:** in `python/p07/ex1/` + `python/p07/capacitor.py`
+
+## ex2 — tournament — lo strategy pattern
+
+**★ PRIME VOLTE qui:** pattern strategy (ABC + polimorfismo, niente sintassi nuova)
+
+**Cosa chiede:** 3 strategie di battaglia (Normal, Aggressive per i trasformisti, Defensive per i guaritori) che decidono COME agisce una creatura in torneo. `is_valid(creature)` controlla la compatibilità, `act(creature)` esegue (e lancia StrategyError se invalida). Il torneo fa combattere tutti contro tutti con le proprie strategie.
+
+**Il concetto in una riga:** la strategia è il "piano di battaglia" ATTACCATO alla creatura per il torneo: la creatura non sa combattere in torneo, il piano sì. `act()` di Normal = solo attack; Aggressive = transform → attack → revert; Defensive = attack → heal. Il tournament.py conosce SOLO `act()` — non sa quale piano sia.
+
+**Esecuzione:** tournament.py → `battle([(FlameFactory(), NormalStrategy()), (HealingCreatureFactory(), DefensiveStrategy())])` → crea le creature, tutti contro tutti → per ogni scontro: `strat_a.act(a)` → dentro act: `is_valid`? → no? → `raise StrategyError("Invalid Creature 'Flameling' for this aggressive strategy")` (torneo 1, l'errore voluto) → si → esegue il piano.
+
+**Come testare:** `cd python/p07 && python3 tournament.py`
+
+**Teoria:**
+- **`isinstance(creature, TransformCapability)`** = il modo di chiedere "questa creatura HA la capacità?" — l'ereditarietà multipla lo rende possibile (lo Shiftling È un TransformCapability)
+- **Strategy vs if a catena:** senza il pattern servirebbe `if tipo == trasformista: ... elif guaritore: ...` DENTRO il torneo. Col pattern, ogni piano sta nella SUA classe e il torneo non cambia mai — aggiungi una strategia nuova senza toccare il torneo (stessa lezione della factory)
+- **StrategyError** è un'eccezione NOSTRA (come GardenError in p02 ex3) — `class StrategyError(Exception)`
+
+**Codice:** in `python/p07/ex2/` + `python/p07/tournament.py`
+
+
+
+---
+
+# p08 — The Matrix (Ambienti virtuali, dipendenze, configurazione)
+
+## ex0 — construct — riconoscere il venv
+
+**★ PRIME VOLTE qui:** `sys.prefix`, `sys.base_prefix`, `sys.executable`, `site.getsitepackages()`, `os.path.basename()`
+
+**Cosa chiede:** un programma che scopre se sta girando DENTRO un ambiente virtuale e mostra le informazioni giuste (dentro: percorso del venv e dei pacchetti; fuori: avviso + istruzioni per crearlo).
+
+**Il concetto in una riga:** dentro un venv, il Python usato è quello della cartellina `.venv`. Il trucco per scoprirlo: `sys.prefix` = dov'è il Python ATTUALE; `sys.base_prefix` = dov'è il Python ORIGINALE (quello di sistema). Se sono DIVERSI → sei dentro un venv. Analogia: prefix è il tuo indirizzo attuale, base_prefix è la casa dei tuoi genitori — se non vivi più dai tuoi, sei "in trasferta" (nel venv).
+
+**Esecuzione:** main → `in_venv = sys.prefix != sys.base_prefix` → se True: stampa `os.path.basename(sys.prefix)` (il NOME della cartellina, senza percorso) + `sys.executable` (il Python in uso) + `site.getsitepackages()[0]` (dove finiscono i pacchetti installati) → se False: avviso "sei nel globale" + istruzioni (`python -m venv matrix_env` + activate).
+
+**Come testare:** `cd python/p08/ex0 && python3 construct.py` (fuori) → `python3 -m venv matrix_env && source matrix_env/bin/activate && python3 construct.py` (dentro — poi `deactivate`).
+
+**Teoria:** il venv NON è magia: `python3 -m venv .venv` copia Python in una cartellina, e l'activate cambia la variabile PATH così che `python3` diventi quello della cartellina. Il programma lo scopre confrontando i due prefix. (La guida completa al venv è in fondo agli appunti.)
+
+**Codice:** in `python/p08/ex0/construct.py`
+
+## ex1 — loading — dipendenze e package manager
+
+**★ PRIME VOLTE qui:** `importlib.metadata.version()`, `requirements.txt`, `pyproject.toml`
+
+**Cosa chiede:** un tool di analisi dati che usa pandas/numpy/matplotlib, con gestione GRACEFUL delle dipendenze mancanti (le controlla una a una e dà le istruzioni), e i file di dipendenze per DUE mondi: `requirements.txt` (pip) e `pyproject.toml` (Poetry).
+
+**Il concetto in una riga:** i pacchetti esterni vanno DICHIARATI in un file, così chiunque ricrea l'ambiente con un comando. Due scuole: pip legge `requirements.txt` (lista semplice: `pandas
+numpy
+...`), Poetry legge `pyproject.toml` (file più ricco, con metadati del progetto). Il programma usa `importlib.metadata.version("pandas")` per chiedere "è installato? che versione?" senza importarlo davvero.
+
+**Esecuzione:** main → per ognuna delle 4 librerie: `check_dependency()` → installata? "[OK] pandas (2.1.0)..." → mancante? "[MISSING] pandas" → se manca qualcosa: istruzioni pip e poetry e stop → se tutto ok: `numpy.random.randint` genera i 1000 dati (il subject vuole NUMPY come fonte dei dati, non liste) → media/deviazione → matplotlib disegna l'istogramma → `matrix_analysis.png`.
+
+**Come testare:** `cd python/p08/ex1 && python3 loading.py` (senza dipendenze: messaggi) → dentro un venv: `pip install -r requirements.txt && python3 loading.py` (analisi completa).
+
+**Teoria:** il subject tollera errori flake8/mypy sugli import qui ("Exceptionally, flake8 and mypy errors are allowed for this exercise, only for import errors"). `requirements.txt` = una riga per pacchetto; `pyproject.toml` = il formato moderno (sezione `[tool.poetry.dependencies]`). L'import di numpy/matplotlib avviene DOPO il check, dentro main — così senza dipendenze non esplode all'import.
+
+**Codice:** in `python/p08/ex1/` (loading.py + requirements.txt + pyproject.toml)
+
+## ex2 — oracle — configurazione con .env
+
+**★ PRIME VOLTE qui:** `python-dotenv` (`load_dotenv()`), `os.getenv()`, file `.env`
+
+**Cosa chiede:** un programma che legge la configurazione da VARIABILI D'AMBIENTE (caricate da un file `.env` con la libreria python-dotenv), con comportamento diverso in development vs production, errori chiari se manca la config, e `.env` nel .gitignore (i segreti NON vanno MAI committati).
+
+**Il concetto in una riga:** i segreti (API key, URL database) non si scrivono nel codice. Stanno in un file `.env` (locale, gitignored) e python-dotenv li carica nelle variabili d'ambiente quando il programma parte. Analogia: il codice è la ricetta pubblica, il .env è il cassetto delle spezie segrete che solo il cuoco ha.
+
+**Esecuzione:** main → `load_dotenv()` (legge `.env` se esiste e mette le righe `CHIAVE=valore` nelle variabili d'ambiente) → `os.getenv("MATRIX_MODE")` ecc. per ognuna → se MATRIX_MODE manca: avviso "copy .env.example to .env" e stop → se "development": stampa tutto (la API key può anche mancare) → se "production": nasconde la API key con `'*' * len(api_key)` e PRETENDE DATABASE_URL e ZION_ENDPOINT (avvisi se mancano) → mode sconosciuto: errore.
+
+**Come testare:** `cd python/p08/ex2 && python3 oracle.py` (senza .env: warning) → `cp .env.example .env && python3 oracle.py` (legge) → modifica MATRIX_MODE=production e rilancia.
+
+**Teoria:** il file `.env.example` è la MASCHERA: mostra quali chiavi servono, senza valori segreti — quello SÌ va committato (e infatti sta nel repo). Il `.env` vero è nel .gitignore ("Never commit real secrets to version control! You must be able to explain why" — perché chiunque clona il repo si prenderebbe le chiavi vere). Le variabili d'ambiente vincono sul file: se il sistema le ha già, getenv trova quelle.
+
+**Codice:** in `python/p08/ex2/` (oracle.py + .env.example + .gitignore)
+
+---
+
+# p09 — Cosmic Data (Pydantic: validazione dei dati)
+
+**★ PRIME VOLTE qui:** `pydantic` (libreria esterna): `BaseModel`, `Field`, `Enum`, `@model_validator`
+
+**Prerequisito:** serve pydantic 2.x installato in un venv (il subject lo impone). Comandi: `cd python/p09 && python3 -m venv .venv && source .venv/bin/activate && pip install "pydantic>=2"`. Poi `python3 ex0/space_station.py` ecc.
+
+**Il concetto in una riga (vale per tutti e 3 gli esercizi):** Pydantic è un GUARDIANO dei dati: definisci una CLASSE-modello (`class SpaceStation(BaseModel)`) dove ogni campo ha un tipo e dei VINCOLI (`crew_size: int = Field(ge=1, le=20)` = "intero tra 1 e 20"). Quando crei l'oggetto, Pydantic CONTROLLA tutto: dato sbagliato → `ValidationError` con il messaggio preciso. È come il guardiano dell'ex4 di p01, ma pronto e con regole scrivibili in una riga. Perché serve: i dati arrivano dall'esterno (API, file) e non ci si può fidare — Pydantic li valida alla porta.
+
+## ex0 — space_station — il primo modello
+
+**Cosa chiede:** modello `SpaceStation` con campi vincolati (station_id 3-10 caratteri, crew_size 1-20, power/oxygen 0-100, last_maintenance datetime, is_operational default True, notes opzionale max 200) + main che crea una stazione valida e ne mostra i campi, poi prova una invalida e mostra l'errore ("Input should be less than or equal to 20").
+
+**Esecuzione:** main → `SpaceStation(station_id="ISS001", ..., last_maintenance=datetime(2024,6,1,10,0,0))` → Pydantic valida OGNI campo → tutto ok → oggetto pronto → stampa i campi → `SpaceStation(crew_size=25, ...)` → Pydantic rifiuta → `except ValidationError as e:` → `e.errors()[0]["msg"]` = il messaggio del primo errore.
+
+**Teoria:** `Field(min_length=3, max_length=10)` = vincolo sulla lunghezza delle stringhe; `Field(ge=0.0, le=100.0)` = greater-equal/less-equal (ge/le) per i numeri; `Optional[str] = None` = campo che può mancare; `bool = True` = valore di default. La CONVERSIONE automatica: se passi una stringa "2024-06-01" a un campo datetime, Pydantic la converte da solo (domanda del subject: "what happens when you pass a string timestamp to a datetime field?" → la converte, o errore se il formato è sbagliato).
+
+**Codice:** in `python/p09/ex0/space_station.py`
+
+## ex1 — alien_contact — validazione custom
+
+**★ PRIME VOLTE qui:** `Enum` (ContactType), `@model_validator(mode="after")`
+
+**Cosa chiede:** modello AlienContact con regole DI BUSINESS che i Field da soli non sanno esprimere: contact_id deve iniziare con "AC", i contatti PHYSICAL devono essere verificati, TELEPATHIC richiede ≥3 testimoni, segnali forti (>7.0) devono avere un messaggio. Un `@model_validator(mode="after")` le controlla TUTTE insieme dopo la validazione dei campi.
+
+**Esecuzione:** main → contatto valido → Pydantic valida i campi → POI gira il validator custom (mode="after" = DOPO i campi): controlla le 4 regole con if → tutte ok → `return self` (OBBLIGATORIO: il validator deve restituire il modello) → contatto invalido (telepathic con 1 testimone) → il validator fa `raise ValueError("Telepathic contact requires at least 3 witnesses")` → il ValidationError lo cattura.
+
+**Teoria:** `Enum` = tipo con un numero CHIUSO di valori (`radio, visual, physical, telepathic`) — se arriva "laser" → errore di validazione automatico. `@model_validator(mode="after")` = decoratore che marca un metodo che gira dopo i campi e vede il modello INTERO (per le regole che coinvolgono più campi insieme — il vecchio `@validator` è deprecato, il subject lo vieta). Dentro il validator: `self.contact_id`, `self.contact_type` ecc. sono già disponibili.
+
+**Codice:** in `python/p09/ex1/alien_contact.py`
+
+## ex2 — space_crew — modelli ANNIDATI
+
+**Cosa chiede:** due modelli in relazione: `CrewMember` (membro singolo) e `SpaceMission` che CONTIENE una LISTA di CrewMember (`crew: List[CrewMember]`). Il validator della missione controlla regole che coinvolgono TUTTO l'equipaggio: serve almeno un Commander/Capitano, le missioni lunghe (>365 giorni) vogliono il 50% di esperti (≥5 anni), tutti attivi.
+
+**Il concetto in una riga:** un modello può stare DENTRO un altro modello (e in liste): `crew: List[CrewMember]` = "questa missione contiene una lista di oggetti CrewMember, e Pydantic valida OGNI membro della lista con le sue regole PRIMA di validare la missione". Come le bambole matrioska: la missione contiene l'equipaggio, l'equipaggio contiene i membri.
+
+**Esecuzione:** main → `CrewMember(...)` × 2 (validati uno a uno) → `SpaceMission(..., crew=crew, ...)` → Pydantic valida i campi della missione E in cascata i 2 membri → il validator: `[m for m in self.crew if m.rank in (Rank.CAPTAIN, Rank.COMMANDER)]` (list comprehension di p03 ex6!) → se la lista è vuota → raise → missione invalida di prova (solo ufficiali, nessun capitano) → "Must have at least one Commander or Captain".
+
+**Teoria:** il Rank è un Enum come il ContactType. Le regole nel validator usano le comprehension per filtrare l'equipaggio — è il p03 che rientra dalla finestra. `Field(min_length=1, max_length=12)` sulla lista = l'equipaggio deve avere 1-12 membri.
+
+**Codice:** in `python/p09/ex2/space_crew.py`
+
 # Elementi usati: cosa è cosa (per l'evaluation)
 
 Devi saper dire di OGNI nome che usi: **è una cosa di Python (predefinita) o una cosa creata da noi? E di che tipo è?**
@@ -1497,7 +1873,22 @@ Dove è comparso per la prima volta ogni elemento nuovo di Python (per ripassare
 | `.append()`, `sum()`/`max()`/`min()`, slicing `[1:]`, `return` senza valore | p03 ex1 |
 | tupla, `math.sqrt()`, `.split()`, `float()`, unpacking, `while True`, `**`, `continue`/`break` | p03 ex2 |
 | set, `random.randint()`, `random.sample()`, **dizionario**, `union`/`intersection`/`difference`, **annotazione di variabile** (`x: Tipo = valore`) | p03 ex3 |
-| (da completare con ex4+) | — |
+| `dict.keys()` / `dict.values()` | p03 ex4 |
+| generatore (`yield`), `next()`, `random.choice()` | p03 ex5 |
+| comprehension (list/dict), `.items()` | p03 ex6 |
+| `open()`, oggetto file, `.read()`, `.close()`, `typing.IO` | p04 ex0 |
+| `.write()`, modalità "w", `.splitlines()`, `"\n".join()` | p04 ex1 |
+| `sys.stdin`/`stdout`/`stderr`, `.readline()`, `.flush()` | p04 ex2 |
+| `with` (context manager) | p04 ex3 |
+| `ABC`, `@abstractmethod`, `isinstance()`, `all()`, `Any` | p05 ex0 |
+| router polimorfico (nessuna sintassi nuova) | p05 ex1 |
+| `Protocol` (duck typing) | p05 ex2 |
+| `import`/`from`, package, `__init__.py`, import relativi, dipendenze circolari | p06 |
+| abstract factory, ereditarietà multipla, strategy pattern, `StrategyError` | p07 |
+| `sys.prefix`/`base_prefix`, `site`, `os.path.basename` | p08 ex0 |
+| `importlib.metadata`, `requirements.txt`, `pyproject.toml` | p08 ex1 |
+| `python-dotenv`, `os.getenv()`, file `.env` | p08 ex2 |
+| `pydantic`: `BaseModel`, `Field`, `Enum`, `@model_validator` | p09 |
 
 ---
 
