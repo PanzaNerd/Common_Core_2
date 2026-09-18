@@ -1,17 +1,4 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    ft_hello_garden.py                                 :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/12 12:46:04 by matthias          #+#    #+#              #
-#    Updated: 2026/09/11 17:45:04 by mpanzani         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-
 def ft_hello_garden():
-	print("Hello, Garden Community!")
+    print("Hello, Garden Community!")
 
 # ft_hello_garden()

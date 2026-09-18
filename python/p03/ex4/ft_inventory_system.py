@@ -1,65 +1,53 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    ft_inventory_system.py                            :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/09/11 10:00:00 by mpanzani          #+#    #+#              #
-#    Updated: 2026/09/11 10:00:00 by mpanzani         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 import sys
 
 
 def main() -> None:
-	print("=== Inventory System Analysis ===")
+    print("=== Inventory System Analysis ===")
 
-	inventory: dict[str, int] = {}
-	for arg in sys.argv[1:]:
-		parts = arg.split(":")
-		if len(parts) != 2:
-			print(f"Error - invalid parameter '{arg}'")
-			continue
-		name, quantity = parts
-		if name in inventory:
-			print(f"Redundant item '{name}' - discarding")
-			continue
-		try:
-			inventory[name] = int(quantity)
-		except ValueError as e:
-			print(f"Quantity error for '{name}': {e}")
+    inventory: dict[str, int] = {}
+    for arg in sys.argv[1:]:
+        parts = arg.split(":")
+        if len(parts) != 2:
+            print(f"Error - invalid parameter '{arg}'")
+            continue
+        name, quantity = parts
+        if name in inventory:
+            print(f"Redundant item '{name}' - discarding")
+            continue
+        try:
+            inventory[name] = int(quantity)
+        except ValueError as e:
+            print(f"Quantity error for '{name}': {e}")
 
-	print(f"Got inventory: {inventory}")
+    print(f"Got inventory: {inventory}")
 
-	names = list(inventory.keys())
-	print(f"Item list: {names}")
+    names = list(inventory.keys())
+    print(f"Item list: {names}")
 
-	if len(names) == 0:
-		print("Empty inventory")
-		return
+    if len(names) == 0:
+        print("Empty inventory")
+        return
 
-	total = sum(inventory.values())
-	print(f"Total quantity of the {len(names)} items: {total}")
+    total = sum(inventory.values())
+    print(f"Total quantity of the {len(names)} items: {total}")
 
-	for name in names:
-		percent = inventory[name] / total * 100
-		print(f"Item {name} represents {round(percent, 1)}%")
+    for name in names:
+        percent = inventory[name] / total * 100
+        print(f"Item {name} represents {round(percent, 1)}%")
 
-	most = names[0]
-	least = names[0]
-	for name in names:
-		if inventory[name] > inventory[most]:
-			most = name
-		if inventory[name] < inventory[least]:
-			least = name
-	print(f"Item most abundant: {most} with quantity {inventory[most]}")
-	print(f"Item least abundant: {least} with quantity {inventory[least]}")
+    most = names[0]
+    least = names[0]
+    for name in names:
+        if inventory[name] > inventory[most]:
+            most = name
+        if inventory[name] < inventory[least]:
+            least = name
+    print(f"Item most abundant: {most} with quantity {inventory[most]}")
+    print(f"Item least abundant: {least} with quantity {inventory[least]}")
 
-	inventory["magic_item"] = 1
-	print(f"Updated inventory: {inventory}")
+    inventory["magic_item"] = 1
+    print(f"Updated inventory: {inventory}")
 
 
 if __name__ == "__main__":
-	main()
+    main()
