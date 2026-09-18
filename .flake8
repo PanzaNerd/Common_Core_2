@@ -1,0 +1,4 @@
+[flake8]
+ignore = W191, E101, E111, E117, E128, E265, E303, W293, W391, F841
+max-line-length = 100
+exclude = .venv, build, dist, __pycache__, materiale, exam02, pushswap

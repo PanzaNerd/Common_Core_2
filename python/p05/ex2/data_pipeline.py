@@ -152,7 +152,8 @@ class DataStream:
 			print("No processor found, no data")
 			return
 		for proc in self._processors:
-			print(f"{proc.name}: total {proc._total} items processed, remaining {len(proc._data)} on processor")
+			print(f"{proc.name}: total {proc._total} items processed, "
+				f"remaining {len(proc._data)} on processor")
 
 	def output_pipeline(self, nb: int, plugin: ExportPlugin) -> None:
 		for proc in self._processors:

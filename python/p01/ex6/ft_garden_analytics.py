@@ -107,7 +107,8 @@ class Tree(Plant):
 		self.stats: "Tree.TreeStats" = self.TreeStats()
 
 	def produce_shade(self) -> None:
-		print(f"Tree {self.name} now produces a shade of {self._height}cm long and {self.trunk_diameter}cm wide.")
+		print(f"Tree {self.name} now produces a shade of {self._height}cm "
+			f"long and {self.trunk_diameter}cm wide.")
 		self.stats.shades += 1
 
 	def show(self) -> None:
