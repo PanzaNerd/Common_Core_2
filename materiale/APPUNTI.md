@@ -1304,12 +1304,14 @@ python3 ft_inventory_system.py                      # inventario vuoto
 3. `arg.split(":")` — spezza ai due punti: "sword:1" → `["sword", "1"]`
 4. `len(parts) != 2` → "hello" non ha i due punti → `Error - invalid parameter 'hello'` → `continue` (si passa al prossimo)
 5. `name in inventory` → "sword" è GIÀ una voce? La seconda volta che appare "sword" sì → `Redundant item 'sword' - discarding` → si tiene il primo. (Il controllo "c'è già?" è istantaneo grazie al dizionario — vedi introduzione)
-6. `inventory[name] = int(qty_str)` — CREA la voce: chiave "sword", valore 1. Se la quantità non è un numero ("value") → except → `Quantity error for 'key': invalid literal...`
-7. `names = list(inventory.keys())` — `keys()` dà tutte le CHIAVI (i nomi); `list()` le mette in una lista ordinata come sono stati inseriti → `['sword', 'potion', ...]`
-8. `total = sum(inventory.values())` — `values()` dà tutte le QUANTITÀ; `sum()` le somma → 12
+6. `inventory[name] = int(quantity)` — CREA la voce: chiave "sword", valore 1. Se la quantità non è un numero ("value") → except → `Quantity error for 'key': invalid literal...`
+7. `names = list(inventory.keys())` — due pezzi: `keys()` è il METODO built-in dei dizionari ("dammi le etichette") ma restituisce una VISTA speciale (dict_keys), NON una lista — non ha posizioni, niente `[0]`. `list()` è la CLASSE built-in che costruisce una lista vera da qualsiasi cosa: il risultato è `['sword', 'potion', 'shield', ...]` con posizioni e ordine. Perché serve: le righe dopo usano `names[0]` (il punto di partenza di most/least — col dizionario non potresti) e il for con un ordine stabile. E Python RICORDA l'ordine di inserimento nei dizionari: la lista esce nell'ordine della riga di comando — è questo che fa funzionare la regola "a parità vince il primo della riga di comando" (names[0] È il primo)
+8. `total = sum(inventory.values())` — due pezzi con due ruoli: `values()` è il METODO built-in dei dizionari, gemello di keys() ("portami tutti i contenuti") — restituisce una VISTA (dict_values), NON una lista, e NON calcola niente: è il cameriere. `sum()` è la FUNZIONE built-in già vista in ex1 ("somma tutto") — è il contabile: `sum([1, 5, 2, 3, 1])` → 12. Dettaglio importante: keys() e values() sono ALLINEATI in coppia (il 1° valore va con la 1ª chiave, ecc.) — per questo `inventory[name]` dà sempre la quantità giusta
+- **sum() vs len() (equivoco classico):** `sum()` SOMMA i numeri e SOLO numeri — parte da 0 e aggiunge ogni elemento, quindi con le stringhe esplode (TypeError: 0 + "a"). `len()` CONTA gli elementi di QUALSIASI cosa (lista, stringa, dizionario). Due mestieri diversi: in ex4 `sum(inventory.values())` = somma delle quantità (12), `len(names)` = quanti oggetti (5)
 9. Percentuali: `inventory[name] / total * 100` per ogni nome → `round(x, 1)` → "sword represents 8.3%"
-10. Più/meno abbondante: si parte da `names[0]` e si confronta con `>` e `<` STRETTI — così, a parità di quantità, resta il primo della riga di comando (il `>` non lo sostituisce)
-11. `inventory["magic_item"] = 1` — aggiungere una voce nuova è la STESSA scrittura dell'aggiornare: se la chiave non esiste la crea, se esiste la sovrascrive
+10. Più/meno abbondante: `most = names[0]` e `least = names[0]` sono le IPOTESI DI PARTENZA ("supponiamo che il più/meno abbondante sia il primo"). IMPORTANTE: il for precedente NON ha consumato la lista — `names` è ancora intera, e `names[0]` la RILEGGE (le liste non hanno lancette: la posizione 0 è sempre lì). Poi il nuovo for confronta tutti con `>` e `<` STRETTI: a parità di quantità il pari NON sostituisce, quindi resta il primo della riga di comando — esattamente la regola del subject. E `most` deve essere un NOME (serve come chiave in `inventory[most]`), non un numero
+11. **LA REGOLA DELLE QUADRE (equivoco da evitare):** stesse quadre, significato diverso a seconda del contenitore — sulla LISTA `lista[1]` = POSIZIONE (il secondo elemento); sul DIZIONARIO `dict[1]` = CHIAVE (la voce la cui etichetta È il numero 1, e se non esiste la CREA). Il dizionario non ha "primo elemento": un numero tra le quadre è un'etichetta come un'altra. Demo: `{'sword': 1, 'potion': 5}` → `inventory[1] = 99` → `{'sword': 1, 'potion': 5, 1: 99}` — NON tocca il primo, crea la voce con chiave 1. È la lezione degli armadietti di ex3: sedie numerate vs etichette.
+11b. `inventory["magic_item"] = 1` — si legge: "nel dizionario inventory, la voce con etichetta 'magic_item' vale 1 — e se non esiste ancora, CREALA". È la riga dei DUE LAVORI IN UNO (già usata nel loop per creare sword/potion/...): etichetta nuova → crea la voce; etichetta esistente → sovrascrive il valore. Demo: `{'sword': 1}` → `inventory['magic_item'] = 1` → `{'sword': 1, 'magic_item': 1}`; poi `inventory['sword'] = 99` → `{'sword': 99, 'magic_item': 1}`. Python decide da solo guardando se l'etichetta esiste già
 
 ### Codice
 
@@ -1325,12 +1327,12 @@ def main() -> None:
 		if len(parts) != 2:
 			print(f"Error - invalid parameter '{arg}'")
 			continue
-		name, qty_str = parts
+		name, quantity = parts
 		if name in inventory:
 			print(f"Redundant item '{name}' - discarding")
 			continue
 		try:
-			inventory[name] = int(qty_str)
+			inventory[name] = int(quantity)
 		except ValueError as e:
 			print(f"Quantity error for '{name}': {e}")
 
@@ -1372,8 +1374,8 @@ if __name__ == "__main__":
 
 - **Chi è cosa:** `split()` → metodo built-in delle stringhe (già visto in ex2); `keys()`, `values()` → METODI built-in dei dizionari; `list()` → CLASSE built-in (converte in lista); `in` → parola chiave ("questa chiave esiste nel dizionario?"); `{}` vuoto → dizionario vuoto; il resto già visto
 - **`inventory[name] = valore` fa due lavori in uno:** se la chiave esiste → aggiorna; se non esiste → crea. È per questo che l'aggiunta di `magic_item` usa la stessa riga di tutto il resto
-- **`name, qty_str = parts`** — unpacking su una lista di 2 pezzi (come `x1, y1, z1 = tupla` di ex2)
-- **Il controllo del duplicato** (`name in inventory`) è la prima applicazione vera della potenza del dizionario: "questa voce esiste già?" senza scorrere niente
+- **`name, quantity = parts`** — unpacking su una lista di 2 pezzi (come `x1, y1, z1 = tupla` di ex2). Traccia con "sword:1": `parts = ["sword", "1"]` → `name = "sword"` e `quantity = "1"`. Due assegnazioni in una riga, IN ORDINE (primo elemento → prima variabile). `name` e `quantity` sono variabili NOSTRE nuove. Attenzione: `quantity` in questo momento è ancora una STRINGA ("1" come testo) — diventa un numero solo dopo, con `int(quantity)` nella riga dell'assegnazione. In C: `name = parts[0]; quantity = parts[1];`. Le variabili a sinistra devono essere ESATTAMENTE quante gli elementi (2 e 2) — per questo la riga sopra controlla `len(parts) != 2`
+- **Il controllo del duplicato** (`name in inventory`) è la prima applicazione vera della potenza del dizionario: "questa etichetta esiste già?" senza scorrere niente. `in` sul dizionario guarda le CHIAVI ("esiste la voce 'sword'?"), NON i valori — demo: con `{'sword': 1}`, `'sword' in inventory` è True ma `1 in inventory` è False. Traccia del doppione: al secondo `sword:2`, `name = "sword"` → la voce esiste → "Redundant item 'sword' - discarding" → `continue` salta tutto → vince il PRIMO sword, come vuole il subject. In C: un loop sull'array per ogni ricerca; qui è una riga istantanea
 - **A parità di quantità vince il primo della riga di comando** — ottenuto coi confronti STRETTI `>` e `<`: il pari NON sostituisce mai, quindi resta il primo trovato
 - **Domanda da evaluation:** "perché un dizionario per l'inventario?" → perché le domande dell'inventario sono per NOME ("quante spade?"), e il dizionario risponde per nome all'istante; una lista dovrebbe essere scorsa ogni volta
 

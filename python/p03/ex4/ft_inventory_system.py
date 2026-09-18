@@ -22,12 +22,12 @@ def main() -> None:
 		if len(parts) != 2:
 			print(f"Error - invalid parameter '{arg}'")
 			continue
-		name, qty_str = parts
+		name, quantity = parts
 		if name in inventory:
 			print(f"Redundant item '{name}' - discarding")
 			continue
 		try:
-			inventory[name] = int(qty_str)
+			inventory[name] = int(quantity)
 		except ValueError as e:
 			print(f"Quantity error for '{name}': {e}")
 
