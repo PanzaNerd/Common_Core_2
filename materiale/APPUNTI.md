@@ -1387,6 +1387,58 @@ if __name__ == "__main__":
 
 ## ex5 — ft_data_stream — i generatori (yield)
 
+**Approfondimento — yield e Generator smontati (dalle domande in chat):**
+
+- **`from typing import Generator`** si legge: "dal modulo typing (già pronto in Python, il modulo delle ETICHETTE per i tipi) prendi l'etichetta Generator". Non esegue niente: serve solo al type hint. `Generator[tuple[str, str], None, None]` ha 3 scomparti: 1° = cosa YIELD (coppie str,str), 2° = cosa RICEVE dall'esterno (None = niente), 3° = cosa RETURN alla fine (None = niente)
+- **yield = un return che NON chiude (spiegazione meccanica, niente metafore):** return consegna il valore E la funzione FINISCE (la prossima chiamata riparte da zero); yield consegna il valore E la funzione si CONGELA nel punto esatto (la prossima next riparte DA LÌ). Demo con i print dentro la funzione: `def demo(): print("A"); yield 10; print("B"); yield 20; print("C")` → `g = demo()` NON stampa nulla (chiamare una funzione con yield NON la esegue: consegna l'oggetto congelato) → `next(g)` stampa A e consegna 10 → `next(g)` stampa B e consegna 20 → `next(g)` stampa C e dà StopIteration. Il punto di congelamento è ESATTAMENTE la riga dello yield
+- **La tupla NON c'entra col generatore:** yield consegna qualsiasi cosa gli scrivi dopo (`yield 5`, `yield (name, action)`). Nel nostro esercizio ogni evento È una coppia (giocatore, azione) = due stringhe → la consegniamo come tupla. Stessa scelta che faresti col return: il meccanismo è uguale, il valore lo scegli tu. Il generatore è il meccanismo; la tupla è il prodotto
+- **ESECUZIONE VERA con valori fissi (random.seed(42)) — il formato che fa capire tutto:**
+
+  ```
+  stream = gen_event()   ->  niente eseguito: stream = macchina al punto zero
+
+  GIRO 0 (i = 0):
+    next(stream) sblocca
+    while True: vero -> entra
+    name = random.choice(PLAYERS)   -> name = 'alice'
+    action = random.choice(ACTIONS) -> action = 'run'
+    yield (name, action)            -> consegna ('alice','run') a next() e si RICONGELA
+    name, action = next(stream)     -> unpacking nel main: name='alice', action='run'
+    print -> Event 0: Player alice did action run
+
+  GIRO 1 (i = 1):
+    next(stream) riparte dallo yield
+    while True: vero -> nuovo giro
+    dadi RITIRATI -> name = 'charlie', action = 'eat'   (valori NUOVI)
+    yield -> consegna ('charlie','eat') e ricongela
+    print -> Event 1: Player charlie did action eat
+
+  GIRO 2 (i = 2):
+    dadi di nuovo -> name = 'bob', action = 'eat'
+    yield -> consegna e congela
+    print -> Event 2: Player bob did action eat
+  ```
+
+  Le 3 cose da portarsi via: (1) le name/action DENTRO la funzione e quelle del MAIN sono variabili SEPARATE con lo stesso nome — dentro vengono rimpiENITE a ogni giro coi dadi, poi la coppia esce e l'unpacking riempie quelle del main; (2) il congelamento è sempre SULLO YIELD: tra un next e l'altro la macchina sta ferma lì con dentro l'ULTIMA coppia tirata; (3) i dadi si tirano a OGNI giro — per questo i valori cambiano
+
+- **DEFINIZIONE di generatore (raffinata):** una funzione che può congelarsi a metà con yield invece di chiudersi con return. Chiamarla → NON la esegue, ti dà l'oggetto congelato; next() → la scongela, esegue fino al prossimo yield, consegna il valore, la ricongela; fine funzione senza altri yield → StopIteration (il for lo gestisce da solo fermandosi)
+- **Il punto chiave:** una funzione con yield, quando la CHIAMI, NON si esegue — ti dà la fabbrica. `stream = gen_event()` crea la fabbrica (nessun giro); `next(stream)` = "fabbrica, dammi il prossimo": scongela, gira fino al prossimo yield, consegna, ricongela
+- **Traccia col pallino di gen_event:** `next(stream)` → while True? SÌ → choice(PLAYERS) → name="bob" → choice(ACTIONS) → action="run" → yield consegna ("bob","run") e CONGELA. Seconda next: RIPARTE dal punto congelato → while True? SÌ → nuovo giro → yield nuovo pezzo → congela. Il while True non va in crash perché a ogni giro si ferma allo yield: chi decide quanto gira sei TU (nel main: 1000 next = 1000 pezzi)
+
+- **Perplessità: "che succede ESATTAMENTE a stream = gen_event()?" — i 4 passi:** (1) Python vede lo yield nel corpo → capisce che è una funzione-generatore; (2) NON esegue il corpo, nemmeno la prima riga; (3) fabbrica l'oggetto: la funzione congelata alla prima riga (partita salvata al minuto zero); (4) stream = quell'oggetto. Nessun dado tirato, nessun name/action. La macchina è spenta
+- **Perplessità: "perché il for non richiama gen_event() ma solo next()?" —** perché chiamare gen_event() di nuovo fabbricherebbe una SECONDA macchina nuova al punto zero, senza far avanzare la prima (comprare un distributore nuovo invece di girare la manovella). Regola: la chiamata si fa UNA volta (crei la macchina); poi next() sulla stessa la fa avanzare. Nel for di consume_event è identico: la chiamata avviene una volta dentro il for, e il for gira la manovella da solo
+- **Correzione all'immagine "name e action scritte una volta e congelate in coda":** (a) i dadi si tirano a OGNI giro, non una volta sola — ogni next() rifà il giro completo (while → dadi → name e action RIMPIENITE di nuovi valori; demo: prima richiesta ("alice","run"), seconda ("bob","eat")); (b) NON esiste nessuna coda: yield consegna il valore IN MANO a next() nello STESSO istante in cui si congela — il testimone della staffetta: il corridore corre fino a te, ti mette il testimone in mano e si ferma lì. Passaggio e congelamento sono lo stesso momento
+
+- **Perplessità: "chiamare stream = gen_event() che succede?" — NULLA.** Chiamare una funzione con yield NON esegue il corpo: né il while, né i dadi, né lo yield. Crea solo l'oggetto congelato AL PUNTO ZERO (macchina spenta). Il corpo parte tutto insieme solo alla PRIMA next() (demo: un print dentro la funzione esce solo alla prima next, non alla chiamata). Quindi: chiamata = crea la macchina spenta; next = accende e fa un giro; yield = spegne a metà giro conservando le variabili (name, action restano congelate per il giro dopo)
+- **Perplessità: "yield si può usare solo con un while?" — NO.** Il while NON è un requisito di yield: è solo un modo per RIPETERE lo yield. Tre forme possibili: (1) niente while, yield in fila → sequenza finita di 3 valori; (2) while True + yield → infinito, ferma il chiamante (gen_event); (3) while con condizione + yield → finisce quando la condizione diventa falsa (consume_event: finché la lista non si svuota). La domanda da farsi: quanti pezzi deve produrre? 3 precisi → 3 yield in fila; infiniti → while True; finché la lista si svuota → while len>0
+
+- **Perplessità: "il while True quando finisce?" — MAI da solo.** Il while True non finisce mai, ma non gira nemmeno mai "all'infinito" tutto insieme: a ogni giro lo yield lo congela. Il loop avanza UN passo per richiesta: il main chiede 1000 volte → 1000 giri (uno per next); poi smette → il generatore resta CONGELATO nel limbo per sempre; una 1001ª richiesta farebbe un 1001° giro senza problemi. Chi decide la fine è il CHIAMANTE, non il while. Confronto coi due generatori dell'esercizio: gen_event = while True, finisce MAI (ferma la produzione il chiamante); consume_event = while len(events) > 0, finisce quando la lista è vuota (si svuota da sola col remove). Traccia di una richiesta: while True? SÌ → choice → name → choice → action → yield consegna e CONGELA — la richiesta finisce qui; la prossima riparte e risale al while
+- **`next()`** = funzione built-in (come len): "dammi il prossimo pezzo"
+- **Il for sul generatore:** `for event in consume_event(event_list)` — il for chiama next() DA SOLO finché il generatore non finisce; un generatore finisce quando la funzione arriva in fondo senza altri yield
+- **Traccia col pallino di consume_event (lista con 2 eventi):** while len(events)>0? SÌ → choice pesca ("charlie","swim") → events.remove() lo TOGLIE (resta 1) → yield consegna → il for lo stampa → richiede ancora → pesca/toglie/consegna l'ultimo → richiede ancora → len>0? NO → il generatore finisce → il for si ferma da solo. Consume_event DISTRUGGE la sua lista di partenza (remove) — per questo "Remains in list" si accorcia a ogni stampa
+- **Perché i generatori (risposta da evaluation):** 1000 eventi in lista = 1000 posti in memoria tutti insieme; il generatore ne tiene UNO alla volta. È la differenza tra portare tutto il raccolto in un carro e portarlo un sacco alla volta
+
+
 **Cosa fa in concreto:** genera 1000 eventi casuali (un giocatore e un'azione) UNO ALLA VOLTA e li stampa; poi crea una lista di 10 eventi e li consuma pescandoli a caso uno per uno finché la lista non è vuota.
 
 **★ PRIME VOLTE qui:** generatore (`yield`), `next()`, `random.choice()`
