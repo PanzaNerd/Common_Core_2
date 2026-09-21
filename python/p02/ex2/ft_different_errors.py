@@ -6,7 +6,8 @@ def garden_operations(operation_number: int) -> None:
     elif operation_number == 2:
         open("/non/existent/file")
     elif operation_number == 3:
-        _ = "garden" + 42
+        # bomba voluta dal subject: deve esplodere TypeError a runtime
+        _ = "garden" + 42  # type: ignore[operator]
 
 
 def test_error_types() -> None:

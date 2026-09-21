@@ -106,7 +106,7 @@ def main() -> None:
     print("Trying to validate input 'Hello':", numeric.validate("Hello"))
     print("Test invalid ingestion of string 'foo' without prior validation:")
     try:
-        numeric.ingest("foo")
+        numeric.ingest("foo")  # type: ignore[arg-type]  # bomba voluta dal subject
     except TypeError as e:
         print(f"Got exception: {e}")
 
