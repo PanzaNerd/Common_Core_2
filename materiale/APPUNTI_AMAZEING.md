@@ -13,7 +13,7 @@ letto/elaborato → cosa ne deriva**. Niente codice, illustrazioni semplici.
    - 1.2 La griglia e i muri (decimale, binario, esadecimale)
    - 1.3 Il seed (la casualità riproducibile)
    - 1.4 La generazione (la talpa che scava tunnel)
-   - 1.5 Il percorso più breve (BFS)
+   - 1.5 Il percorso più breve (BFS: il fuoco)
    - 1.6 L'OUTPUT: il file esadecimale
    - 1.7 Il display interattivo
    - 1.8 Il main e la gestione errori
@@ -21,11 +21,22 @@ letto/elaborato → cosa ne deriva**. Niente codice, illustrazioni semplici.
 3. Studio del codice (in ordine di esecuzione)
    - L'ordine di studio (perché questo)
    - 3.1 a_maze_ing.py — il direttore d'orchestra
-   - 3.2 config_parser.py — nasce il Config (base pronta)
-   - 3.3 mazegen.py — il cuore (base pronta)
-   - 3.4 output_writer.py — il file di output (base pronta)
-   - 3.5 display.py — il terminale interattivo (base pronta)
+   - 3.2 config_parser.py — dalla chiamata del main alla nascita del Config
+   - 3.3 mazegen.py — il cuore: talpa, piccone, 42 e fuoco
+     · approfondimenti: with_42/has_42 · (x,y) vs [y][x] · corda,
+       neighbors, self · rng.choice · self.rng · piazzetta 3x3 ·
+       _unvisited_neighbors · fine della generazione · queue e
+       came_from · traccia completa · scudo prima della risalita
+   - 3.4 output_writer.py — il file esadecimale
+   - 3.5 display.py — il terminale interattivo
+     · approfondimenti: l'import senza E · color_index · print(CLEAR) ·
+       codici ANSI dei colori · path_n e path_w · vista d'insieme ·
+       riempimento e consumo · costruzione riga per riga
 4. Preparazione alla difesa (la scala di valutazione)
+   - Il set di consegna
+   - 4.1 Display e menu · 4.2 Config: formato ed errori · 4.3 File di
+     output · 4.4 Il generatore · 4.5 Modulo riusabile · 4.6 Le
+     trappole della difesa
 5. Glossario
 
 ---
@@ -67,13 +78,53 @@ python3 a_maze_ing.py config.txt
 Nel display: `1` = rigenera, `2` = mostra/nascondi percorso, `3` = cambia
 colore muri, `q` = esci. Uscita con codice 0 = tutto ok, 1 = errore.
 
-**Test automatici** (16 test):
+**Test automatici** (22 test):
 
 ```bash
 make test                                                # tutta la suite
 python3 -m pytest tests/test_config_parser.py -v         # solo il parser
 python3 -m pytest tests/test_output_writer.py::test_path_to_nesw_simple -v   # un singolo test
 ```
+
+### Approfondimento: pytest — il vigile dei test (cos'è, come becca gli errori)
+
+- pytest è un pacchetto PREDEFINITO (installato con pip, fa parte dei
+  tool di sviluppo): un PROGRAMMA che esegue i test. Si lancia con
+  python3 -m pytest (o make test). In C: l'equivalente non esiste di
+  serie — testi a mano col debugger o con un framework esterno.
+- Un TEST = una funzione con nome test_* in un file test_*.py. Dentro
+  fa due cose: PREPARA (costruisce l'input, es. un config in un file
+  temporaneo) e DOMANDA (una riga assert: la domanda vera e propria).
+  assert condizione = "se la condizione è falsa, ALZA la mano":
+  pytest raccoglie le mani alzate e alla fine fa il resoconto.
+- I 3 file della cartella tests/:
+  - test_config_parser.py (14 test): ogni test prepara un config e
+    domanda una cosa — es. test_lowercase_keys_ok domanda "le chiavi
+    minuscole sono accettate?", test_missing_key domanda "senza
+    PERFECT salta fuori ConfigError?" (e per questo usa
+    pytest.raises: "mi aspetto proprio QUESTO errore").
+  - test_mazegen.py (4 test): connettività del perfetto/non perfetto,
+    la soglia 9x6 del 42, i mattoncini tutti chiusi.
+  - test_output_writer.py (4 test): il formato del file e la
+    conversione del percorso in NESW.
+- PROVA VERA che i test servono (fatta davanti ai nostri occhi):
+  abbiamo ROTTO il parser (tolto il .lower() del PERFECT) e
+  make test ha subito segnalato 3 test rossi (test_valid_config,
+  test_unknown_keys_ignored, test_no_seed_is_none) — il bug delle
+  minuscole, quello che la scala valutava. Ripristinato il codice:
+  22 verdi in 0.01s. Ecco il valore: una modifica che rompe qualcosa
+  viene beccata in UN secondo, prima dell'evaluator.
+- Il subject III.3 dice "not submitted or graded": li teniamo per
+  NOI, come prova pronta alla mano se l'evaluator chiede una modifica
+  (cap. IX: "a brief modification... may occasionally be requested").
+- Chi è cosa: pytest = pacchetto predefinito (pip); assert = parola
+  chiave predefinita di Python; pytest.raises = strumento di pytest;
+  le funzioni test_* = NOSTRE.
+- Risposte pronte: "Cos'è pytest?" Il programma che esegue i test e
+  fa il resoconto dei fallimenti. "Cos'è un test?" Una funzione che
+  prepara un input e fa una domanda con assert. "A cosa vi servono?"
+  A beccare subito qualsiasi modifica che rompe il programma: li
+  abbiamo visti fermare un bug vero del parser.
 
 **Controlli di qualita'** (richiesti dal subject):
 
@@ -945,13 +996,14 @@ la funzione solve().
 
 ### L'idea: il fuoco sull'erba secca
 
-Il fuoco parte dall'entrata e si propaga di una cella al minuto, in
+Il fuoco parte dall'entrata e si propaga un PASSO alla volta, in
 TUTTE le direzioni contemporaneamente. Su ogni cella che raggiunge
-scrive il MINUTO in cui l'ha toccata. Il minuto scritto sull'uscita è
+scrive A QUALE PASSO l'ha toccata. Il numero scritto sull'uscita è
 la lunghezza della strada più corta.
 
 Nel 4x4 di sempre (numeri generati dal programma vero; il punto = le
-celle mai toccate, il fuoco si ferma appena tocca l'uscita):
+celle mai toccate, il fuoco si ferma quando l'uscita esce dalla fila
+— il break del solve):
 
 ```
 +---+---+---+---+
@@ -967,12 +1019,12 @@ celle mai toccate, il fuoco si ferma appena tocca l'uscita):
 
 ### Come fa a sapere che è il più corto? Non lo scopre: lo costruisce
 
-Il fuoco avanza UN passo al minuto, ovunque: al minuto 0 brucia solo
-l'entrata; al minuto 1 tutte le celle a 1 passo; al minuto 2 tutte
-quelle a 2 passi... Una cella prende fuoco un minuto dopo la PRIMA
-delle sue vicine che brucia: non può prendere fuoco prima (prima non
-brucia nessuna sua vicina), e appena una vicina brucia, prende fuoco
-il minuto dopo. Quindi il minuto scritto su ogni cella è SEMPRE il
+Il fuoco avanza UN passo alla volta, ovunque: al passo 0 brucia solo
+l'entrata; al passo 1 tutte le celle a 1 passo di distanza; al passo
+2 tutte quelle a 2 passi... Una cella prende fuoco un passo dopo la
+PRIMA delle sue vicine che brucia: non può bruciare prima (prima non
+brucia nessuna sua vicina), e appena una vicina brucia, lei brucia
+al passo dopo. Quindi il numero scritto su ogni cella è SEMPRE il
 minimo possibile: nessuna strada più corta poteva arrivarci prima.
 
 La catena di "chi ha acceso chi", dall'uscita all'indietro:
@@ -981,11 +1033,11 @@ La catena di "chi ha acceso chi", dall'uscita all'indietro:
 (3,3) acceso da (3,2) <- da (3,1) <- da (2,1) <- da (2,0) <- da (1,0) <- da (0,0)
 ```
 
-Ogni passaggio scende di UN minuto esatto: 6, 5, 4, 3, 2, 1, 0. Il
+Ogni passaggio scende di UN passo esatto: 6, 5, 4, 3, 2, 1, 0. Il
 percorso, capovolto: (0,0),(1,0),(2,0),(2,1),(3,1),(3,2),(3,3) — 6
 passi. Se esistesse una strada da 5, il fuoco sarebbe arrivato
-all'uscita al minuto 5: impossibile, perché l'uscita ha due sole
-vicine, (3,2) (minuto 5) e (2,3) (che il fuoco non ha nemmeno fatto
+all'uscita al passo 5: impossibile, perché l'uscita ha due sole
+vicine, (3,2) (passo 5) e (2,3) (che il fuoco non ha nemmeno fatto
 in tempo a toccare).
 
 ### Come lo fa il programma
@@ -998,45 +1050,45 @@ quaderno è un dizionario chiamato came_from: un dizionario è la
 tabella chiave→valore già vista in 1.1, e qui la chiave è la cella,
 il valore è chi l'ha accesa (l'entrata ha scritto "nessuno").
 
-Seconda cosa: per far avanzare il fuoco minuto per minuto, il
-programma tiene una PILA DI FOGLI: ogni foglio è una cella toccata
-che deve ancora propagare il fuoco ai vicini. Quando una cella
-prende fuoco, il suo foglio viene messo in CIMA alla pila. Il
-programma prende sempre il foglio in FONDO, cioè il più vecchio:
-così le celle propagano il fuoco nell'ordine in cui sono state
-toccate — prima tutte quelle del minuto 1, poi quelle del minuto 2,
-e via. Prendere dal fondo si chiama FIFO: il primo foglio entrato è
-il primo che esce.
+Seconda cosa: per far avanzare il fuoco passo per passo, il
+programma tiene una LISTA D'ATTESA: ogni cella accesa che deve
+ancora propagare il fuoco ai vicini aspetta lì in fila. Quando una
+cella prende fuoco, si mette in CODA. Il programma serve sempre la
+PRIMA della fila, cioè la più vecchia: così le celle propagano il
+fuoco nell'ordine in cui sono state accese — prima tutte quelle a 1
+passo, poi quelle a 2 passi, e via. Servire il primo arrivato si
+chiama FIFO: primo arrivato, primo servito.
 
-(La talpa usava la stessa pila al contrario: prendeva la CIMA — LIFO,
-l'ultimo entrato è il primo che esce — ma solo per tornare indietro
-lungo la corda quando era bloccata, non per trovare strade corte.)
+(La talpa usava una struttura simile al contrario: la corda, servita
+dalla CIMA — LIFO, l'ultimo arrivato è il primo servito — ma solo
+per tornare indietro quando era bloccata, non per trovare strade
+corte.)
 
-Attenzione: il fuoco non è una cosa separata dalla pila — prendere
-sempre il foglio più vecchio È il fuoco. I minuti non si conoscono
-all'inizio: li scrive il programma cella per cella, e la pila presa
-dal fondo li fa uscire nell'ordine giusto (0, 1, 2...). Senza
-quell'ordine i minuti uscirebbero sbagliati e il percorso
-ricostruito sarebbe più lungo del necessario. Due pile, due mestieri:
-quella della talpa RICORDA la strada già fatta (per tornare
-indietro); quella della BFS PRODUCE i minuti nell'ordine giusto
-mentre calcola la strada corta.
+Attenzione: il fuoco non è una cosa separata dalla fila — servire
+sempre il primo arrivato È il fuoco. I passi non si conoscono
+all'inizio: li scrive il programma cella per cella, e la fila
+servita dal davanti li fa uscire nell'ordine giusto (0, 1, 2...).
+Senza quell'ordine i passi uscirebbero sbagliati e il percorso
+ricostruito sarebbe più lungo del necessario. Due strutture, due
+mestieri: la corda della talpa RICORDA la strada già fatta (per
+tornare indietro); la fila della BFS PRODUCE i passi nell'ordine
+giusto mentre calcola la strada corta.
 
 ### Nel codice
 
-- la pila di fogli = una deque di collections ("via il foglio in
-  fondo" = popleft(), "foglio nuovo in cima" = append())
+- la lista d'attesa = una deque di collections ("il primo della
+  fila" = popleft(), "nuova cella in coda" = append())
 - chi ha acceso chi = il dizionario came_from (l'entrata ha None)
 - i 4 lati = i 4 controlli con _has_wall (le monete)
 - la ricostruzione = il while che risale came_from e poi reverse
 
 **Frase pronta per l'evaluation:** "La BFS è come un fuoco che parte
-dall'entrata e brucia una cella al minuto in tutte le direzioni: ogni
-cella prende fuoco al minuto minimo possibile e annota chi l'ha
-accesa. Quando il fuoco tocca l'uscita, risalgo la catena di chi ha
-acceso chi fino all'entrata e la capovolgo: è il percorso più corto,
-perché il fuoco raggiunge ogni cella nel minor numero di passi
-possibile."
+dall'entrata e avanza un passo alla volta in tutte le direzioni: ogni
+cella prende fuoco al passo minimo possibile e annota chi l'ha
+accesa. Quando il fuoco raggiunge l'uscita, risalgo la catena di chi
+ha acceso chi fino all'entrata e la capovolgo: è il percorso più
+corto, perché il fuoco raggiunge ogni cella nel minor numero di
+passi possibile."
 
 ## 1.6 L'OUTPUT: il file esadecimale
 
@@ -1055,10 +1107,11 @@ se y aumenta → S.
 ## 1.7 Il display interattivo
 
 Il labirinto si mostra nel terminale in **stile minimale pulito: 1
-cella = 1 carattere**, muri `─` orizzontali e `│` verticali con **gli
-incroci giusti** (`┼`, `┬`, `┴`, `├`, `┤`, `┌`, `┐`, `└`, `┘`): la
-struttura si legge come un labirinto vero. Un labirinto 20x15 è largo
-41 caratteri. Lo sfondo NON viene forzato: vale il tema del
+cella = 3 caratteri**, muri `───` orizzontali e `│` verticali con
+**gli incroci giusti** (`┼`, `┬`, `┴`, `├`, `┤`, `┌`, `┐`, `└`, `┘`):
+la struttura si legge come un labirinto vero, con le proporzioni
+giuste. Un labirinto 20x15 è largo 61 caratteri. Lo sfondo NON viene
+forzato: vale il tema del
 terminale. Sotto il labirinto c'è un **menu numerato in INGLESE**
 dentro una cornice (tutto il programma è in inglese, come il subject):
 `1) Regenerate maze` (richiama generate con gli stessi parametri),
@@ -1075,18 +1128,18 @@ mattoncini restano isole chiuse, quindi 4 e 2 si leggono lo stesso).
 **Il muro esterno del labirinto è completamente chiuso**: entry ed
 exit sono celle marcate dentro il bordo, non aperture.
 
-### Perché il labirinto sembra alto e stretto?
+### Perché le celle sono larghe 3 caratteri (e prima sembrava alto)
 
-Il labirinto 20x15 è più LARGO che alto in celle (20 colonne, 15
-righe), ma a schermo sembra il contrario. Il motivo: i caratteri del
-terminale non sono quadrati — un carattere è circa 2 volte più ALTO
-che largo. Con 1 cella = 1 carattere, 20 caratteri in orizzontale
-occupano meno spazio visivo di 15 righe in verticale → il labirinto
-appare alto e stretto.
-
-Non è un bug: è l'effetto ottico della griglia di caratteri. Per
-farlo sembrare "sdraiato" basta aumentare WIDTH nel config (es.
-WIDTH=40 HEIGHT=15): nel codice non cambia nulla.
+I caratteri del terminale non sono quadrati: uno è circa 2 volte più
+ALTO che largo. Se ogni cella fosse 1 carattere largo e 1 alto (1x1),
+il labirinto uscirebbe stirato in verticale: 20 colonne occuperebbero
+meno spazio visivo di 15 righe. Per questo ogni cella è larga 3
+caratteri e alta 1: il rettangolo 3x1 compensa l'altezza del
+carattere e il labirinto appare con le proporzioni vere, come il
+rendering d'esempio del subject. Il muro orizzontale è `───`, il
+verticale resta `│` (è già verticale, non va allargato). La modifica
+tocca SOLO _print_maze: le stringhe del disegno (1 carattere → 3), la
+logica non cambia.
 
 ## 1.8 Il main e la gestione errori
 
@@ -1153,43 +1206,41 @@ file (i "musicisti") nell'ordine giusto e protegge tutto dagli errori.
 
 ### Il flusso in miniatura (le tappe)
 
-1. controlla gli argomenti da terminale (righe 28-30)
-2. tappa A: parse del config, dentro un try (righe 32-39)
-3. tappa B: crea il generatore e genera il labirinto (righe 41-43)
-4. tappa C: trova il percorso (riga 45)
-5. tappa D: scrive il file di output (righe 46-47)
-6. se il 42 manca, avvisa con un messaggio (righe 49-50)
-7. tappa E: apre il display (riga 52)
-8. in fondo: il "pulsante di avvio" (righe 55-63)
+1. controlla gli argomenti da terminale (righe 18-20)
+2. tappa A: parse del config, dentro un try (righe 23-31)
+3. tappa B: crea il generatore e genera il labirinto (righe 34-36)
+4. tappa C: trova il percorso (riga 39)
+5. tappa D: scrive il file di output (righe 41-42)
+6. se il 42 manca, avvisa con un messaggio (righe 45-46)
+7. tappa E: apre il display (riga 49)
+8. in fondo: il "pulsante di avvio" (righe 53-63)
 
 ### Esecuzione riga per riga
 
-**Righe 1-11: l'header 42.** Solo un commento obbligatorio della
-scuola (login, data): Python lo salta, come /* ... */ in C.
+**Righe 2-5: la docstring.** Il file comincia direttamente con la
+docstring (il primo `"""..."""` dentro un file o una funzione non è
+un semplice commento: è la DOCUMENTAZIONE ufficiale di quel file o
+funzione, si legge con help()). Qui dice a cosa serve il programma e
+come si usa. (Niente header 42: rimosso alla pulizia di consegna.)
 
-**Righe 13-16: la docstring.** Il primo `"""..."""` dentro un file o
-una funzione non è un semplice commento: è la DOCUMENTAZIONE ufficiale
-di quel file o funzione (si può leggere con help()). Qui dice a cosa
-serve il programma e come si usa.
-
-**Riga 18: `import sys`.** sys è un MODULO PREDEFINITO di Python: una
+**Riga 7: `import sys`.** sys è un MODULO PREDEFINITO di Python: una
 libreria già pronta dentro Python, come le librerie standard del C
 (#include <stdlib.h>). Porta con sé due strumenti che servono qui:
 sys.argv (gli argomenti da terminale) e sys.exit (spegnere il
 programma con un codice d'uscita).
 
-**Righe 20-23: gli import dei NOSTRI file.** config_parser, display,
+**Righe 9-12: gli import dei NOSTRI file.** config_parser, display,
 mazegen, output_writer sono i NOSTRI moduli: gli altri file .py della
 cartella del progetto. `import` = "aggancia quel file: da ora posso
 usare le sue funzioni e classi". In C si fa con #include + compilazione
 di più file .c; in Python basta scrivere il nome del file senza .py.
 
-**Riga 26: `def main():`** NOSTRA funzione. Il nome main è una
+**Riga 15: `def main():`** NOSTRA funzione. Il nome main è una
 convenzione (non è obbligatorio come in C). `-> None` è il type hint:
 la funzione non restituisce niente (come void in C), serve a mypy e al
 lettore.
 
-**Righe 28-30: il controllo degli argomenti.**
+**Righe 18-20: il controllo degli argomenti.**
 - `len(sys.argv)` — sys.argv è la LISTA di tutto ciò che è stato
   scritto da terminale: argv[0] = nome del programma, argv[1] = primo
   argomento (il config). È l'argc/argv del C. len() è una funzione
@@ -1204,7 +1255,7 @@ lettore.
 - `sys.exit(1)` — spegne il programma SUBITO. Il numero è il codice
   d'uscita: 0 = tutto ok, 1 = errore (come return 1 dal main in C).
 
-**Righe 32-39: tappa A protetta dal try.**
+**Righe 23-31: tappa A protetta dal try.**
 - `try:` apre la RETE DI SICUREZZA: esegui quello che segue, e se
   salta fuori un errore non crashare, vai alla rete giusta. In C non
   esiste: gli errori si controllavano a mano con if e return.
@@ -1222,7 +1273,7 @@ lettore.
   Il subject chiede esattamente questo: mai crashare, sempre un
   messaggio chiaro.
 
-**Righe 41-43: tappa B (in breve, studiata nel file 3).**
+**Righe 34-36: tappa B (in breve, studiata nel file 3).**
 - `gen = mazegen.MazeGenerator(...)` — crea un oggetto della NOSTRA
   classe MazeGenerator: il "laboratorio" con larghezza, altezza e
   seed. `config.width` = il campo width della scatola Config (il
@@ -1232,20 +1283,20 @@ lettore.
   passano per nome e l'ordine non conta (in C non esistono). Al
   ritorno, gen.grid contiene la griglia.
 
-**Riga 45: tappa C.** `path = gen.solve()` — il BFS (capitolo 1.5)
+**Riga 39: tappa C.** `path = gen.solve()` — il BFS (capitolo 1.5)
 trova il percorso più corto e lo restituisce come lista di celle.
 
-**Righe 46-47: tappa D.** `output_writer.write_output_file(...)` —
+**Righe 41-42: tappa D.** `output_writer.write_output_file(...)` —
 scrive il file di output (capitolo 1.6, file 4).
 
-**Righe 49-50: il messaggio del 42.** Se `gen.has_42` è False (maze
+**Righe 45-46: il messaggio del 42.** Se `gen.has_42` è False (maze
 troppo piccolo, sotto 9x6), il main stampa il messaggio richiesto dal
 subject e il programma CONTINUA lo stesso.
 
-**Riga 52: tappa E.** `display.run(gen)` — apre il display
+**Riga 49: tappa E.** `display.run(gen)` — apre il display
 interattivo (capitolo 1.7, file 5).
 
-**Righe 55-63: il pulsante di avvio e l'ultima rete.**
+**Righe 53-63: il pulsante di avvio e l'ultima rete.**
 - `if __name__ == "__main__":` — il trucco più famoso di Python.
   __name__ è una variabile PREDEFINITA che Python riempie da solo con
   il nome del file. Quando il file viene ESEGUITO da terminale,
@@ -1309,16 +1360,16 @@ interattivo (capitolo 1.7, file 5).
 
 ### Cos'è
 
-Il modulo che il main chiama per PRIMO (tappa A, riga 33): legge
+Il modulo che il main chiama per PRIMO (tappa A, riga 24): legge
 config.txt (righe KEY=VALUE), lo valida e restituisce l'oggetto Config
 coi parametri del labirinto. Studio in ordine di CHIAMATE: entriamo
-qui dalla riga 33 del main e ci restiamo finché parse_config non
+qui dalla riga 24 del main e ci restiamo finché parse_config non
 ritorna al main col Config in mano.
 
-### Prima della chiamata: cosa è successo all'import (righe 13-86)
+### Prima della chiamata: cosa è successo all'import (righe 8-84)
 
-Il file config_parser.py NON nasce alla riga 33 del main: nasce alla
-riga 20, all'import. In quel momento Python ha eseguito il file
+Il file config_parser.py NON nasce alla riga 24 del main: nasce alla
+riga 9, all'import. In quel momento Python ha eseguito il file
 dall'alto in basso e ha PREPARATO le definizioni:
 
 - REQUIRED_KEYS: la lista delle chiavi obbligatorie
@@ -1332,17 +1383,17 @@ Preparare non è fare: niente di visibile è successo (come dichiarare
 le funzioni in C prima del main). Le funzioni di servizio verranno
 spiegate quando verranno CHIAMATE, nell'ordine di esecuzione.
 
-### Dentro parse_config (righe 88-101)
+### Dentro parse_config (righe 85-99)
 
 - La docstring è il contratto: "mi dai il percorso, ti restituisco
   Config; contenuto sbagliato → ConfigError; file illeggibile → OSError
   che PROPAGA al chiamante".
-- Riga 101: values, la scatola vuota — chiavi stringhe (WIDTH,
+- Riga 99: values, la scatola vuota — chiavi stringhe (WIDTH,
   HEIGHT...) e valori stringhe (ancora grezzi: "20" come parola, non
   come numero). Ci finiscono le righe del config NON ancora
   interpretate.
 
-### Riga 102: ★ PRIMA VOLTA — with e open
+### Riga 101: ★ PRIMA VOLTA — with e open
 
 - **open(path, "r", encoding="utf-8")** — la fopen del C: chiede al
   sistema operativo di preparare il file per la lettura e restituisce
@@ -1353,14 +1404,14 @@ spiegate quando verranno CHIAMATE, nell'ordine di esecuzione.
   chiave, passato per nome).
 - **as f** — il nome del manico (in C: FILE *f = fopen(...)).
 - **with** — la porta che si chiude da sola: alla fine del blocco
-  indentato (righe 103-117) il file viene chiuso SEMPRE, anche se
+  indentato (righe 102-121) il file viene chiuso SEMPRE, anche se
   dentro scoppia un errore. Risolve il bug classico del C: dimenticarsi
   la fclose (o uscire prima per un errore) lascia il file aperto.
 - Il filo col main: se il file non esiste, open fallisce QUI con
   OSError; parse_config non lo cattura ("propaga") e l'errore risale
   alla SECONDA rete del try nel main → messaggio + uscita 1.
 
-### Righe 103-106: la lettura riga per riga
+### Righe 102-105: la lettura riga per riga
 
 - line_no = 0: contatore di righe, per i messaggi d'errore.
 - for line in f: a ogni giro line diventa UNA riga intera del file; il
@@ -1373,7 +1424,7 @@ spiegate quando verranno CHIAMATE, nell'ordine di esecuzione.
   comando che ogni stringa sa fare): toglie gli spazi alle estremità e
   il fine-riga invisibile. line resta sporca, stripped è la pulita.
 
-### Le decisioni del loop (righe 107-117): cosa fare di ogni riga
+### Le decisioni del loop (righe 106-121): cosa fare di ogni riga
 
 - `if stripped == "" or stripped.startswith("#"):` — due casi in cui
   la riga NON conta: è vuota (dopo la pulizia non resta niente) oppure
@@ -1409,7 +1460,7 @@ spiegate quando verranno CHIAMATE, nell'ordine di esecuzione.
 Quando le righe del file sono finite, il for si ferma da solo; finisce
 il blocco del with e il file si chiude da solo (la porta automatica).
 
-### La validazione (righe 119-147): dalle stringhe ai valori veri
+### La validazione (righe 123-156): dalle stringhe ai valori veri
 
 - `missing: list[str] = []` — la lista vuota delle chiavi mancanti.
   `for key in REQUIRED_KEYS:` scorre le obbligatorie; se una non sta
@@ -1422,29 +1473,29 @@ il blocco del with e il file si chiude da solo (la porta automatica).
   ciclo di strcat).
 - Ora le CONVERSIONI, nell'ordine delle chiamate.
   `width = _parse_int(values["WIDTH"], "WIDTH")`: il pallino salta alla
-  riga 54 — QUI viene chiamata la prima funzione di servizio.
+  riga 45 — QUI viene chiamata la prima funzione di servizio.
   `values["WIDTH"]` è la parola "20"; dentro, `int(raw)` (★ PRIMA
   VOLTA `int`: la atoi del C: la parola diventa numero) dentro un
   try/except: se la parola non è un numero, int alza ValueError
   (eccezione predefinita) e la rete della funzione la trasforma in
   ConfigError col messaggio chiaro, che vola al main; se riesce,
-  return consegna il numero e il pallino torna alla riga 126. height
+  return consegna il numero e il pallino torna alle righe 132-133. height
   identico.
 - `if width < 2 or height < 2:` — un labirinto deve essere almeno 2x2.
 - `entry = _parse_coords(values["ENTRY"], "ENTRY")` — salta alla riga
-  71: split(",") taglia "0,0" in due pezzi; se non sono ESATTAMENTE
+  66: split(",") taglia "0,0" in due pezzi; se non sono ESATTAMENTE
   due → errore; altrimenti converte i pezzi (dopo strip) con _parse_int
   e li impacchetta: `return (x, y)` — ★ PRIMA VOLTA la COPPIA
   (tupla): il pacchetto di valori tra parentesi tonde (in C: una
   struct o due variabili separate; qui il pacchetto viaggia intero).
-- `_check_bounds(entry, width, height, "ENTRY")` — salta alla riga 81:
+- `_check_bounds(entry, width, height, "ENTRY")` — salta alla riga 76:
   spacchetta la coppia (`x, y = point`) e controlla i quattro bordi;
   fuori → ConfigError. exit identico — con un dettaglio di nome: la
   variabile si chiama `exit_` col trattino IN FONDO perché exit è una
   funzione predefinita di Python e non vogliamo coprirla (convenzione).
 - `if entry == exit_:` — entrata e uscita devono essere diverse.
 - `perfect = _parse_bool(values["PERFECT"], "PERFECT")` — salta alla
-  riga 62: accetta solo "True" e "False" ESATTI, altrimenti
+  riga 53: accetta solo "True" e "False" ESATTI, altrimenti
   ConfigError. ★ PRIMA VOLTA i VALORI DI VERITÀ: True/False sono il
   bool (in C non esistevano: si usava int 0/1).
 - `output_file = values["OUTPUT_FILE"]` — resta testo così com'è (è un
@@ -1453,17 +1504,17 @@ il blocco del with e il file si chiude da solo (la porta automatica).
   seed resta None. ★ PRIMA VOLTA `None`: il "nessun valore" (il NULL
   del C): significherà "usa un seme casuale vero". Se c'è → _parse_int.
 
-### La nascita del Config e il ritorno al main (riga 148)
+### La nascita del Config e il ritorno al main (riga 157)
 
 `return Config(width, height, entry, exit_, output_file, perfect,
 seed)` — QUI viene chiamata la classe Config: il pallino salta al suo
-__init__ (riga 42), la FABBRICA della scatola: ogni campo
+__init__ (riga 33), la FABBRICA della scatola: ogni campo
 `self.width = width` ecc. ★ PRIMA VOLTA `self`: il pronome "io"
 dell'oggetto — ogni oggetto tiene i propri valori nei propri campi,
 come i campi di una struct in C, ma qui la struct si passa DA SOLA:
 self arriva come primo parametro di ogni metodo, senza scriverlo nella
 chiamata. Poi return consegna la scatola finita al chiamante → il
-pallino torna al MAIN, riga 33: `config =` la riceve. TAPPA A
+pallino torna al MAIN, riga 24: `config =` la riceve. TAPPA A
 COMPLETA: da qui in poi il main userà config.width, config.height...
 
 ### Chi è cosa
@@ -1507,9 +1558,9 @@ COMPLETA: da qui in poi il main userà config.width, config.height...
 
 ### Risposte pronte per l'evaluation
 
-- "Quando viene eseguito config_parser.py?" All'import (riga 20 del
+- "Quando viene eseguito config_parser.py?" All'import (riga 9 del
   main): Python prepara le definizioni; parse_config viene CHIAMATO
-  alla riga 33 e solo lì parte il suo corpo.
+  alla riga 24 e solo lì parte il suo corpo.
 - "Cosa fa open? Perché gli dai 3 argomenti?" Apre il file in lettura
   e restituisce il manico. path = quale file, "r" = sola lettura,
   encoding = etichettatura dei caratteri.
@@ -1548,7 +1599,7 @@ display — per questo è anche il modulo riusabile del subject. Studio
 in ordine di chiamate: tappa B del main (creazione + generazione),
 poi tappa C (solve).
 
-### All'import (righe 28-62): la preparazione
+### All'import (righe 19-53): la preparazione
 
 - `import random` — il cassetto dei DADI (teoria 1.3).
   `from collections import deque` — ★ PRIMA VOLTA `from ... import`:
@@ -1557,11 +1608,11 @@ poi tappa C (solve).
 - FOUR e TWO: i disegni delle cifre come LISTE DI COPPIE (x, y),
   ciascuna relativa all'angolo del disegno (il commento con # e . nel
   file mostra la forma delle cifre). Sono costanti: non cambiano mai.
-- La definizione della classe (righe 65-78): la docstring coi campi. I
+- La definizione della classe (righe 54-69): la docstring coi campi. I
   METODI (le funzioni dell'oggetto) si spiegano quando vengono
   chiamati.
 
-### __init__ (righe 80-89): la nascita dell'oggetto — tappa B, prima chiamata
+### __init__ (righe 70-81): la nascita dell'oggetto — tappa B, prima chiamata
 
 `MazeGenerator(config.width, config.height, config.seed)` nel main fa
 scattare la fabbrica:
@@ -1575,16 +1626,16 @@ scattare la fabbrica:
   mattoncino ancora), has_42 = False, entry/exit/perfect PROVVISORI
   (saranno riscritti da generate).
 
-### generate (righe 109-149): il direttore della generazione
+### generate (righe 100-144): il direttore della generazione
 
 - Salva i parametri: perfect, entry; per exit: `if exit is None:` (★
   PRIMA VOLTA `is None`: il controllo "è davvero nessun valore?" — non
   si confronta con ==) usa l'angolo in basso a destra.
-- La validazione: _in_bounds (riga 91: dentro i bordi?) — se fuori, o
+- La validazione: _in_bounds (riga 82: dentro i bordi?) — se fuori, o
   se entry == exit → `raise ValueError` (eccezione predefinita: "chi
   ha chiamato ha sbagliato"; è la rete di sicurezza per chi importa il
   modulo).
-- La griglia: DOPPIO FOR annidato (righe 138-142): ★ PRIMA VOLTA
+- La griglia: DOPPIO FOR annidato (righe 130-135): ★ PRIMA VOLTA
   `range`: la sequenza 0, 1, 2... fino a n-1 (il for (int i = 0; i <
   n; i++) del C). Per ogni riga si crea una lista e per ogni cella si
   mette N+E+S+W = 1+2+4+8 = 15: TUTTE le scatole chiuse (il punto di
@@ -1592,7 +1643,7 @@ scattare la fabbrica:
 - I tre passi nell'ordine: _carve_42, _carve_maze, poi
   _carve_extra_walls SOLO se not perfect (i cicli del piccone).
 
-### _carve_42 (righe 151-186): il disegno "42" (teoria 1.4, già a fondo)
+### _carve_42 (righe 145-181): il disegno "42" (teoria 1.4, già a fondo)
 
 - forty_two azzerata e has_42 = False: si riparte puliti a ogni
   generazione.
@@ -1647,7 +1698,7 @@ stampa il messaggio di omissione solo se il 42 non c'è, e ogni
 generazione riparte da False per non ereditare il risultato della
 precedente."
 
-### _carve_maze (righe 188-218): la talpa (teoria 1.4, le 3 regole)
+### _carve_maze (righe 182-222): la talpa (teoria 1.4, le 3 regole)
 
 - visited: la griglia dei segni "già visto", tutta False (i valori di
   verità del 3.2), costruita col doppio for.
@@ -1660,7 +1711,7 @@ precedente."
 - Il while (finché la corda non è vuota):
   - `x, y = stack[len(stack) - 1]` — guarda la CIMA (l'ultimo
     elemento) senza toglierla: la talpa è lì.
-  - `_unvisited_neighbors` (riga 220): i 4 controlli (sopra, destra,
+  - `_unvisited_neighbors` (riga 223): i 4 controlli (sopra, destra,
     sotto, sinistra); per ognuno: dentro i bordi? non visitato? → si
     aggiunge la terna di informazioni: (vicino, moneta del muro dal MIO
     lato, moneta dal SUO lato) — es. verso NORD: (x, y-1, N, S): io
@@ -1672,7 +1723,7 @@ precedente."
   - Altrimenti: `nx, ny, mask_here, mask_there =
     self.rng.choice(neighbors)` — il DADO: ★ PRIMA VOLTA `choice`:
     sceglie un elemento a caso della lista (tante facce quanti vicini
-    disponibili, teoria 1.4). Poi _remove_wall (riga 101: toglie la
+    disponibili, teoria 1.4). Poi _remove_wall (riga 92: toglie la
     moneta → il muro si apre; la sottrazione funziona perché la moneta
     c'è di sicuro) da entrambi i lati, marca il vicino,
     stack.append(...): la talpa si sposta.
@@ -1986,7 +2037,7 @@ l'ultimo pop è dall'entrata stessa. Succede quando non esiste più
 nessuna cella non visitata: la generazione finisce quando TUTTE le
 celle sono scavate, non all'uscita."
 
-### _carve_extra_walls (righe 238-275): il piccone (teoria 1.4 PERFECT=False)
+### _carve_extra_walls (righe 248-294): il piccone (teoria 1.4 PERFECT=False)
 
 - `for _ in range(20):` — ★ PRIMA VOLTA il NOME USA-E-GETTA `_`: "la
   variabile non mi interessa" — ripeti 20 volte (i 20 colpi del
@@ -2000,15 +2051,15 @@ celle sono scavate, non all'uscita."
 - Se la cella o il vicino sono mattoncini del 42 → `continue` (mai
   aprire le isole).
 - Se il muro è GIÀ aperto → `continue`. Il controllo: `_has_wall`
-  (riga 97): `(self.grid[y][x] & mask) != 0` — ★ PRIMA VOLTA `&`:
+  (riga 88): `(self.grid[y][x] & mask) != 0` — ★ PRIMA VOLTA `&`:
   l'AND BIT A BIT — "ho questa moneta nel sacchetto?" (teoria 1.2: il
   trucco delle monete).
 - Altrimenti apre i due lati (_remove_wall) e fa il CONTROLLO 3x3:
-  `_has_3x3_open` (riga 277): scorre TUTTE le finestre 3x3 possibili
+  `_has_3x3_open` (riga 295): scorre TUTTE le finestre 3x3 possibili
   (doppi for fino a height-2 e width-2); `_window_3x3_open` (riga
-  285): una finestra è "tutta aperta" se i suoi 12 muri INTERNI (6
+  306): una finestra è "tutta aperta" se i suoi 12 muri INTERNI (6
   orizzontali + 6 verticali) sono tutti aperti. Se dopo il colpo è
-  nata una piazzetta 3x3 → _add_wall (riga 105: rimette le monete): il
+  nata una piazzetta 3x3 → _add_wall (riga 96: rimette le monete): il
   colpo viene ANNULLATO. (Teoria 1.4: il 2x2 è legale, il 3x3 no — il
   subject vieta corridoi più larghi di 2 celle.)
 
@@ -2053,7 +2104,7 @@ la catena finisce esattamente qui (cell diventa None e il while della
 risalita si ferma).
 
 Risposta da evaluation: "queue è una deque del modulo collections:
-una fila FIFO che contiene l'entrata come primo foglio. came_from è
+una fila FIFO che contiene l'entrata come prima arrivata. came_from è
 il registro di chi ha acceso chi, e l'entrata ha None: punto di
 partenza della catena e capolinea della risalita."
 
@@ -2147,7 +2198,7 @@ labirinti non succede mai, ma la funzione è difensiva: è il
 controllo di sicurezza prima di usare l'uscita come chiave del
 registro."
 
-### solve (righe 297-331): il fuoco (teoria 1.5) — tappa C del main
+### solve (righe 320-367): il fuoco (teoria 1.5) — tappa C del main
 
 - `queue = deque()` — ★ PRIMA VOLTA `deque`: la LISTA D'ATTESA delle
   celle che devono ancora prendere fuoco (append = in coda, popleft =
@@ -2162,7 +2213,7 @@ registro."
   - Se è l'uscita → `break` (★ PRIMA VOLTA `break`: esce subito dal
     ciclo — il fuoco è arrivato).
   - I 4 controlli (N/E/S/W): se il muro è APERTO → `_add_neighbor`
-    (riga 333): se il vicino non è MAI stato visto (non sta in
+    (riga 368): se il vicino non è MAI stato visto (non sta in
     came_from), lo "accende": segna chi l'ha acceso e lo mette in
     coda. Ogni cella si accende UNA volta sola → la prima
     registrazione è la distanza minima (teoria 1.5: non la scopre, la
@@ -2237,13 +2288,13 @@ La tappa D: scrive il file di output nel formato del subject (teoria
 1.6). È il modulo più corto: una tabella, una conversione, una
 scrittura.
 
-### All'import (righe 15-18)
+### All'import (righe 5-8)
 
 HEX_DIGITS = "0123456789ABCDEF": la tabella numero→cifra (teoria 1.2:
 l'esadecimale vive SOLO nel file). path_to_nesw e write_output_file
 vengono definite.
 
-### write_output_file (chiamata dal main, riga 46)
+### write_output_file (chiamata dal main, riga 41)
 
 - `with open(filename, "w", encoding="utf-8") as f:` — with/open del
   3.2, ma con "w" = WRITE: ★ PRIMA VOLTA la modalità "w": apre per
@@ -2262,7 +2313,7 @@ vengono definite.
   entry[1] il secondo (la y) — l'indice parte da 0 (il conteggio del
   capitolo sul 42).
 - L'ultima riga: `path_to_nesw(path) + "\n"` — QUI viene chiamata la
-  conversione (riga 18): per ogni PASSO si confronta la cella i con la
+  conversione (riga 8): per ogni PASSO si confronta la cella i con la
   i+1: x cresciuta di 1 → "E" (est), calata → "W", y calata → "N" (si
   sale), cresciuta → "S". `range(len(path) - 1)` — ★ PRIMA VOLTA il
   MOTIVO del -1: con 5 celle ci sono 4 PASSI (i passi sono le celle
@@ -2312,10 +2363,10 @@ vengono definite.
 ### Cos'è
 
 La tappa E (teoria 1.7): disegna il labirinto e gestisce il menu. Una
-cella = 1 carattere e un muro = 1 carattere: un 20x15 è largo 41
-caratteri.
+cella = 3 caratteri e un muro orizzontale = 3: un 20x15 è largo
+61 caratteri.
 
-### All'import (righe 20-39)
+### All'import (righe 9-28)
 
 - `from mazegen import N, S, W, MazeGenerator` — il from...import del
   3.3: prende solo i pezzi che servono.
@@ -2327,7 +2378,48 @@ caratteri.
   SFONDI riempiono i mattoncini del 42: il blocco uniforme). Il verde
   NON c'è: è riservato al percorso.
 
-### run (chiamata dal main, riga 52)
+### Approfondimento: perché l'import non prende E (e il from...import spiegato)
+
+- COME SI LEGGE: "dal modulo mazegen prendi i nomi N, S, W e
+  MazeGenerator".
+- DOMANDA: e la E? Non c'è perché il display non la usa MAI.
+- Il disegno fa UNA cosa per ogni cella: disegna il muro SOPRA (N) e
+  il muro a SINISTRA (W). Basta questo:
+  - il muro EST della cella (x,y) è il muro OVEST della cella (x+1,y):
+    lo disegna la vicina di destra quando tocca a lei;
+  - il muro SUD della cella (x,y) è il muro NORD della cella (x,y+1):
+    lo disegna la cella sotto.
+- I 4 bordi esterni, e chi li disegna:
+  - ALTO: N della riga 0, primo giro del loop dei muri. Il bordo
+    esterno non si apre MAI (la talpa si ferma ai bordi): sempre "─".
+  - SINISTRA: W della colonna 0: sempre "│".
+  - BASSO: S dell'ultima riga, nel loop del fondo: l'UNICO punto del
+    display dove si legge S.
+  - DESTRA: una "│" FISSA attaccata a fine riga, senza guardare
+    nessun bit. Giusto così: il bordo esterno è sempre chiuso, il
+    segno non cambia mai.
+- Se importassimo E senza usarla: flake8 F401 "imported but unused".
+  Un import che non serve è un errore di igiene.
+- from...import, i DUE modi di prendere da un modulo:
+  1. import mazegen: entra TUTTO il modulo; i nomi si usano col punto
+     (mazegen.N). In C: l'#include, ti porti il file intero.
+  2. from mazegen import N: copia SOLO il nome N nel nostro file; da
+     lì si scrive N da solo. In C: copiare a mano nel file la sola
+     riga #define N 1.
+- N, S, W sono VARIABILI normali (le monete 1, 4, 8 di 1.2, definite
+  in cima a mazegen.py). Python non distingue: variabili, funzioni e
+  classi si importano tutte con la stessa sintassi — nella stessa
+  riga c'è anche MazeGenerator, che è una classe.
+- Il nome importato è una COPIA: se dopo l'import mazegen.N cambiasse,
+  il nostro N resterebbe il valore vecchio. Qui non importa: le monete
+  non cambiano mai.
+- Risposta da evaluation: "il display disegna solo i muri N e W di
+  ogni cella; l'E di una cella è il W della vicina di destra e il S è
+  il N di quella sotto; il bordo destro è una barra fissa perché
+  esterno. Importare un nome che non si usa darebbe un errore di
+  flake8."
+
+### run (chiamata dal main, riga 49)
 
 - show_path = False (il percorso nasce nascosto) e color_index = 0
   (primo colore).
@@ -2354,7 +2446,134 @@ caratteri.
   - "q" → break → il while finisce → run finisce → si torna al main →
     il programma termina. (Il break visto nel solve del 3.3.)
 
-### _print_maze (righe 75-148): il disegno (teoria 1.7)
+### Approfondimento: color_index — l'indice della giostra dei colori
+
+- COME SI LEGGE: `color_index = 0` → "la variabile color_index vale 0".
+- Chi è cosa: color_index è una VARIABILE NOSTRA, LOCALE di run (non
+  self.color_index: non è un attributo del generatore — è un affare
+  del menu, nasce dentro run e vive finché vive run). In C: una
+  variabile locale della funzione, int color_index = 0.
+- A cosa serve: è la POSIZIONE sulla giostra. WALL_COLORS è una lista
+  di 4 stringhe (RED, BLUE, MAGENTA, CYAN) e WALL_BGS le 4 stringhe
+  degli sfondi (41, 44, 45, 46). color_index dice QUALE delle 4
+  prendere: _print_maze riceve WALL_COLORS[color_index] (il colore
+  dei muri) e WALL_BGS[color_index] (lo sfondo del 42, lo stesso
+  colore: il blocco uniforme).
+- Perché 0: due motivi.
+  1. Le liste di Python (come gli array del C) contano da 0: l'indice
+     0 è il PRIMO elemento. color_index = 0 vuol dire "partiamo dal
+     primo colore della lista": WALL_COLORS[0] = RED — il menu si apre
+     sempre coi muri rossi.
+  2. La variabile deve ESISTERE prima di essere letta: al primo giro
+     del while, _print_maze legge subito WALL_COLORS[color_index]; se
+     color_index non fosse ancora nata, Python alzerebbe NameError.
+     Per questo nasce PRIMA del while, insieme a show_path.
+- La traccia della nascita (all'apertura del menu):
+
+  | riga | domanda | risposta | cosa succede |
+  |---|---|---|---|
+  | color_index = 0 | — | — | la variabile nasce e vale 0 |
+  | _print_maze(..., WALL_COLORS[color_index], ...) | quale stringa ha l'indice 0? | RED | i muri escono rossi |
+  | WALL_BGS[color_index] | quale sfondo ha l'indice 0? | \033[41m | il 42 col fondo rosso |
+
+- Come cambia (tasto 3): color_index = (color_index + 1) % 4: la
+  giostra 0→1→2→3→0. Il % len(WALL_COLORS) tiene l'indice DENTRO la
+  lista: 3+1 farebbe 4, ma WALL_COLORS[4] non esiste (IndexError): il
+  resto della divisione per 4 riporta a 0 (RED).
+- ATTENZIONE: la variabile nasce UNA volta sola, PRIMA del while. Se
+  nascesse DENTRO il while, a ogni giro verrebbe rimessa a 0 e la
+  giostra si bloccherebbe sul colore 1.
+- Risposta da evaluation: "color_index è l'indice della lista
+  WALL_COLORS: dice quale colore usare per i muri (e lo stesso indice
+  per WALL_BGS, lo sfondo del 42). Parte da 0 perché le liste contano
+  da 0 e 0 è il primo colore (RED), e nasce prima del ciclo perché al
+  primo giro viene già letta. Il tasto 3 la fa girare in tondo con
+  l'operatore %."
+
+### Approfondimento: print(CLEAR) — l'ordine di cancellare lo schermo
+
+- COME SI LEGGE: `CLEAR: str = "\033[2J\033[H"` → "la costante CLEAR
+  vale la stringa ESC [ 2 J ESC [ H". E `print(CLEAR)` → "stampa la
+  stringa CLEAR".
+- Ma print non la MOSTRA: la CONSEGNA al terminale. Il carattere
+  `\033` è l'ESC (il numero 27, invisibile — i byte veri sono
+  1b 5b 32 4a 1b 5b 48) e significa: "attenzione terminale, quello
+  che segue NON è testo da scrivere, è un ORDINE".
+- I due ordini:
+  - `2J`: cancella TUTTO lo schermo (J = cancellare, 2 = tutto);
+  - `H`: porta il cursore a CASA, in alto a sinistra (da dove
+    comincia il titolo). Serve perché dopo il 2J la posizione del
+    cursore non è garantita.
+- Perché li mandiamo: il menu è un giro infinito che ridisegna il
+  labirinto ogni volta. Senza la cancellata, a ogni giro il labirinto
+  nuovo si stamperebbe SOTTO quello vecchio e la schermata si
+  accatasta (il labirinto cammina giù). CLEAR svuota e il cursore
+  torna su: ogni giro ridisegna la stessa schermata. In C: lo stesso
+  identico printf("\033[2J\033[H") — i codici ANSI sono del
+  TERMINALE, non del linguaggio.
+- IL BLOCCO VUOTO (visto lanciando make run): sì, è colpa di CLEAR.
+  Due casi:
+  - Terminale VERO (Terminal/iTerm del Mac, quello della scuola):
+    esegue l'ordine davvero — cancella e il labirinto appare subito
+    in alto. Il blocco non si vede MAI: cancellare e riscrivere
+    avviene nello stesso istante.
+  - Terminale che NON sa cancellare (il pannello dove gira Claude
+    Code o VS Code, o un output catturato): non può svuotare davvero
+    lo schermo, allora "cancella" a modo suo emettendo TANTE RIGHE
+    VUOTE. Le righe vuote spingono via il comando make run, e il
+    labirinto appare una pagina più in basso. Quel blocco vuoto È la
+    cancellata fatta male.
+- Non tocca la valutazione: l'evaluator lancia in un terminale vero.
+- Risposta da evaluation: "CLEAR è una stringa con due codici ANSI:
+  \033[2J cancella lo schermo e \033[H porta il cursore in alto a
+  sinistra; serve perché il menu ridisegna il labirinto ogni giro e
+  senza la cancellata i disegni si accatasterebbero uno sotto
+  l'altro".
+
+### Approfondimento: i codici ANSI dei colori (RED e compagnia)
+
+- COME SI LEGGE: `RED: str = "\033[31m"` → "la costante RED, di tipo
+  stringa, vale la stringa ESC [ 31 m".
+- La stringa ha 5 caratteri (byte veri: 1b 5b 33 31 6d):
+  - `\033`: il carattere ESC (27) — come con CLEAR: "ORDINE in
+    arrivo";
+  - `[`: l'ordine comincia qui;
+  - `3` `1`: DUE caratteri '3' e '1' — testo, NON il numero 31: è il
+    codice del colore che il terminale legge, come un modulo da
+    compilare;
+  - `m`: fine dell'ordine: "modifica l'aspetto del testo" (SGR).
+- La famiglia dei codici:
+  - 30-37 = colore del TESTO: 30 nero, 31 rosso, 32 verde, 33 giallo,
+    34 blu, 35 magenta, 36 ciano, 37 bianco;
+  - 40-47 = colore dello SFONDO (stessi colori + 40: WALL_BGS usa
+    41, 44, 45, 46);
+  - 0 = spegni tutto (RESET); 49 = sfondo di default (NO_BG: spegne
+    SOLO lo sfondo, non il testo).
+- Come agisce — la penna: il codice non è un carattere visibile, è il
+  momento in cui prendi in mano la penna rossa. Tutto quello stampato
+  DOPO esce rosso finché non arriva un ordine contrario. Nel display
+  la stringa è INCOLLATA DAVANTI ai muri: print(wall_color + wall):
+  il terminale riceve prima "ESC[31m", poi i caratteri, e li scrive
+  tutti rossi. (Vista con cat -v: ^[[31mrosso^[[0m normale: il codice
+  sta in mezzo al testo, invisibile.)
+- Perché le COSTANTI: RED è una variabile NOSTRA (in cima a
+  display.py), un NOME per la stringa — il codice dice "stampa in
+  RED" invece di "stampa quell'accozzaglia". In C identico:
+  printf("\033[31mrosso\033[0m") — i codici ANSI sono del TERMINALE,
+  non del linguaggio.
+- ATTENZIONE onesta: `NORMAL: str = ""` è la stringa VUOTA: stampare
+  "" non fa niente, nessun ordine. Viene messa prima di I e O con
+  l'idea "qui scrivi senza colori", ma la stringa vuota NON spegne il
+  colore già acceso (per quello serve RESET): I e O escono del colore
+  dei muri. Cosmetico, non cambia nulla.
+- Risposta da evaluation: "RED è una costante che vale '\033[31m':
+  ESC[ apre un ordine ANSI, 31 è il codice del rosso, m chiude (SGR).
+  Il terminale non la mostra: da lì scrive rosso finché non arriva
+  \033[0m. Il display la incolla davanti ai caratteri del labirinto
+  (wall_color + wall): i muri escono del colore scelto, e il tasto 3
+  cambia quale stringa viene usata."
+
+### _print_maze (righe 69-146): il disegno (teoria 1.7)
 
 - Se show_path è True → path = gen.solve() (il fuoco del 3.3, chiamato
   di nuovo solo per disegnare).
@@ -2366,7 +2585,7 @@ caratteri.
   della partenza. Servono perché il puntino si disegna SUL muro
   attraversato.
 - Il triplo for: per ogni riga y: prima la RIGA DEI MURI (wall): per
-  ogni x il giunto (_junction) + il muro N: chiuso → "─"; aperto ma
+  ogni x il giunto (_junction) + il muro N: chiuso → "───"; aperto ma
   attraversato dal percorso → puntino verde; altrimenti spazio. Poi la
   RIGA DELLE CELLE (line): per ogni x il muro W (│ / puntino / spazio)
   + il CONTENUTO: mattoncino del 42 → sfondo colorato (il blocco
@@ -2376,7 +2595,160 @@ caratteri.
 - I colori: wall_color si "accende" prima di ogni riga e RESET alla
   fine: i codici ANSI vanno spenti o colorerebbero tutto ciò che segue.
 
-### _junction (righe 151-203): l'incrocio
+### Approfondimento: path_n e path_w — a chi appartiene il muro attraversato
+
+- Il fine del procedimento: NIENTE generazione (il labirinto è già
+  costruito: questo loop gira solo nel display, quando si preme 2).
+  Il solve restituisce la lista delle CELLE; ma tra due celle
+  consecutive c'è un MURO da attraversare, e il disegno ha 1
+  carattere per muro. Il puntino verde deve cadere ESATTAMENTE su
+  quel carattere: le due liste sono il promemoria di DOVE.
+- Il loop non confronta "chi ha la Y più piccola": fa 4 DOMANDE in
+  fila (cascata), una per direzione del passo:
+  - y2 == y1 - 1 → "la seconda è una riga SOPRA?" → si SALE;
+  - y2 == y1 + 1 → "la seconda è una riga SOTTO?" → si SCENDE;
+  - x2 == x1 + 1 → "la seconda è una colonna a DESTRA?" → si va a
+    DESTRA;
+  - else → resta solo SINISTRA.
+- LA REGOLA UNICA dietro tutto: nel disegno ogni muro è disegnato
+  UNA volta sola e appartiene a UNA cella sola:
+  - il muro ORIZZONTALE tra due celle = il muro NORD della cella
+    SOTTO;
+  - il muro VERTICALE tra due celle = il muro OVEST della cella a
+    DESTRA.
+  (È la stessa lezione dell'import senza E: ogni muro è il N di
+  qualcuno o il W di qualcuno.)
+- Quindi il loop fa una cosa sola: "di chi è il muro che attraversiamo
+  in questo passo? Segna QUELLA cella nella lista giusta":
+  - SU → cella sotto = la PRIMA (la partenza) → path_n riceve
+    (x1, y1);
+  - GIÙ → cella sotto = la SECONDA (l'arrivo) → path_n riceve
+    (x2, y2);
+  - DESTRA → cella a destra = la SECONDA → path_w riceve (x2, y2);
+  - SINISTRA → cella a destra = la PRIMA → path_w riceve (x1, y1).
+- Traccia VERA (labirinto 6x4, seed 42, path da solve):
+  - passo 0: (0,0) -> (1,0) DESTRA → W di (1,0) → path_w
+  - passo 2: (2,0) -> (2,1) GIÙ → N di (2,1) → path_n
+  - passo 4: (3,1) -> (3,0) SU → il muro è orizzontale, la cella
+    sotto è (3,1) che è la PRIMA → path_n
+  - passo 8: (5,1) -> (4,1) SINISTRA → il muro è verticale, la cella
+    a destra è (5,1) che è la PRIMA → path_w
+  - alla fine: path_n = [(2,1), (3,1), (5,1), (4,2), (5,3)],
+    path_w = [(1,0), (2,0), (3,1), (4,0), (5,0), (5,1), (5,2)].
+- Poi i due loop del disegno, quando il muro è aperto (else),
+  domandano (x, y) in path_n / in path_w: sì → puntino verde, no →
+  spazio. Nel disegno vero i puntini stanno tutti sui muri
+  attraversati dalla catena.
+- Risposta da evaluation: "solve dà le celle, il display ha un
+  carattere per muro: il loop traduce ogni passo tra due celle nella
+  marcatura del muro attraversato. Siccome ogni muro è disegnato una
+  volta sola — come N della cella sotto o W della cella a destra —
+  per ogni passo si appende nella lista giusta la cella che possiede
+  quel muro; i loop del disegno poi mettono il puntino sui muri
+  marcati."
+
+### LA VISTA D'INSIEME: chi produce cosa (tre attori separati)
+
+```
+generate() (talpa+piccone) -> gen.grid = IL LABIRINTO
+solve()    (il fuoco)      -> path     = IL PERCORSO (solo celle)
+_print_maze                 -> la schermata = labirinto + puntini
+```
+
+_print_maze stampa il labirinto eccome — ma il labirinto viene SEMPRE
+da gen.grid (già fatto dalla talpa). Solve non genera nulla: quando si
+preme 2 viene chiamato dentro _print_maze solo per calcolare il
+percorso da disegnarci sopra.
+
+I tre stadi, col labirinto VERO della traccia (6x4, seed 42):
+
+1) Quello che si vede SEMPRE (menu appena aperto): solo i muri di
+   gen.grid.
+
+```
++---+---+---+---+---+---+
+| I         |           |
++---+---+   +   +---+   +
+|       |       |       |
++   +   +---+---+   +---+
+|   |           |       |
++   +---+---+   +---+   +
+|           |         O |
++---+---+---+---+---+---+
+```
+
+2) Quello che dà solve: i NUMERI sono l'ordine nella lista path, le *
+   sono i muri che ogni passo attraversa (messe lì da path_n e
+   path_w). Ogni * sta ESATTAMENTE tra due numeri consecutivi: quella
+   * È il muro attraversato in quel passo.
+
+```
++---+---+---+---+---+---+
+| I *  1*  2|  5*  6*  7|
++---+---+ * + * +---+ * +
+|       |  3*  4|  9*  8|
++   +   +---+---+ * +---+
+|   |           | 10* 11|
++   +---+---+   +---+ * +
+|           |         O |
++---+---+---+---+---+---+
+```
+
+   Leggila così: I -> 1 -> 2 scende (la * sopra il 3), 3 -> 4 a destra
+   (la * tra 3 e 4), 4 RISALE (la * sopra il 4), e così via fino a O.
+   Due zoom:
+   - passo 2 (il 2 scende sul 3): la * sta SOPRA il 3 → è il muro N
+     di (2,1), la cella SOTTO, che era la SECONDA del passo → path_n;
+   - passo 8 (l'8 va a sinistra sul 9): la * sta a SINISTRA dell'8 →
+     è il muro W di (5,1), la cella a DESTRA, che era la PRIMA del
+     passo → path_w. (La cella 8 ha due *: è in TUTTE E DUE le liste:
+     entrata dall'alto al passo 7 e uscita a sinistra al passo 8.)
+
+3) Il disegno finale (dopo aver premuto 2). Nel display vero i
+   puntini sono TUTTI verdi; qui le * sui muri restano * per far
+   vedere che sono DUE meccanismi diversi: i puntini sulle CELLE
+   nascono da (x, y) in path, i puntini sui MURI da (x, y) in path_n
+   / path_w. Senza il loop che stavamo studiando avremmo le celle
+   puntinate ma i muri attraversati resterebbero spazi vuoti.
+
+```
++---+---+---+---+---+---+
+| I * . * . | . * . * . |
++---+---+ * + * +---+ * +
+|       | . * . | . * . |
++   +   +---+---+ * +---+
+|   |           | . * . |
++   +---+---+   +---+ * +
+|           |         O |
++---+---+---+---+---+---+
+```
+
+### Come vengono riempite e consumate le due liste
+
+- RIEMPIMENTO: il loop prende il path A COPPIE consecutive e per ogni
+  coppia risponde a UNA domanda (si sale? si scende? si va a destra?
+  a sinistra?) e appende UNA cella a UNA lista — la cella che
+  POSSiede il muro attraversato. Contenuto finale del labirinto 6x4
+  (12 passi):
+  - path_n = [(2,1), (3,1), (5,1), (4,2), (5,3)] → 5 muri ORIZZONTALI
+  - path_w = [(1,0), (2,0), (3,1), (4,0), (5,0), (5,1), (5,2)] → 7
+    muri VERTICALI
+  - 5 + 7 = 12: ogni passo marca esattamente un muro.
+- CONSUMO: le liste da sole non disegnano niente: sono il promemoria
+  che i due loop del disegno consultano. Quando il disegno trova un
+  muro APERTO fa UNA domanda: "la cella è nella lista?" Sì → puntino
+  verde, no → spazio.
+- Riga dei muri SOPRA la riga 1 (muri N, labirinto vero):
+  (0,1) chiuso → "───"; (1,1) chiuso; (2,1) aperto e in path_n →
+  puntino; (3,1) aperto e in path_n → puntino; (4,1) chiuso; (5,1)
+  aperto e in path_n → puntino.
+- Riga delle CELLE 1 (muri W): (1,1) aperto ma NON in path_w →
+  spazio (il percorso non passa di lì!); (3,1) e (5,1) aperti e in
+  path_w → puntini; gli altri chiusi → "│".
+- Questo è il dettaglio che spiega tutto: NON basta che il muro sia
+  aperto — il puntino va solo dove il percorso passa davvero.
+
+### _junction (righe 147-198): l'incrocio
 
 Guarda i 4 LATI del nodo (sinistra, destra, sopra, sotto) e sceglie il
 glifo giusto (┼ con 4 muri, ┬ quando manca il basso, ─ per il solo
@@ -2384,6 +2756,48 @@ orizzontale...). Ai BORDI (x == width o y == height) il bordo esterno
 conta come muro. La cascata di if: si controlla dal caso più pieno al
 più vuoto e il PRIMO che combacia vince (l'ordine conta!). Se nessun
 lato ha un muro → spazio.
+
+### Approfondimento: la costruzione riga per riga (il blocco dei due for + junction)
+
+- Il blocco costruisce la SCHERMATA INTERA: una riga di muri + una
+  riga di celle per OGNI riga del labirinto, più la riga di fondo:
+  2*height + 1 righe. Ogni riga è UNA stringa che cresce pezzo per
+  pezzo: wall = wall + ...
+- Anatomia della riga dei muri: GIUNTO + muro, GIUNTO + muro, ...,
+  GIUNTO finale (i giunti chiudono anche le estremità). Il giunto è
+  l'incrocio della griglia, il muro è il segmento orizzontale
+  ("─", spazio o puntino).
+- Il giunto fa 4 DOMANDE (dal nodo partono muri verso sinistra,
+  destra, sopra, sotto?) e la cascata va dal più pieno al più vuoto:
+  il PRIMO che combacia vince.
+- Traccia vera (6x4, seed 42), la riga y=0 cresce così:
+  '┌───' → '┌───────' → '┌───────────' → '┌───────────┬───' →
+  '┌───────────┬───────' → '┌───────────┬───────────' →
+  '┌───────────┬───────────┐'
+  - giunto (0,0): sin=F des=T su=F giù=T → ┌ (l'angolo in alto a
+    sinistra: niente a sinistra, niente sopra);
+  - giunto (1,0) e (2,0): solo sin e des → ─;
+  - giunto (3,0): giù=T (da lì scende il muro W di (3,0)) → ┬;
+  - giunto (6,0), il bordo destro: sin=T des=F giù=T → ┐.
+- Riga delle celle: muro W (│/spazio/puntino) + contenuto (I/O/42/
+  puntino/spazio) per ogni cella + bordo destro fisso │.
+- Riga di fondo: come la riga dei muri ma con y = height: le domande
+  cambiano — sin/des guardano i muri S dell'ultima riga, su guarda i
+  W dell'ultima riga, giù è sempre F (sotto il fondo non c'è niente).
+  Traccia: '└───' → '└───────' → '└───────────' → '└───────────┴───' →
+  '└───────────┴───────' → '└───────────┴───────────' →
+  '└───────────┴───────────┘' (il ┴ al giunto (3,4): sale il
+  muro W di (3,3)).
+- Perché i giunti servono: con un carattere per NODO, un bivio a T
+  disegnato col simbolo sbagliato avrebbe un moncone di muro
+  fantasma o un buco. I cartelli giusti riproducono gli incroci
+  dell'esempio del subject.
+- Risposta da evaluation: "ogni riga di muri è una stringa costruita
+  come giunto+muro ripetuti; _junction guarda i 4 muri che si
+  incontrano al nodo della griglia e con una cascata di if dal caso
+  più pieno al più vuoto sceglie il simbolo giusto (┼ ┬ ┴ ├ ┤ ┌ ┐ └
+  ┘ ─ │); la riga di fondo usa y = height e guarda i muri S
+  dell'ultima riga."
 
 ### Chi è cosa
 
@@ -2434,6 +2848,34 @@ lato ha un muro → spazio.
 La scala della difesa ha 7 sezioni. Per ognuna: cosa fa l'evaluator,
 dove sta la risposta nel codice, cosa dire. I punti con ▼ sono quelli
 dove si scava di più.
+
+## Il set di consegna (niente di più)
+
+- DA CONSEGNARE: a_maze_ing.py (il main), config_parser.py,
+  mazegen.py (generatore + solve, anche il modulo riusabile della
+  sezione 6), display.py, output_writer.py, Makefile (install/run/
+  debug/clean/lint/lint-strict: le regole del subject III.2),
+  config.txt (il programma si lancia con lui e l'evaluator lo
+  EDITA), README.md (tutte le sezioni del VII), pyproject.toml (il
+  build della wheel; e `mypy .` pulito senza pytest), tests/ (i 3
+  file di test — il subject III.3 dice "not submitted or graded",
+  li teniamo per noi: make test verde), .gitignore (richiesto da
+  III.3: esclude gli artefatti Python), .flake8 (minimo: esclude
+  solo .venv, cosi' `flake8 .` del subject resta pulito anche con un
+  venv dentro la cartella), mazegen-1.0.0-py3-none-any.whl (VI: "the
+  file must be located at the root of your git repository" — il
+  pacchetto costruito sta alla radice; l'evaluator lo RICOSTRUIRA'
+  comunque dalle sorgenti).
+- DA NON CONSEGNARE (restano in locale, esclusi dai .gitignore):
+  output_validator.py (strumento del subject, non nostro), maze.txt (output di
+  un run), __pycache__/, .venv/, dist/ e build/.
+- LA CARTELLA DI PROVA: ~/Desktop/consegna_amazeing contiene ESATTAMENTE
+  i 14 pezzi (nient'altro): è ciò che si copia sulla macchina della
+  scuola. Lì è stata fatta la prova generale da zero: venv nuovo +
+  pip install flake8 mypy pytest build → flake8 . pulito → mypy .
+  --strict pulito → 22 test verdi → run con "q" (maze.txt scritto,
+  uscita pulita) → validator OK → wheel ricostruita. Dopo ogni
+  modifica al progetto: ricopiare i file cambiati anche lì.
 
 ## 4.1 Display e menu (sezione 2 della scala)
 
@@ -2508,6 +2950,177 @@ python3 -m venv /tmp/venv2
 - Da dire: pyproject.toml + setuptools fanno il pacchetto; mazegen.py
   è autonomo (non importa config, output né display): funziona
   installato da solo.
+### Approfondimento: perché un modulo riusabile (la direzione delle frecce)
+
+- La generazione del labirinto è la PARTE PREZIOSA (l'algoritmo);
+  parser e display sono solo la pelle di QUESTO programma. Il cap. VI
+  vuole che la parte preziosa possa vivere in progetti futuri (un
+  videogioco, un simulatore...) senza portarsi dietro config.txt, il
+  menu e il file di output. In C: la libreria maze.c compilata una
+  volta e linkata da qualunque programma; in Python: mazegen.py +
+  pip install.
+- LA REGOLA D'ORO: nessuna dipendenza dal programma che lo usa.
+  Prova 1: gli UNICI import di mazegen.py sono `import random` e
+  `from collections import deque` (libreria standard): non sa nemmeno
+  che config.txt, display e output_writer esistono — cancellandoli
+  tutti, lui continua a funzionare identico. Prova 2: gli altri file
+  importano LUI (a_maze_ing: import mazegen; display: from mazegen
+  import ...), mai il contrario: la freccia va in una sola
+  direzione.
+- PROVA VERA del riuso (fatta da /tmp, fuori dal progetto, con la
+  SOLA wheel installata): un "progetto futuro" ha importato mazegen
+  (mazegen.__file__ → site-packages del venv), ha generato un 12x8
+  NON perfetto con seed 7, ha contato i vicoli ciechi (celle con 3
+  muri: 10) e ha chiesto il percorso — senza aprire nessun altro
+  nostro file.
+- IL CONTRATTO (l'intero manuale d'uso, 5 righe, le stesse che il
+  cap. VI obbliga a documentare e che stanno nel docstring e nel
+  README): from mazegen import MazeGenerator; gen =
+  MazeGenerator(width, height, seed) [1. istanzia]; gen.generate(
+  perfect, entry, exit) [2. parametri]; gen.grid e gen.solve()
+  [3. struttura e soluzione]. Un futuro programmatore legge il
+  docstring e usa il generatore senza aprire nient'altro (in C: il
+  docstring = l'header .h con le firme).
+- Risposte pronte: "Perché un modulo riusabile?" Il generatore è la
+  parte preziosa, deve poter essere importato in progetti futuri
+  (cap. VI). "Come fa a funzionare da solo?" Importa solo random e
+  collections; gli altri importano lui, mai il contrario. "Come si
+  usa?" Istanzio, passo i parametri, leggo grid e solve().
+
+- PROVATA DAVVERO (prova generale 2026-09-23): venv1 → install build
+  → ricostruita la wheel dalle sorgenti; venv2 → installata la wheel
+  → da una cartella QUALUNQUE (non quella del progetto):
+  import mazegen funziona e mazegen.__file__ punta a
+  venv2/lib/.../site-packages/mazegen.py (la prova che si usa il
+  modulo INSTALLATO, non il file del progetto). Stesso labirinto di
+  sempre con seed 42.
+- Il subject VI vuole anche il pacchetto costruito alla radice del
+  repo ("the file must be located at the root of your git
+  repository"): mazegen-1.0.0-py3-none-any.whl è committato lì, e
+  l'evaluator lo ricostruirà comunque dalle sorgenti (pyproject.toml
+  + mazegen.py).
+
+### pyproject.toml dalla A alla Z (il "Tom")
+
+- COME SI LEGGE il nome: py-project-toml = "il file TOML di
+  configurazione del progetto Python". TOML = Tom's Obvious Minimal
+  Language: un formato standard per i file di configurazione —
+  sezioni in parentesi quadre [sezione] e righe chiave = valore. È il
+  config.txt del sistema di COSTRUZIONE (in C non c'è l'equivalente
+  diretto: è una ricetta letta da pip, come un Makefile ma per
+  l'installazione).
+- PERCHÉ esiste: il cap. VI vuole il modulo riusabile "suitable for a
+  later installation by pip". pip, per installare, ha bisogno della
+  RICETTA: nome, versione, quali file. pyproject.toml È la ricetta.
+- I 4 blocchi del NOSTRO file, chi è cosa:
+  1. [build-system]: chi fa il lavoro di costruzione. requires =
+     setuptools (la libreria standard per fare pacchetti, predefinita
+     di Python) e build-backend = setuptools.build_meta (il motore).
+  2. [project]: la CARTA D'IDENTITÀ del pacchetto: name = "mazegen",
+     version = "1.0.0", description, requires-python = ">=3.10".
+  3. [tool.setuptools]: py-modules = ["mazegen"] → QUALE file entra
+     nel pacchetto: il solo mazegen.py.
+  4. [tool.mypy]: exclude = [".venv", "output_validator.py",
+     "tests/"] → NON c'entra col pacchetto: è la configurazione di
+     mypy, che vive qui perché questo è il posto standard dove mypy
+     la cerca (così `mypy .` è pulito anche senza pytest installato).
+- IL BUILD, in ordine di esecuzione:
+  1. python3 -m build (o make build) → setuptools legge pyproject.toml
+     → produce dist/mazegen-1.0.0-py3-none-any.whl E il tar.gz (il
+     subject ammette entrambi).
+  2. Il NOME della wheel si scompone: nome-versione-python-ABI-
+     piattaforma: py3 = gira su qualunque Python 3; none = nessuna
+     ABI specifica (è puro codice Python, niente compilato); any =
+     qualunque sistema operativo. (In C sarebbe una libreria
+     compilata per architettura: qui "any".)
+  3. La wheel è letteralmente uno ZIP (si apre con unzip): dentro
+     mazegen.py + la cartella mazegen-1.0.0.dist-info con METADATA
+     (la carta d'identità copiata dal pyproject), WHEEL e RECORD (la
+     lista dei file).
+  4. pip install dist/mazegen-1.0.0-py3-none-any.whl (dentro un venv)
+     → copia mazegen.py dove Python lo trova → da qualunque
+     programma: from mazegen import MazeGenerator funziona.
+  5. Il venv: un Python ISOLATO (una copia di Python con le sue
+     librerie in una cartella a parte) — serve per non sporcare il
+     sistema e per provare l'installazione da zero, come farà
+     l'evaluator.
+- Perché SOLO mazegen.py entra nel pacchetto: è autonomo — importa
+  solo random e collections (mai config_parser, output_writer,
+  display). Il resto del programma non fa parte del modulo riusabile.
+- SEZIONE 6 della difesa, passo passo:
+  - l'evaluator vede la wheel alla radice del repo (cap. VI);
+  - in un venv installa i tool e RICOSTRUISCE il pacchetto dalle
+    nostre sorgenti (python3 -m build);
+  - in un altro venv installa la wheel e prova a USARE il modulo:
+    import, MazeGenerator, generate, solve;
+  - domande probabili, con risposta pronta:
+    - "Cos'è pyproject.toml?" La ricetta del pacchetto: nome,
+      versione, file, officina (setuptools).
+    - "Cos'è una wheel?" Il pacchetto pronto: uno zip con mazegen.py
+      e i metadati; nome = nome-versione-py3-none-any.
+    - "Cos'è un venv?" Un Python isolato per provare l'installazione
+      senza sporcare il sistema.
+    - "Come si usa il generatore?" Le 3 cose del cap. VI:
+      istanziare MazeGenerator(width, height, seed), passare i
+      parametri a generate(perfect, entry, exit), accedere a grid e
+      solve() (il docstring di mazegen.py mostra l'esempio).
+- Collegamento col Makefile: install mette i tool (pip install),
+  build fa il pacchetto (python3 -m build).
+- CHI FA COSA (per non confondersi): il Makefile NON crea il venv e
+  NON installa il pacchetto — il venv lo crea l'evaluator (o noi)
+  con python3 -m venv; il pacchetto è già committato alla radice.
+  Le 5 regole del Makefile (install/run/debug/clean/lint) sono quelle
+  obbligatorie del subject III.2: install = il corriere porta i 4
+  tool; build = costruisce la scatola. Le metafore: pacchetto =
+  scatola di biscotti (dentro il modulo, sopra l'etichetta);
+  wheel = la scatola già sigillata; venv = una seconda cucina
+  separata; pip = il corriere che porta le scatole in site-packages.
+
+### Approfondimento: pip — il gestore di pacchetti
+
+- pip = "Pip Installs Packages": il GESTORE DI PACCHETTI di Python.
+  Programma PREDEFINITO che viaggia con Python (si lancia con
+  python3 -m pip: "chiedi a python3 di eseguire il modulo pip" — così
+  installa nel Python giusto, quello del venv).
+- Da dove scarica: PyPI (Python Package Index, pypi.org), il magazzino
+  online con ~500.000 pacchetti. Ci parla pip, non l'utente.
+- Cosa vuol dire "installare": copiare i file .py del pacchetto dentro
+  site-packages — LA cartella dove Python cerca quando si fa import
+  (nel venv: .venv/lib/.../site-packages/; ogni pacchetto ha la sua
+  cartella + una cartella .dist-info coi metadati, la stessa della
+  wheel). Da quel momento l'import funziona da qualunque programma.
+- In più fa da solo le DIPENDENZE (se un pacchetto ne richiede un
+  altro, lo installa: mccabe, pycodestyle, pyflakes sono dipendenze
+  di flake8; pluggy e iniconfig di pytest) e le versioni
+  (pip install x==1.2.3).
+- Analogia col C: in C non c'è l'equivalente standard — si scaricano
+  i sorgenti e si compila, o si usa il gestore del sistema. pip è
+  l'apt/brew del mondo Python.
+- NEL NOSTRO CASO, tre momenti precisi:
+  1. make install → pip install flake8 mypy pytest build: i 4
+     strumenti di sviluppo nel venv;
+  2. make build → python3 -m build: il modulo build (installato da
+     pip!) legge pyproject.toml e produce la wheel;
+  3. sezione 6 → pip install dist/mazegen-1.0.0-py3-none-any.whl:
+     copia il NOSTRO mazegen.py in site-packages → chiunque può fare
+     from mazegen import MazeGenerator.
+- Punto chiave per la difesa: il PROGRAMMA non usa pip — a_maze_ing
+  importa solo la libreria standard (sys, random, collections), zero
+  dipendenze esterne: gira su qualunque Python pulito. pip serve per
+  i tool di sviluppo e per rendere il NOSTRO modulo installabile
+  dagli altri (il requisito del cap. VI). Il blocco [project] del
+  pyproject.toml è scritto per pip/setuptools: nome, versione,
+  requires-python — pip lo legge per decidere se può installare.
+- Risposte pronte:
+  - "Cos'è pip?" Il gestore di pacchetti di Python: scarica da PyPI
+    e installa in site-packages.
+  - "Il programma dipende da pip?" No: solo libreria standard. pip
+    serve ai tool e all'installazione del modulo riusabile.
+  - "Come si installa il vostro modulo?" pip install
+    mazegen-1.0.0-py3-none-any.whl in un venv, poi from mazegen
+    import MazeGenerator.
+  - "Perché python3 -m pip e non pip?" Per installare nel Python del
+    venv, non in quello di sistema (bloccato da PEP 668).
 
 ## 4.6 Le trappole della difesa
 
@@ -2515,6 +3128,12 @@ python3 -m venv /tmp/venv2
   Exception copre tutto. La scala dà 0 a un programma che termina in
   modo inatteso.
 - Non modificare nessun file se non config.txt.
+- TRAPPOLA SCOVATA ALLA PROVA GENERALE: se l'evaluator crea un venv
+  DENTRO la cartella (python3 -m venv venv), `flake8 .` lo scansiona
+  e fallisce con migliaia di errori di site-packages. Risolta: il
+  .flake8 esclude sia .venv che venv e il pyproject [tool.mypy]
+  esclude "venv". Se l'evaluator usa un altro nome... fa parte delle
+  sue scelte: i due nomi canonici sono coperti.
 - La scala premia chi spiega: usa le metafore (talpa, piccone,
   fuoco) e le tracce riga per riga degli appunti.
 - Bonus (sezione 7): facoltativi, non ne abbiamo — non prometterne.
