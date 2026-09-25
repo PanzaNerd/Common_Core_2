@@ -1514,6 +1514,17 @@ if __name__ == "__main__":
 - **Domanda del subject: "che tipo di dato ritorna open()?"** → un OGGETTO FILE (non una stringa!): è l'oggetto che TIENE APERTO il file e ha i metodi read/close/write. In C: il `FILE *`. Il CONTENUTO è `f.read()` (quella sì è una stringa)
 - `open(filename, "r")` — la "r" = modalità lettura (read). In ex1 servirà "w" = scrittura
 - L'errore di un file inesistente è `FileNotFoundError` (sottotipo di OSError) — lo conosci da p02
+- **Come si legge `f: IO = open(filename, "r")`:** "f — prometto che sarà un oggetto file (IO è l'etichetta) — uguale al risultato di open(filename, 'r')". Tre pezzi: `f` = variabile nostra · `: IO` = etichetta/promessa (a runtime non fa NULLA, serve a mypy e all'evaluator) · `= open(...)` = la chiamata vera, che apre il file e ritorna l'oggetto file. In C è esattamente `FILE *f = fopen(filename, "r");` — il `FILE *` è la promessa, fopen la chiamata
+- **Come si legge `from typing import IO`:** "dal modulo typing, importa l'etichetta IO". `typing` = modulo PREDEFINITO della libreria standard che contiene SOLO etichette per le promesse (nessuna funzione utile al programma); `IO` = l'etichetta "oggetto file". Il subject lo autorizza esplicitamente ("Authorized: import typing, typing.IO") — senza l'import, il nome `IO` non esiste e la promessa `f: IO` darebbe NameError
+- **Cosa è `OSError`:** la FAMIGLIA di eccezioni predefinita che raccoglie TUTTI gli errori del sistema operativo. `FileNotFoundError` (errno 2, file inesistente) e `PermissionError` (errno 13, permesso negato) sono suoi sottotipi. Il subject mostra ENTRAMBI i casi (foo e /etc/master.passwd): un solo `except OSError` li prende tutti e due. In C: la variabile `errno` e `perror()`
+- **Come si legge `except OSError as e`:** "se dentro il try scatta un qualsiasi errore del sistema operativo, prendilo e mettilo nella variabile e"
+- **Le modalità di open (SECONDO parametro, NON sono i permessi unix rwx):** `"r"` = read: legge, il file DEVE esistere (errno 2 altrimenti) · `"w"` = write: crea se non esiste, SVUOTA se esiste · `"x"` = creazione esclusiva (errore FileExistsError se esiste già) · `"a"` = append, scrive in coda senza svuotare. Per p04 servono solo `"r"` (ex0) e `"w"` (ex1)
+- **Perché chiudere sempre (`.close()` = `fclose` del C):** (1) finché il programma vive, il file aperto occupa un file descriptor — il SO ne concede un numero limitato per processo (in C: "Too many open files") · (2) le scritture NON vanno subito su disco: restano nel BUFFER di Python e arrivano al file solo con flush/close (demo fatta: durante il run `cat` vede il file VUOTO, dopo la fine del programma appare "ciao") · a fine programma NORMALE Python chiude e svuota tutto da solo (per questo in uno script corto non si nota nulla), MA se il programma crasha i dati nel buffer vanno persi · dal ex3 in poi il subject introduce `with`, che chiude da solo anche in caso di errore (il subject VIETA di usarlo prima di ex3)
+
+**All'evaluation:**
+- Files to Submit del subject: SOLO `ft_ancient_text.py`. Nessun file txt da consegnare: l'evaluator si porta i suoi file di test (o ricrea il frammento dell'esempio). Il nostro `ancient_fragment.txt` serve SOLO per testare in locale e non è pushato (su GitHub ci sono solo i 4 .py di p04)
+- I 4 casi di test del subject, da saper riprodurre: (1) senza argomento → usage · (2) `python3 ft_ancient_text.py foo` → errno 2 gestito, NO crash · (3) `python3 ft_ancient_text.py /etc/master.passwd` → errno 13 Permission denied, gestito, NO crash · (4) file vero → contenuto con `--` e chiusura
+- La domanda del subject: "What is the type of the data returned by open()?" → un oggetto IO (oggetto file), NON una stringa
 
 **Codice:** in `python/p04/ex0/ft_ancient_text.py` (già scritto e testato)
 
@@ -1535,6 +1546,8 @@ if __name__ == "__main__":
 
 **Teoria:** l'oggetto file ha DUE metodi speculari: `.read()` (legge tutto) e `.write(testo)` (scrive il testo). La modalità si sceglie nel secondo parametro di open: "r" legge, "w" scrive (crea/sovrascrive). In C: `fopen(name, "r")` / `fopen(name, "w")` + `fwrite`.
 
+**★ LEZIONE DEL FILE VUOTO (bug vero trovato al PC della scuola, 25/9):** se il file è VUOTO (0 byte), `splitlines()` dà la lista VUOTA `[]` → `new_lines[0]` esplode con `IndexError: list index out of range` (il primo elemento di una lista vuota non esiste). Perché su un PC sì e sull'altro no? Perché i due "file vuoti" NON erano uguali: un file con DENTRO un solo a-capo (`\n`, 1 byte) ha UNA riga (vuota) → `splitlines()` dà `[""]` → funziona e stampa `--#`; un file di 0 byte veri (creato con `touch`) ha ZERO righe → `[]` → traceback. LA DIFFERENZA ERA IL FILE, NON IL PC. Fix: `if len(new_lines) > 0:` prima di `new_lines[0]` — si legge "se nella lista c'è almeno una riga" (if = domanda). Con la guardia: file vuoto → solo "Transform data:" e poi la domanda, niente crash; file normale → output identico a prima. Stesso fix in ex2. Risposta pronta evaluation: "cosa succede se ti danno un file vuoto?" → splitlines dà lista vuota, senza la guardia new_lines[0] esploderebbe — il subject chiede di gestire i casi di errore.
+
 **Codice:** in `python/p04/ex1/ft_archive_creation.py` (già scritto e testato)
 
 ## ex2 — ft_stream_management — i 3 canali
@@ -1552,7 +1565,7 @@ if __name__ == "__main__":
 
 **Come testare:** `cd python/p04/ex2 && python3 ft_stream_management.py foo` (errore su stderr) · con un file valido e input piped
 
-**Teoria:** `input()` è solo una comodità costruita SOPRA stdin/stdout: il subject ti fa fare a mano quello che input() fa da solo. `flush()` serve perché l'output è bufferizzato (parte a blocchi): senza flush la domanda potrebbe non apparire prima della risposta.
+**Teoria:** `input()` è solo una comodità costruita SOPRA stdin/stdout: il subject ti fa fare a mano quello che input() fa da solo. `flush()` serve perché l'output è bufferizzato (parte a blocchi): senza flush la domanda potrebbe non apparire prima della risposta. **DIMOSTRAZIONE VISTA DAL VERO (25/9):** quando stdout e stderr finiscono nello stesso canale (es. `2>&1 | tail -2`), la riga `[STDERR] ...` è comparsa PRIMA delle righe del programma, anche se nel codice il print dell'intestazione viene prima: stdout è BUFFERIZZATO (aspetta di riempire un blocco prima di spedire), stderr è SENZA buffer (parte SUBITO). Per questo la domanda usa `sys.stdout.write(...)` + `flush()`: senza flush, la domanda resterebbe nel buffer mentre l'utente fissa lo schermo vuoto. Con la pipe il comando di test può mostrare l'ordine "sbagliato": è il buffer, non un bug — all'evaluation va saputo spiegare.
 
 **Codice:** in `python/p04/ex2/ft_stream_management.py` (già scritto e testato)
 

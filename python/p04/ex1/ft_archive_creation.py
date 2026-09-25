@@ -24,9 +24,10 @@ def main() -> None:
     lines = content.splitlines()
     new_lines = [line + "#" for line in lines]
     print("Transform data:")
-    print("--" + new_lines[0])
-    for line in new_lines[1:]:
-        print(line)
+    if len(new_lines) > 0:
+        print("--" + new_lines[0])
+        for line in new_lines[1:]:
+            print(line)
 
     name = input("--Enter new file name (or empty): ")
     if name == "":
