@@ -1601,7 +1601,7 @@ if __name__ == "__main__":
 
 **Esecuzione:** main → 4 dimostrazioni → ogni `secure_archive(...)` fa: `with open(filename, "r") as f:` → `return (True, f.read())` — il with chiude DA SOLO il file prima che il return consegni il valore → se open fallisce: `except OSError as e:` → `return (False, str(e))` (la TUPLA col fallimento — niente crash, come p02 vuole).
 
-**Come testare:** `cd python/p04/ex3 && python3 ft_vault_security.py`
+**Come testare:** `cd python/p04/ex3 && python3 ft_vault_security.py` — l'unica cosa da preparare è il file NORMALE (copiarlo da materiale). Il file inesistente non va creato (il punto è che non esiste) e quello inaccessibile è già di sistema (`/etc/master.passwd`, verificabile con `cat` → Permission denied). Per un file inaccessibile PROPRIO (trucco da evaluation): `touch vietato.txt && chmod 000 vietato.txt` → anche il tuo file dà errno 13; poi `chmod 644` per ripristinare. Il programma non chiede NIENTE: 4 demo in fila, poi `cat new_fragment.txt` per vedere il file scritto, e pulire.
 
 **Teoria:** il `with` funziona con qualunque "risorsa" che va chiusa (file, connessioni). Traduzione C: il `fclose()` che metteresti in ogni ramo d'errore, scritto UNA volta da Python. Il subject (p04): "use of the with statement will be introduced in exercise 3. You must not use it before" — per questo ex0-ex2 chiudono a mano.
 
