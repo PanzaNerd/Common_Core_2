@@ -1496,6 +1496,8 @@ if __name__ == "__main__":
 
 # p04 — Data Archivist (File I/O)
 
+**Il pericolo principale degli archivi digitali (dall'introduzione del subject):** la PERDITA DEI DATI — il subject: "data is fragile. Without proper preservation, it vanishes into the digital void forever". Tradotto in tecnica, i modi in cui i dati muoiono: file non chiusi (i dati restano nel buffer e non arrivano mai su disco, soprattutto col crash) · errori non gestiti (traceback che interrompe tutto) · apertura in "w" sopra un file esistente (lo svuota). Tutto il modulo è difesa contro questo: chiudere sempre, gestire gli errori senza crashare, il `with`, i 3 canali.
+
 ## ex0 — ft_ancient_text — leggere un file
 
 **Cosa fa in concreto:** prende un nome di file da riga di comando, ne legge il contenuto e lo stampa come farebbe il comando `cat`, con una riga di intestazione e una di chiusura; se il file non esiste o è protetto, stampa l'errore senza crashare.
