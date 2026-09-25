@@ -26,7 +26,11 @@ def main() -> None:
     print("=== Game Coordinate System ===")
 
     print("Get a first set of coordinates")
-    x1, y1, z1 = get_player_pos()
+    try:
+        x1, y1, z1 = get_player_pos()
+    except EOFError:
+        print("Input ended unexpectedly.")
+        return
     print(f"Got a first tuple: {(x1, y1, z1)}")
     print(f"It includes: X={x1}, Y={y1}, Z={z1}")
 
@@ -34,7 +38,11 @@ def main() -> None:
     print(f"Distance to center: {round(distance, 4)}")
 
     print("Get a second set of coordinates")
-    x2, y2, z2 = get_player_pos()
+    try:
+        x2, y2, z2 = get_player_pos()
+    except EOFError:
+        print("Input ended unexpectedly.")
+        return
 
     distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
     print(f"Distance between the 2 sets of coordinates: {round(distance, 4)}")

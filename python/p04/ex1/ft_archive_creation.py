@@ -29,7 +29,10 @@ def main() -> None:
         for line in new_lines[1:]:
             print(line)
 
-    name = input("--Enter new file name (or empty): ")
+    try:
+        name = input("--Enter new file name (or empty): ")
+    except EOFError:
+        name = ""
     if name == "":
         print("Not saving data.")
         return
