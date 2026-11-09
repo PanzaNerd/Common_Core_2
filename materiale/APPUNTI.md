@@ -1625,63 +1625,219 @@ if __name__ == "__main__":
 
 ## ex0 — data_processor — le classi astratte (ABC)
 
-**Cosa fa in concreto:** definisce un CONTRATTO (classe astratta) con 3 operazioni che ogni "processore di dati" deve avere, e crea 3 processori concreti: uno per i numeri, uno per i testi, uno per i log. Il main li testa con dati validi e invalidi.
+**Cosa fa in concreto:** costruisce una mini-libreria di 3 "processori" — Numeric (numeri), Text (testi), Log (dizionari) — ognuno con 3 verbi: `validate` (questo dato è roba mia?), `ingest` (sì? lo metto in magazzino), `output` (tiro fuori il pezzo più vecchio col suo numero d'ordine). Il main li crea e li testa con dati giusti e sbagliati, incluso un errore FATTO ESPLODERE apposta perché lo chiede il subject.
 
 **★ PRIME VOLTE qui:** `ABC`, `@abstractmethod`, `isinstance()`, `all()`, `Any`
 
-**Cosa chiede:** una classe astratta `DataProcessor` che definisce L'INTERFACCIA comune (validate, ingest, output) e 3 classi concrete (NumericProcessor, TextProcessor, LogProcessor) che la implementano per i loro tipi di dati. Il main testa validi/invalidi e l'ingest senza validazione (che deve esplodere).
+**Cosa chiede:** la classe astratta `DataProcessor` (ABC) coi 2 metodi astratti `validate`/`ingest` e il metodo normale `output`; 3 classi figlie che li implementano ognuna per i suoi tipi; il main testa validi/invalidi e l'ingest senza validazione (che deve esplodere).
 
-**Il concetto in una riga:** una classe ASTRATTA è un CONTRATTO, non un oggetto: non puoi crearla (`DataProcessor()` → errore), esiste solo per dire alle figlie "TU devi avere questi metodi, io dico il COME si chiamano ma non il cosa fanno" (`@abstractmethod` = metodo dichiarato senza corpo, `...` al posto del codice). Le figlie SONO OBBLIGATE a implementarli, o non si possono creare nemmeno loro. È il "progetto dei progetti" — come il contratto che firmi prima di lavorare: dice i TUOI doveri, non come li svolgi.
+**★ IL CONCETTO — quello che Python fa DAVVERO (una sola regola nuova):**
 
-**Esecuzione:** main → crea `NumericProcessor()` (funziona: ha implementato validate e ingest) → `numeric.validate(42)` → dentro: `isinstance(42, (int, float))` → True ("42 è un int o un float?") → `numeric.validate("Hello")` → False → `numeric.ingest("foo")` SENZA validazione → dentro ingest: `if not self.validate(data): raise TypeError("Improper numeric data")` → esplode (voluto: il subject vuole l'errore) → `ingest([1,2,3,4,5])` → valida → `_store` trasforma in stringhe e le accoda coi RANK → `output()` estrae il più vecchio (pop(0)) e lo restituisce come tupla `(rank, pezzo)`.
+1. Classe = scatola di metodi (p01). Oggetto = lo costruisci dalla scatola.
+2. **L'UNICA regola nuova di tutto l'esercizio:** se nella scatola c'è anche UN SOLO metodo rimasto VUOTO (corpo `...`) marcato con `@abstractmethod`, Python RIFIUTA di costruire oggetti da quella scatola. `DataProcessor()` → `TypeError: Can't instantiate abstract class DataProcessor without an implementation for abstract methods 'ingest', 'validate'`. Niente "ideali", niente magie: solo questo controllo.
+3. La madre lascia vuoti apposta `validate` e `ingest`. Perché? Perché lei NON SA come si valida "un dato qualunque" (numero? stringa? dizionario? non è affar suo). Scrive i NOMI dei metodi, lascia il corpo vuoto, e ci appiccica il bollino.
+4. Il bollino `@abstractmethod` vuol dire UNA cosa: "chi eredita da me DEVE scrivere il corpo di questo metodo, altrimenti non si costruisce nemmeno lui". La figlia scrive un metodo con lo STESSO NOME → il SUO prende il posto di quello vuoto della madre → bollino rispettato. Questa mossa si chiama **OVERRIDE** (sovrascrivere): si fa già in p01 quando una figlia riscrive un metodo della madre — solo che in p01 è FACOLTATIVA, qui sui buchi è OBBLIGATORIA. Il template si può riassumere così: "erediti il codice già scritto + i buchi, e nei buchi DEVI scrivere (override), altrimenti errore alla creazione".
+5. Ogni figlia scrive `validate` e `ingest` A MODO SUO (3 ricette diverse: numeri / stringhe / dizionari). Ora nella scatola della figlia non c'è più niente di vuoto → si costruisce.
+6. Tutto il resto (`output`, `_store`, `_rank`, `name`) è codice GIÀ SCRITTO nella madre: le figlie lo ereditano ESATTAMENTE come in p01. La madre è metà lavoro già fatto, metà buchi da riempire.
 
-**Come testare:** `cd python/p05/ex0 && python3 data_processor.py`
+La "regola" che si sente è solo il controllo del punto 2. **Il bollino è il foglietto "NON DIMENTICARE: ogni processore deve saper validare e ingerire" — ma Python non si fida dei foglietti: se dimentichi, ERRORE alla creazione.**
+
+**Perché si chiama "astratta":** astratto = il contrario di concreto. La madre ESISTE davvero (classe vera in memoria, con codice vero: `__init__`, `_store`, `output`) — ma alcuni suoi metodi esistono SOLO COME IDEA (nome + firma, corpo `...`): per questo la classe nel complesso è INCOMPLETA, non può creare oggetti, ed è detta astratta. "Un processore di dati" è l'idea astratta; "il processore di numeri" è la cosa concreta: non assumi un'idea, assumi un lavoratore concreto. Col CMS: il template non è un sito, è l'idea di sito. Nel codice: ABC = Abstract Base Class (il modulo si chiama proprio `abc`). In C il gemello è il prototipo di funzione (`int validate(void *);`): dichiara l'idea; la definizione col corpo è la cosa concreta — un header di soli prototipi non lo esegui, e la madre astratta non la costruisci.
+
+**L'analogia — il regolamento di famiglia (dice il VERBO, non la ricetta):** "Chi lavora in famiglia DEVE saper CUCINARE (validate) e SERVIRE (ingest). Il regolamento dice i VERBI, non le ricette: uno fa la pasta, uno la pizza, uno il sushi." La madre non lavora mai (non si costruisce), ma lascia il magazzino di famiglia già pronto (`output`) a tutti i figli. Il figlio che non sa cucinare non viene assunto (errore alla creazione).
+
+**L'analogia dell'utente (CMS):** la madre è il template di un sito: design e struttura FISSI (il codice già scritto), campi MODIFICABILI vuoti (i buchi). Le figlie sono i siti consegnati ai clienti: ognuna riempie i campi a modo suo, ma il design non si tocca. Precisione per l'evaluation: tecnicamente una figlia POTREBBE fare override anche di `output` (l'override funziona su qualsiasi metodo), ma il senso del template è "riempi i buchi, il resto usalo com'è".
+
+**Perché esiste questo meccanismo (domanda da evaluation):**
+1. **La madre non saprebbe cosa scrivere nei buchi:** come si valida "un dato qualunque"? Se `validate` fosse un metodo classico avrebbe un corpo finto che le figlie riscriverebbero comunque — il buco dice esplicitamente "questo NON lo so fare io, lo devi fare tu".
+2. **La garanzia per chi usa gli oggetti:** con le classi classiche chiamare `oggetto.validate()` è una promessa a parole (se il metodo manca → AttributeError a runtime); con l'ABC è una garanzia controllata dall'interprete (se la classe è figlia di DataProcessor, i metodi CI SONO — altrimenti l'oggetto non sarebbe mai nato). ex1 userà proprio questa garanzia: il DataStream chiama validate su processori di cui non conosce il tipo.
+3. **L'errore nel momento giusto:** processore che dimentica `ingest` — senza ABC l'errore esplode alla CHIAMATA (magari all'evaluation); con ABC esplode alla CREAZIONE, sulla riga che va corretta. In C è la differenza tra errore di compilazione (subito, al build) e segfault a runtime (in demo): Python non ha il compilatore che controlla, l'ABC è la rete di sicurezza.
+**In una riga:** l'ABC trasforma una promessa ("tutti devono avere validate e ingest") in una garanzia controllata dall'interprete, con l'errore alla creazione dell'oggetto invece che alla chiamata.
+**Figlia vuota, il contrasto in una riga:** con la madre CLASSICA una figlia vuota (`class Figlia(Madre): pass`) eredita tutto e funziona — perché la madre ha fatto TUTTO il lavoro. Con la madre ASTRATTA una figlia vuota viene RIFIUTATA alla creazione — perché la madre ha lasciato apposta dei buchi ("non so validare un dato qualunque"), e se la figlia non li riempie Python se ne accorge SUBITO invece di scoprirlo alla prima chiamata. Non cambia cosa può fare il programma: cambia QUANDO scopri l'errore — subito, sulla riga che lo ha causato, invece che a runtime davanti all'evaluator.
+
+**Differenza con l'ereditarietà classica (p01 ex5):**
+
+| | p01 (classica) | p05 (astratta) |
+|---|---|---|
+| La madre | completa → puoi crearla | coi buchi → non puoi crearla |
+| Override | facoltativo — senza, gira la versione della madre | obbligatorio sui buchi — senza, nemmeno la figlia si crea |
+| La meccanica | identica: si eredita codice vero | identica |
+| In una riga | "erediti tutto, cambi ciò che vuoi" | "erediti il già fatto, i buchi DEVI riempirli" |
+
+**★ L'albero genealogico (chi ha cosa — richiesto il 3/11):**
+
+```
+ABC (modulo abc — la legge del controllo buchi)
+ └── DataProcessor (ASTRATTA: non costruibile)
+      ├── NumericProcessor → oggetto numeric (numeri)
+      ├── TextProcessor    → oggetto text    (testi)
+      └── LogProcessor     → oggetto log     (log)
+```
+
+- **Attributi** `name`, `_data`, `_rank`, `_total`: creati dall'`__init__` della MADRE → ogni oggetto ha la SUA copia (3 magazzini separati, uno per lavoratore)
+- **Metodi completi** `_store`, `output`: scritti nella madre UNA volta → ereditati da tutte le figlie senza riscriverli
+- **Buchi** `validate`, `ingest`: dichiarati dalla madre (vuoti), RIEMPITI da ogni figlia a modo suo (override) → ogni chiamata usa la versione DELLA FIGLIA, quella vuota della madre non gira mai
+- **`__init__` delle figlie:** contiene solo `super().__init__("Nome")` — super() = "la parte di madre che è dentro di me". ATTENZIONE alla distinzione (da evaluation): l'ereditarietà dei METODI è automatica (basta `class Figlia(Madre):` — `_store` e `output` arrivano gratis); gli ATTRIBUTI invece si CREANO solo quando gira un `__init__`, e siccome la figlia ha il SUO `__init__` (override, come per qualunque metodo) quello della madre non girerebbe MAI da solo → la figlia lo chiama esplicitamente: `super().__init__("Nome")` = "esegui il costruttore della MADRE" → nascono name, _data, _rank, _total. Senza super: oggetto nato senza attributi → AttributeError (provato con demo). La stringa tra parentesi è il VALORE che finisce in self.name — la targhetta col nome del lavoratore (usata in ex1 per le statistiche), non un "proprietario"
+- **Ricerca meccanica dei metodi:** `numeric.validate(...)` → 1° in NumericProcessor → trovato (buco riempito) → gira la figlia · `numeric._store(...)` → non c'è nella figlia → si SALE alla madre → trovato → gira la madre · `numeric.output()` → idem (madre). Python sale la catena solo quando la classe più in basso non ha il metodo
+- **I 3 attributi della scheda — cosa contengono e quando cambiano (PROVA col ciclo di vita):** tutti e 3 nascono nell'`__init__` della madre (`_data=[]`, `_rank=0`, `_total=0`) — ogni lavoratore ha le SUE copie. `_data` = il MAGAZZINO: la lista di coppie (rank, pezzo) che c'è FISICAMENTE dentro ADESSO — cresce con ingest, si accorcia con output, len(_data) = il "remaining" delle stats di ex1. `_rank` = il TIMBRO numeratore: il numero d'ordine del PROSSIMO pezzo (parte da 0, ogni pezzo prende il valore attuale poi rank += 1) — non scende MAI, output non lo tocca, in ex2 diventa le chiavi item_N. `_total` = la STORIA: contatore dei pezzi processati (+1 per pezzo in _store) — non scende MAI, è il "total X items processed" delle stats. CICLO DI VITA (demo): creato → []/0/0 · ingest([1,2,3,4,5]) → 5 pezzi/5/5 · output ×3 → _data scende a 2, _rank e _total RESTANO 5. Regola: ingest fa crescere tutti e 3; output fa scendere SOLO _data — rank e total contano la STORIA, data conta l'ADESSO. ex1: dopo i 2 batch numeric = 8/8/8 → consuma 3 → _data 5, rank e total restano 8 → stats "total 8, remaining 5" = _total e len(_data). NOTA ONESTA da evaluation: _rank e _total hanno SEMPRE lo stesso valore (entrambi +1 per pezzo da 0) — stesso numero, due lavori diversi: rank = il numero da stampare sul pezzo (il biglietto), total = il contatore per le statistiche. In C: _data = buffer della coda; _rank = contatore globale di ID progressivi (static); _total = contatore statistico. **CHI CAMBIA COSA:** `_store` è l'UNICO che cambia _rank e _total; _data la cambiano in DUE (_store cresce, output scende); validate non tocca nulla; __init__ li crea. Frase da evaluation: "_store è l'unica porta d'ingresso dei dati (cresce _data, _rank, _total); output è l'unica porta d'uscita (accorcia solo _data); i contatori della storia si muovono solo all'ingresso"
+
+**Esecuzione (traccia completa):**
+- **Prima del main:** import (abc dà `ABC` e `@abstractmethod`, typing dà `Any`) → Python registra le 4 classi in memoria (i `def` NON eseguono i corpi) → riga 145: `__name__ == "__main__"` vero → parte `main()`
+- **101-104:** banner → `numeric = NumericProcessor()` → `__init__` della figlia → `super().__init__("Numeric Processor")` — `super()` si legge "la parte di MADRE che è dentro di me" → l'`__init__` della madre crea la scheda: name="Numeric Processor", `_data=[]` (magazzino vuoto), `_rank=0`, `_total=0`
+- **105 `numeric.validate(42)`:** `isinstance(42, (int, float))` → True → return True → "…'42': True". **★ isinstance(x, Tipo)** = built-in: "x è un int o un float?" — controllo del tipo A RUNTIME (in C: confronto di tag), risponde True/False
+- **106 `numeric.validate("Hello")`:** le domande si fanno TUTTE in fila: "Hello" è int/float? NO (salto il corpo) → è lista? NO (salto il corpo) → return False. A risposta falsa si salta solo il CORPO, mai la funzione
+- **107-112 LA BOMBA VOLUTA:** `try: numeric.ingest("foo")` → dentro ingest: `validate("foo")` → False → `not False` = True → `raise TypeError("Improper numeric data")` — l'eccezione PARTE (le righe dopo non girano, la funzione muore lì) → il try la intercetta: `except TypeError as e` → e = l'eccezione, `{e}` = il messaggio → "Got exception: Improper numeric data". Il subject VUOLE questa esplosione ("on purpose"): è un test richiesto, non un bug
+- **114-115 `ingest([1,2,3,4,5])`:** validate → è lista → `all(isinstance(item, (int, float)) for item in data)` — pezzo per pezzo: 1 ok, 2 ok, 3 ok, 4 ok, 5 ok → **★ all()** = built-in "sono TUTTI True?" (in C: catena di &&) → True → `self._store([str(item) for item in data])` — la comprehension fa ["1","2","3","4","5"]: i numeri diventano STRINGHE (il magazzino parla solo str) → **_store (madre)**: giro 0: append((0,"1")) → _data=[(0,"1")], _rank=1, _total=1 · giro 1: (1,"2"), _rank=2 · … · giro 4: (4,"5"), _rank=5, _total=5. Magazzino: [(0,"1"),(1,"2"),(2,"3"),(3,"4"),(4,"5")] — ogni pezzo entra come coppia (rank, pezzo), il rank è il NUMERO D'ORDINE d'ingresso; `_total` conta i pezzi passati TOTALI e non scende MAI (in ex1 farà le statistiche)
+- **116-119 estrazione:** `for i in range(3)` (i=0,1,2) → `output()` = `return self._data.pop(0)` — **pop(0) si legge** "tira fuori il PRIMO della lista e toglilo" (FIFO, la coda — come il fuoco del BFS di AMAZEING) → giro 0: (0,"1") → rank=0, value="1" → "Numeric value 0: 1" (il rank esce dall'unpacking ma NON si stampa) · giro 1: (1,"2") · giro 2: (2,"3"). In magazzino restano (3,"4") e (4,"5"); _rank=5 e _total=5 NON scendono (contano la storia, non il magazzino attuale)
+- **121-128 Text:** `text = TextProcessor()` → super().__init__("Text Processor") → magazzino FRESCO tutto suo → `validate(42)`: né str né lista → False → `ingest(["Hello","Nexus","World"])`: validi → `self._store(list(data))` — **list(data) = la COPIA della lista** (così se il chiamante modifica la sua, il magazzino non cambia) → magazzino [(0,"Hello"),(1,"Nexus"),(2,"World")] → `output()` → (0,"Hello") → "Text value 0: Hello" (Nexus e World restano nel magazzino: il subject li lascia lì)
+- **130-142 Log:** `log.validate("Hello")` → False → logs = lista di 2 dict → `ingest(logs)`: validate → è lista → `all(self.validate(item) for item in data)` — ogni elemento deve passare lo stesso controllo: le 2 chiavi log_level/log_message DEVONO esserci (correzione del 29/10: prima un dict senza chiave → KeyError a runtime; ora validate dice False → TypeError pulito) e ogni chiave/valore deve essere str (`.items()` = le coppie chiave,valore, p03 ex4) → valido → comprehension `f"{entry['log_level']}: {entry['log_message']}"` → ["NOTICE: Connection to server", "ERROR: Unauthorized access!!"] — il dict diventa una STRINGA "livello: messaggio" (il "converts the data into strings" del subject) → _store → [(0,"NOTICE…"),(1,"ERROR…")] → 2 output → le 2 stampe finali
+- **Chiusura:** main finisce, si torna alla riga 146, il programma esce. Nessun input utente, nessun file: è un collaudo a copione fisso
+
+**Come testare:** `cd python/p05/ex0 && python3 data_processor.py` (l'output è identico all'esempio del subject, verificato)
+
+**Quali rami testa il main (e quali abbiamo verificato noi):** il main per tutti e 3 i processori testa SOLO il ramo LISTA di ingest (`ingest([1,2,3,4,5])`, `ingest(['Hello','Nexus','World'])`, `ingest(logs)` con logs = lista di 2 dict — le QUADRE attorno ai dict fanno la lista). I rami del pezzo SINGOLO (else) NON compaiono nell'output del subject e sono stati verificati con demo separate (regola vitale: ogni ramo eseguito almeno una volta): `ingest(42)` → [(0,'42')] · `ingest('Hello')` → [(0,'Hello')] · `ingest({'log_level':'NOTICE','log_message':'Connection to server'})` → [(0,'NOTICE: Connection to server')] — tutti funzionano. NOTA sui riferimenti: `_data` è passato per RIFERIMENTO (come un puntatore in C) — `output()` fa `pop` sulla STESSA lista che chiunque altro osserva: per questo dopo l'estrazione la lista è più corta ovunque
+
+**Il viaggio di un numero SOLO (ingest(42) passo per passo):** guardia (riga 44): validate(42) → True → non scatta → `isinstance(42, list)` → False → else → `self._store([str(42)])`: str(42) = "42" → lista da UN pezzo ["42"] (perché _store lavora sempre con una lista di pezzi: numero solo = lista da 1, lista di numeri = lista da molti — stesso nastro trasportatore) → un giro di for: append((0,"42")) → magazzino [(0,"42")], _rank=1, _total=1. ingest = l'ENTRATA del magazzino (trasforma in str, incarta in lista, archivia col rank); output = l'USCITA. In questo programma è un collaudo dell'architettura; in ex1/ex2 il router userà ingest per davvero.
+**Perché TUTTO tra parentesi quadre (i 2 rami di ingest):** le quadre costruiscono una NUOVA lista da dare a `_store`, che per contratto vuole UNA LISTA di stringhe (`pieces: list[str]`) e ci fa il for. Ramo if (è lista): `[str(item) for item in data]` = comprehension — giro 1: item=1 → "1" entra nella lista nuova · … · giro 5: "5" → risultato ["1","2","3","4","5"]. Ramo else (numero solo): `[str(42)]` = quadre con UNO slot → ["42"]. LE QUADRE SONO OBBLIGATORIE: PROVA — `n._store('42')` senza quadre → [(0,'4'),(1,'2')]: il for sbrìciola la stringa in caratteri! Le quadre trasformano "42" da DUE pezzi ('4','2') a UN pezzo solo ("42"). Regola: _store riceve SEMPRE una lista; le quadre la costruiscono (pezzo per pezzo col for nel ramo lista, direttamente col pezzo unico nel ramo singolo)
 
 **Teoria:**
-- **Chi è cosa:** `ABC` → classe predefinita del modulo `abc` (ereditando da lei la classe diventa astratta); `@abstractmethod` → decoratore predefinito del modulo abc (marca il metodo come obbligatorio); `isinstance(x, Tipo)` → funzione built-in ("x è di quel tipo?" — il controllo dei tipi a runtime); `all()` → funzione built-in (True se TUTTI gli elementi sono veri); `Any` → tipo predefinito del modulo typing ("dato di qualunque tipo" — per questo validate accetta qualsiasi cosa); `...` → "qui non c'è codice" (pass)
-- **Polimorfismo (primo assaggio):** `output()` e il meccanismo rank/store stanno nella classe MADRE, le figlie ereditano il lavoro fatto. Le figlie cambiano SOLO validate/ingest: stesso contratto, comportamenti diversi
-- **Il mypy warning voluto:** chiamare `numeric.ingest("foo")` è di proposito un errore di tipo (il subject lo dice: "This will leave you with a mypy warning, on purpose")
-- **`_store` col rank:** ogni pezzo ingerito riceve un NUMERO PROGRESSIVO (il rank) e viene accodato in `(rank, pezzo)`; `output()` toglie il più vecchio (FIFO — coda, come il fuoco di BFS)
+- **Chi è cosa:** `ABC` → classe predefinita del modulo `abc` (ereditandola, Python attiva il controllo dei buchi); `@abstractmethod` → decoratore predefinito del modulo abc (il BOLLINO); `isinstance(x, Tipo)` → funzione built-in ("x è di quel tipo?" — il controllo dei tipi a runtime, in C sarebbe un confronto di tag); `all()` → funzione built-in (True se TUTTI gli elementi sono veri); `Any` → tipo predefinito del modulo typing ("dato di qualunque tipo" — per questo validate accetta qualsiasi cosa); `...` → corpo vuoto, "qui non c'è codice" (equivale a pass)
+- **`self` tra parentesi (perché c'è):** self = l'OGGETTO STESSO. Quando chiami `n.validate(42)`, Python di nascosto passa DUE cose: l'oggetto a sinistra del punto (→ self) e 42 (→ data). Nella DEFINIZIONE dichiari entrambi i parametri, nella CHIAMATA ne scrivi uno solo: il primo lo riempie Python con l'oggetto a sinistra del punto. A cosa serve: a raggiungere le cose DI QUEL lavoratore — `self._store(...)` = "il magazzino di QUESTO oggetto" (senza self, Python non saprebbe quale dei 3 magazzini riempire); `validate` invece non tocca self, gli basta data. PROVA: `n.validate(42)` e `NumericProcessor.validate(n, 42)` sono la STESSA chiamata (la seconda è la forma esplicita). In C: self è il puntatore `this` che passeresti a mano come primo parametro — Python lo passa da solo col punto
+- **`item` dove nasce (e le altre variabili del ciclo):** `item` NON si dichiara prima: nasce DENTRO il `for` della comprehension (`[str(item) for item in data]`) — il for dichiara SEMPRE la sua variabile del ciclo, anche dentro una riga. È il ciclo normale compresso: `nuova = []` + `for item in data: nuova.append(str(item))` — giro 1: item=1, giro 2: item=2... Alla fine la variabile sparisce (PROVA: usare item fuori → NameError). Stesso discorso in `all(isinstance(item, (int, float)) for item in data)` (generatore senza quadre, p03 ex5), in `for entry in entries` (entry = il dict della passata) e in `for k, v in data.items()` (k = chiave, v = valore). In C: la variabile del `for (int i = 0; ...)` — la dichiara il ciclo
+- **Polimorfismo (primo assaggio):** `output()` e `_store` stanno nella MADRE, le figlie li ereditano e li usano senza riscriverli. Le figlie cambiano SOLO validate/ingest: stessi verbi, ricette diverse
+- **Il mypy warning voluto:** `numeric.ingest("foo")` è di proposito un errore di tipo — il subject lo dice: "This will leave you with a mypy warning, on purpose". È la BOMBA VOLUTA: deve esplodere a runtime
+- **ingest: il vero lavoro è il MAGAZZINO, non l'alert:** l'alert (`raise`) è solo la GUARDIA all'ingresso (il caso invalido); il lavoro vero è trasformare in stringhe e chiamare `_store` — PROVA: `n._data` prima è [], dopo `n.ingest([1,2,3,4,5])` è [(0,'1'),(1,'2'),(2,'3'),(3,'4'),(4,'5')] (numeri → STRINGHE coi rank, _rank=5, _total=5). Perché ingest ricontrolla invece di fidarsi: il subject impone che se chiami ingest SENZA validate e il dato è invalido, deve esplodere — ingest è autosufficiente (guardia + lavoro). Perché trasforma in stringhe: il magazzino parla solo str, così ex1/ex2 possono mescolare numeri, testi e log nello stesso flusso
+- **`_store` col rank:** ogni pezzo ingerito riceve un NUMERO PROGRESSIVO (rank) e viene accodato come coppia `(rank, pezzo)`; `output()` toglie il più vecchio (FIFO — la coda, come il fuoco del BFS di AMAZEING)
+- **`pop` spiegato (il cuore di output):** `lista.pop(indice)` fa DUE cose in una: LEGGE l'elemento a quell'indice E lo RIMUOVE dalla lista, restituendolo come valore. `lista[0]` legge SOLO (lista invariata); `lista.pop(0)` legge e toglie (lista accorciata) — PROVA. Senza indice pop() toglie l'ULTIMO (LIFO, la pila); con 0 toglie il PRIMO (FIFO, la coda — esce la roba entrata prima). In C sarebbe il dequeue: prendi array[0] e fai scorrere tutto a sinistra — pop(0) lo fa da solo. `_data` = il magazzino (attributo nostro, lista di coppie (rank, pezzo))
+- **output NON è gestione della memoria:** Python ha il garbage collector — niente leak da evitare (niente free() come in C). output è l'USCITA del magazzino: il pezzo esce perché va al CONSUMATORE (in ex1 il main lo consuma e le stats "remaining" scendono; in ex2 alimenterà i plugin CSV/JSON). Il subject: "extract the oldest piece... The piece of data is then removed" — estrarre E rimuovere: il pezzo è del chiamante adesso, insieme al suo rank (in ex2 il rank diventa la chiave item_3, item_4...). Analogia: il bancomat eroga una banconota — esce perché ce l'hai TU, non per svuotare la macchina. In C: il dequeue preleva per PROCESSARE, la free è la conseguenza non lo scopo
+- **Perché l'if/else in ingest (lista sì/no):** `_store` lavora SEMPRE con una lista di pezzi (fa il for) — il dato però arriva in DUE forme: lista → i pezzi sono già separati → `[str(item) for item in data]`; numero solo → un pezzo solo → `[str(data)]` (lista da uno). Due strade, stessa destinazione: PROVA — ingest(42) → [(0,'42')] e ingest([1,2,3]) → [(0,'1'),(1,'2'),(2,'3')]. NON è un doppio controllo inutile: (1) validate risponde solo SÌ/NO, un bool senza memoria — non dice a ingest "era una lista"; (2) ingest deve funzionare anche SENZA validate chiamato prima (il subject lo impone) — è autosufficiente. E non sono la stessa domanda: validate chiede "è ACCETTABILE?", ingest chiede "è una LISTA?" per scegliere la confezione. Analogia: il portiere dice solo "può entrare" e non accompagna nessuno; l'operaio guarda lui il pacco per decidere come spacchettarlo (vassoio o pezzo unico)
 
 **Codice:** in `python/p05/ex0/data_processor.py` (già scritto e testato)
 
 ## ex1 — data_stream — il router polimorfico
 
-**Cosa fa in concreto:** crea un "centralino" a cui registri i processori di ex0: gli dai una lista di dati MISTI (testi, numeri, log) e lui smista ogni elemento al processore giusto; se nessuno lo vuole, stampa l'errore. Mostra anche le statistiche di ogni processore.
+**Cosa fa in concreto:** costruisce un CENTRALINO (`DataStream`) a cui registri i lavoratori di ex0; gli dai una lista di dati MISTI (stringhe, numeri, log) e lui smista OGNI elemento al lavoratore giusto chiedendo in giro `validate`; se nessuno lo vuole, stampa l'errore. Poi stampa le STATISTICHE di ogni lavoratore (totale pezzi processati / rimasti nel magazzino). Il main: registra solo Numeric → manda un batch di 5 elementi → 3 errori + 4 pezzi numerici → registra anche Text e Log → rimanda lo stesso batch → ognuno prende i suoi → consuma 3/2/1 pezzi → statistiche aggiornate.
 
-**★ PRIME VOLTE qui:** routing per tipo (nessuna sintassi nuova — il polimorfismo applicato)
+**★ PRIME VOLTE qui:** nessuna sintassi nuova — il polimorfismo in AZIONE (la garanzia di ex0 viene USATA)
 
-**Cosa chiede:** una classe `DataStream` che raccoglie i processor REGISTRATI e, per ogni elemento di uno stream misto, lo manda al processor GIUSTO usando solo `validate()` — senza sapere niente dei tipi concreti.
+**★ L'albero genealogico:**
 
-**Il concetto in una riga:** il DataStream non conosce NumericProcessor/TextProcessor/LogProcessor: conosce SOLO "una lista di cose che hanno validate() e ingest()". Per ogni elemento: prova i processor in ordine, il PRIMO che dice "sì" se lo prende; se nessuno lo vuole → errore. È il centralino: inoltra la chiamata senza sapere chi risponderà.
+```
+ABC
+ └── DataProcessor (astratta)            ← copia IDENTICA a ex0
+      ├── NumericProcessor ┐
+      ├── TextProcessor    ├─ i 3 lavoratori di ex0
+      └── LogProcessor     ┘
 
-**Esecuzione:** main → `stream.register_processor(NumericProcessor())` → `process_stream(batch)` → per ogni elemento: for sui processor → `proc.validate(element)` → il primo True vince (`ingest` + `break`) → se nessuno: "DataStream error" → `print_processors_stats()` legge `total` (conteggio pezzi) e `len(_data)` (rimanenti) di ognuno → poi si registrano Text e Log e si rimanda lo stesso batch (ora ogni elemento trova il suo).
+DataStream (classe NUOVA — NON è figlia di nessuno: è il CLIENTE del contratto)
+ └── _processors = lista (la RUBRICA dei lavoratori registrati)
+```
 
-**Come testare:** `cd python/p05/ex1 && python3 data_stream.py`
+- **DataStream** = il centralino: non eredita da DataProcessor, la USA. Ha: `_processors` (lista vuota all'inizio), `register_processor(proc)` = append nella rubrica, `process_stream(stream)` = il cuore, `print_processors_stats()` = le statistiche
+- Il contratto di ex0 è la garanzia che rende sicuro il centralino: qualunque cosa registrata HA validate e ingest (altrimenti non sarebbe mai nata)
 
-**Teoria:**
-- **Perché è polimorfismo:** il router chiama SEMPRE lo stesso metodo (`validate`/`ingest`) su oggetti diversi, e ogni oggetto risponde a modo suo. Aggiungere un 4° processor = registrarlo, ZERO modifiche al router — è il vantaggio che il subject chiede di spiegare
-- **Registrare i processor = consegnare il contratto:** il DataStream si fida che qualunque cosa registrata rispetti l'interfaccia di DataProcessor (è per questo che la classe astratta esiste)
+**La meccanica del router (process_stream), giro giro:**
+
+```
+for element in stream:            # un elemento alla volta
+    handled = False               # "per ora nessuno se l'è preso"
+    for proc in self._processors: # chiedo ai lavoratori IN ORDINE di registrazione
+        if proc.validate(element):  # "è roba tua?"
+            proc.ingest(element)    # "sì? prenditela"
+            handled = True
+            break                   # il PRIMO che dice sì vince
+    if not handled:                 # ho chiesto a tutti: nessuno l'ha voluto
+        print("DataStream error - Can't process element in stream: ...")
+```
+
+**Esecuzione (traccia completa coi valori veri):**
+- `stream = DataStream()` → rubrica vuota → stats: "No processor found, no data" (len == 0)
+- `register_processor(NumericProcessor())` → rubrica = [numeric]
+- **Primo batch** (solo Numeric): "Hello world" → validate False → ERROR · [3.14,-1,2.71] → True → ingest → 3 pezzi · [2 dict] → False → ERROR · 42 → True → 1 pezzo · ["Hi","five"] → False → ERROR. Stats: "Numeric Processor: total 4 items processed, remaining 4 on processor" (total = _total = la storia; remaining = len(_data) = il magazzino)
+- `register_processor(TextProcessor())` + `register_processor(LogProcessor())` → rubrica = [numeric, text, log] — L'ORDINE CONTA: il primo che dice sì vince
+- **Stesso batch di nuovo:** "Hello world" → numeric no, TEXT sì (1 pezzo) · [3.14,-1,2.71] → numeric sì (è il primo) → +3 · [2 dict] → numeric no, text no, LOG sì → +2 · 42 → numeric +1 · ["Hi","five"] → text +2. Stats: Numeric 8/8, Text 3/3, Log 2/2
+- **Consumo 3/2/1:** `for proc in stream._processors:` (il main accede all'attributo privato: si può, è lo stesso file) con `nb = 3 se Numeric, 2 se Text, 1 se Log` — TERNARIO annidato: if/else che PRODUCE un valore (si legge: "se il nome è Numeric → 3; altrimenti se è Text → 2; altrimenti → 1"; in C è il `?:`). `for _ in range(nb):` — `_` = variabile usa-e-getta ("il contatore non mi serve, ripeto e basta") → `proc.output()` × nb: il valore restituito viene BUTTATO VIA — interessa solo l'effetto collaterale (il pezzo esce e le stats cambiano: è il consumo dimostrato dal subject, non la pulizia della memoria). Traccia: numeric 3× pop → magazzino 8→5 · text 2× → 3→1 · log 1× → 2→1 → stats: total NON scende (storia), remaining scende (len(_data)). Nessun IndexError: ogni processore ha pezzi a sufficienza (8≥3, 3≥2, 2≥1). **ATTENZIONE: 3/2/1 non c'entra col 5 del batch** — il batch ha 5 ELEMENTI ma genera 8 PEZZI (un elemento-lista si scompone in più pezzi: [3.14,-1,2.71] → 3, [2 dict] → 2, ["Hi","five"] → 2, più i 2 singoli). Il 3/2/1 è il copione del subject: numeri arbitrari di PEZZI da estrarre, scelti per (1) non svuotare i magazzini (nessun IndexError) e (2) lasciare qualcosa dentro (remaining 5/1/1) così le stats finali mostrano la differenza total vs remaining. **E 3/2/1 non sono né indici né rank:** sono il numero di RIPETIZIONI di output() (nb). Il rank è il BIGLIETTO assegnato da _store (0,1,2,3...) che viaggia nella tupla; pop(0) usa SEMPRE l'indice 0 (il primo della lista, qualunque biglietto abbia). Coincidenza che confonde: 3 poppate fanno uscire i biglietti 0,1,2 — il 3 è il CONTO delle poppate, gli 0/1/2 sono i BIGLIETTI dei pezzi usciti
+- **Nota:** il main accede a `stream._processors` (attributo col trattino basso): si può perché è lo stesso file — da fuori l'underscore dice "non toccare"
+
+**Come testare:** `cd python/p05/ex1 && python3 data_stream.py` (output identico all'esempio del subject, verificato; bugfix 5/11: il validate di Log qui e in ex2 aveva lo stesso buco delle chiavi mancanti di ex0 — corretto in entrambi, edge case verificati)
+
+**Teoria — il POLIMORFISMO spiegato (la domanda centrale del modulo):**
+- La parola: poli = molti, morfos = forme → "molte forme"
+- **In una riga:** la STESSA chiamata produce comportamenti DIVERSI a seconda dell'oggetto che la riceve. `proc.validate([3.14,-1,2.71])` → True se proc è Numeric, False se è Text, False se è Log — stessa riga, 3 comportamenti (ogni figlia ha riempito il buco a modo suo)
+- Il meccanismo è la ricerca che sale (vista in ex0): Python cerca il metodo nella classe DELL'oggetto → trova la versione della figlia → gira quella. Questa ricerca automatica È il polimorfismo
+- **Analogia C:** in C non esiste — lo faresti a mano con un puntatore a funzione nella struct (vtable): `proc->validate(proc, data)` gira codice diverso secondo il puntatore. Python fa lo stesso automaticamente
+- **Analogia di parole:** il verbo "aprire" — apri la porta, la bottiglia, il libro: un verbo, molte azioni. validate è il verbo: sul Numeric controlla numeri, sul Text stringhe, sul Log dizionari
+- **Il vantaggio:** chi usa gli oggetti scrive UNA riga e gestisce tutti i tipi; un QuartoProcessor nuovo = registrarlo, ZERO modifiche al router
+- **Risposta da evaluation:** "polimorfismo significa che la stessa chiamata di metodo si comporta diversamente in base alla classe dell'oggetto: ogni figlia riempie i buchi del contratto a modo suo, e Python, cercando il metodo nella classe dell'oggetto, esegue automaticamente la versione giusta — così chi usa gli oggetti non deve sapere che tipo sono"
+
+**Teoria — le 2 domande del subject (da evaluation):**
+- **"How does polymorphism allow the DataStream to handle different data types without knowing their specific implementations?"** → il router conosce SOLO il contratto: chiama `validate`/`ingest` con gli STESSI nomi su oggetti diversi, e ognuno risponde a modo suo (il buco riempito da ogni figlia). Non serve sapere CHE classe sia: basta che rispetti DataProcessor — la garanzia di ex0. È il centralino che inoltra la chiamata senza sapere chi risponderà
+- **"What are the benefits of this design approach?"** → (1) aggiungere un 4° processore = UN register_processor, ZERO modifiche al router (il centralino non cambia mai); (2) il router resta semplice: niente if a catena sui tipi; (3) ogni lavoratore tiene le SUE regole chiuse in casa sua (incapsulamento); (4) il contratto rende sicuro il salto nel buio: se è registrato, i metodi ci sono
+- **Registrare = consegnare il contratto:** il DataStream si fida che qualunque cosa registrata rispetti l'interfaccia di DataProcessor (è per questo che la classe astratta esiste)
 
 **Codice:** in `python/p05/ex1/data_stream.py` (già scritto e testato)
 
 ## ex2 — data_pipeline — i plugin con Protocol
 
-**Cosa fa in concreto:** aggiunge al centralino la parte di USCITA: due "plugin" (uno CSV, uno JSON) che ricevono i dati processati e li stampano formattati; il centralino estrae N pezzi da ogni processore e li passa al plugin scelto.
+**Cosa fa in concreto:** completa la pipeline di ex1 con la parte di USCITA. Il DataStream impara `output_pipeline(nb, plugin)`: estrae fino a nb pezzi da OGNI processore registrato e li consegna su un vassoio a un plugin che li formatta e stampa — due plugin: CSV (valori separati da virgole) e JSON (coppie chiave-valore). Il main: registra i 3 → batch 1 → esporta 3 pezzi a testa in CSV → batch 2 → esporta 5 a testa in JSON. Output verificato identico al subject.
 
-**★ PRIME VOLTE qui:** `Protocol` (duck typing)
+**★ PRIME VOLTE qui:** `Protocol` (duck typing / structural typing)
 
-**Cosa chiede:** un sistema di export a plugin: `ExportPlugin` è un Protocol che dichiara `process_output(data)`; classi CsvPlugin e JsonPlugin lo implementano; `DataStream.output_pipeline(nb, plugin)` consuma nb pezzi da OGNI processor e li passa al plugin scelto.
+**★ L'albero genealogico:**
 
-**Il concetto in una riga:** il Protocol è il contratto PIÙ leggero: "chiunque abbia un metodo `process_output(lista)` può fare il plugin — non deve ereditare da nessuno, basta che abbia il metodo". Duck typing: "se cammina come un'anatra e starnazza come un'anatra, è un'anatra". Il CSV e il JSON non hanno nessun antenato comune: condividono solo la FORMA.
+```
+ABC
+ └── DataProcessor (astratta)        ← copia di ex0/ex1
+      ├── NumericProcessor
+      ├── TextProcessor
+      └── LogProcessor
 
-**Esecuzione:** main → registra 3 processor → batch → `output_pipeline(3, CsvPlugin())` → per ogni processor: estrae fino a 3 pezzi (o quanti disponibili) → `plugin.process_output(data)` → il CsvPlugin incolla i valori con la virgola e stampa → secondo batch → `output_pipeline(5, JsonPlugin())` → chiavi `"item_<rank>"` coi rank progressivi (per questo i numeri ripartono da 3: i primi 3 li ha mangiati il CSV).
+ExportPlugin (Protocol)              ← NUOVO: dichiara la FORMA del plugin
+      (NESSUNO eredita da lui!)
 
-**Come testare:** `cd python/p05/ex2 && python3 data_pipeline.py`
+CsvPlugin    ← NON è figlia di nessuno: ha solo process_output
+JsonPlugin   ← idem
+
+DataStream   ← come ex1 + il metodo nuovo output_pipeline
+```
+
+Il punto chiave: CsvPlugin e JsonPlugin NON hanno nessun antenato comune — non ereditano da ExportPlugin. Sono due classi libere che hanno il metodo `process_output`. Questo È il concetto nuovo.
+
+**★ IL PROTOCOL (l'unico concetto nuovo):** `class ExportPlugin(Protocol)` con `def process_output(self, data: list[tuple[int, str]]) -> None: ...` — sembra un abstractmethod (il corpo `...`) ma il meccanismo è TOTALMENTE diverso:
+
+| | ABC (ex0) | Protocol (ex2) |
+|---|---|---|
+| Chi lo rispetta | DEVE ereditare dalla madre | chiunque abbia il metodo giusto |
+| Chi controlla | Python a RUNTIME: figlia senza il metodo → non si crea | SOLO mypy: a runtime non controlla NIENTE |
+| Nome del gioco | nominal typing (conta la parentela) | duck typing / structural typing (conta la FORMA) |
+
+**Duck typing** = "se cammina come un'anatra e starnazza come un'anatra, è un'anatra": se la classe ha `process_output` con la firma giusta, mypy la accetta come ExportPlugin — senza parentele (il subject: "made export-compatible through duck typing"). **Conseguenza da evaluation:** il Protocol NON protegge a runtime — oggetto senza process_output → AttributeError solo QUANDO viene chiamato. L'ABC protegge, il Protocol documenta: l'annotazione `plugin: ExportPlugin` è il post-it per mypy.
+
+**COSA È ESATTAMENTE il Protocol (le 4 prove del demo):** una classe del modulo typing il cui unico lavoro è DESCRIVERE UNA FORMA (metodi + firme) — uno stampino. Prova 1: `ExportPlugin()` → `TypeError: Protocols cannot be instantiated` (non si crea: esiste solo come descrizione). Prova 2: `issubclass(CsvPlugin, ExportPlugin)` → TypeError "Instance and class checks can only be used with @runtime_checkable protocols" (a runtime Python rifiuta persino di confrontarlo). Prova 3: `CsvPlugin.__bases__` = (object,) — il plugin NON eredita da lui. Prova 4: oggetto senza process_output → AttributeError solo alla CHIAMATA (nessun controllo a runtime). Il metodo `...` dentro il Protocol non gira MAI: è solo la forma scritta. Chi lo usa: SOLO MYPY — legge `plugin: ExportPlugin`, confronta la STRUTTURA dell'oggetto (ha process_output? sì → ok) e accetta o rifiuta a tempo di scrittura; Python esegue e se ne frega. Definizione da evaluation: "Protocol è un tipo del modulo typing che descrive una FORMA senza imporre parentele: a runtime è inerte (non si istanzia, non si controlla, i suoi metodi non girano), mypy lo usa per accettare qualunque oggetto con quella forma (structural typing). L'ABC invece è un contratto imposto a runtime sull'ereditarietà"
+**RUNTIME = quando il programma viene eseguito** (vs tempo di scrittura: quando mypy/linter/compilatore analizzano il codice fermo). ABC = controllo a runtime (Python esplode mentre il programma gira); Protocol = controllo solo a tempo di scrittura (mypy); isinstance = runtime. In C: compile time (gcc) vs runtime (il binario che gira — il segfault è un errore a runtime). Analogia: la revisione della macchina (mypy) vs la guida vera (runtime) — una macchina mai revisionata può partire e si rompe in corsa (AttributeError). L'ABC è il dispositivo che blocca la partenza se manca un pezzo; il Protocol è la lista dei controlli del meccanico
+
+**La meccanica di output_pipeline, giro giro:**
+
+```
+for proc in self._processors:          # ogni lavoratore della rubrica
+    data = []                          # il VASSOIO vuoto
+    for _ in range(nb):                # prova a estrarre nb pezzi
+        if len(proc._data) == 0:       # magazzino vuoto? (LA GUARDIA!)
+            break
+        data.append(proc.output())     # pop e metti sul vassoio
+    plugin.process_output(data)        # consegna il vassoio al plugin
+```
+
+La guardia `if len(proc._data) == 0: break` è la protezione che mancava in ex1: magazzino con meno di nb pezzi → si estrae quello che c'è e basta, niente IndexError (fase JSON: Text ne ha 4 con nb=5 → escono 4). I 2 plugin — stessi ingredienti, ricette diverse: CsvPlugin = `values = [piece for _, piece in data]` (unpacking che butta il rank col `_`) → `",".join(values)` (il join di p04) → "3.14,-1,2.71" · JsonPlugin = `items = [f'"item_{rank}": "{piece}"' for rank, piece in data]` (qui il rank SERVE: diventa la chiave) → `"{" + ", ".join(items) + "}"` → {"item_3": "42", ...}.
+
+**Esecuzione (traccia completa):** registra i 3 → batch 1 → stats 4/3/2 → `output_pipeline(3, CsvPlugin())` → 3 pezzi a testa → stats 4/1, 3/0, 2/0 (il CSV ha mangiato i rank 0,1,2 di ogni processore) → batch 2 → stats 11/8, 7/4, 4/2 → `output_pipeline(5, JsonPlugin())` → Numeric ha 8 pezzi, ne escono 5 con rank che RIPARTONO DA 3: item_3, item_4... perché i biglietti 0,1,2 li aveva già consumati il CSV — **il rank non si azzera MAI: è la storia del processore. È per questo che il subject stampa item_3 e non item_0 — domanda da evaluation garantita.** Text ne ha 4 → escono 4 (item_3..item_6) · Log ne ha 2 → item_2, item_3. Stats finali: Numeric 11/3, Text 7/0, Log 4/0. **ATTENZIONE ai nomi:** il "total 4" delle stats NON è la variabile locale `data` di output_pipeline (il vassoio, lista vuota fresca a ogni chiamata — non compare mai nelle stats): è `proc._total`, l'ATTRIBUTO del processore. La riga delle stats è `f\"{proc.name}: total {proc._total} items processed, remaining {len(proc._data)} on processor\"` — total = _total (la storia: [3.14,-1,2.71] → 3 pezzi + 42 → 1 pezzo = 4), remaining = len(_data) (il magazzino). `data` è un nome generico riusato ovunque (validate(data), ingest(data), process_output(data), data=[]): ogni volta è una variabile diversa di un metodo diverso
+
+**Come testare:** `cd python/p05/ex2 && python3 data_pipeline.py` (output identico al subject, verificato; il validate di Log qui ha ricevuto lo stesso fix delle chiavi di ex0/ex1)
 
 **Teoria:**
-- **Protocol vs ABC:** la ABC OBBLIGA a ereditare; il Protocol non obbliga a nulla — controlla solo la forma (structural typing). Niente `class CsvPlugin(ExportPlugin)`: basta `def process_output(...)` e mypy lo accetta come plugin
-- **Il rank attraversa tutto il sistema:** `output()` dà `(rank, pezzo)` e il JSON lo usa per le chiavi `item_3`, `item_4`... — il motivo per cui i numeri non ripartono da 0
+- **Plugin, definizione semplice:** pezzo INTERCAMBIABILE che si ATTACCA a un sistema già funzionante per aggiungergli una capacità (qui: un formato di export) senza toccare il sistema — da "plug in" = attaccarsi. Il sistema definisce la PRESA (la forma richiesta: il Protocol ExportPlugin), il plugin è la SPINA: qualunque pezzo con quella forma si attacca. Perché CSV e JSON sono plugin: (1) intercambiabili — la STESSA chiamata `output_pipeline(nb, plugin)` cambia formato con ZERO modifiche al DataStream; (2) esterni al sistema (non ereditano da niente); (3) hanno la forma giusta (process_output). Prova del nove da evaluation: per aggiungere un formato XML basta scrivere una classe XmlPlugin con process_output e passarla — il DataStream non cambia. Analogia: la presa della corrente — forma fissa, qualunque spina giusta ci si attacca (lampada, TV, aspirapolvere); il muro non sa cosa stai attaccando
+- **Protocol vs ABC (domanda da evaluation):** la ABC obbliga a ereditare e Python controlla alla creazione (nominal typing); il Protocol non obbliga a nulla — conta solo la forma (structural typing), controllata da mypy, zero controlli a runtime. Niente `class CsvPlugin(ExportPlugin)`: basta `def process_output(...)`
+- **Il rank attraversa tutto il sistema:** output() dà (rank, pezzo); il CSV lo butta (`_`), il JSON lo usa per le chiavi item_N — il motivo per cui i numeri non ripartono da 0
 
 **Codice:** in `python/p05/ex2/data_pipeline.py` (già scritto e testato)
 
@@ -1695,7 +1851,7 @@ if __name__ == "__main__":
 
 ## ★ PRIMA VOLTA — i 4 misteri degli import (tutta la teoria in un colpo)
 
-**Mistero 1 — import vs from:** `import elements` carica TUTTO il modulo e lo usi col punto: `elements.create_fire()`. `from elements import create_water` carica SOLO quella funzione e la chiami DIRETTA: `create_water()`. Stessa roba, due stili: col punto = "cassetta degli attrezzi", senza = "attrezzo in mano".
+**Mistero 1 — import vs from:** `import elements` carica TUTTO il modulo e lo usi col punto: `elements.create_fire()`. `from elements import create_water` esegue comunque TUTTO il file (come sempre: un modulo gira sempre per intero, una volta sola), ma ti CONSEGNA solo quel nome, e lo chiami DIRETTA: `create_water()`. Stessa roba, due stili: col punto = "cassetta degli attrezzi" (hai un nome per la cassetta), senza = "attrezzo in mano" (hai il nome SOLO dell'attrezzo, la cassetta non ha nome da te).
 
 **Mistero 2 — i package e `__init__.py`:** una cartella con dentro `__init__.py` diventa un PACKAGE importabile col nome della cartella. `__init__.py` gira quando importi il package e decide COSA ESPORRE: nel nostro caso espone `create_air` ma NON `create_earth` — per questo `alchemy.create_earth()` esplode con AttributeError (il "segreto" del subject, voluto). Analogia: `__init__.py` è la vetrina del negozio: la merce che non metti in vetrina non la vendi.
 
@@ -1711,10 +1867,196 @@ if __name__ == "__main__":
 - **ft_kaboom_0**: il grimoire LIGHT funziona (il validator ha la sua lista di ingredienti, niente ciclo) → "Spell recorded: Fantasy (Earth, wind and fire - VALID)"
 - **ft_kaboom_1**: il grimoire DARK esplode — dark_spellbook importa dark_validator che importa dark_spellbook → ImportError con traceback (voluto, è la dimostrazione del mistero 4)
 
+## ft_alembic_0..1 — il mistero 1 riga per riga (i due stili in pratica)
+
+### ft_alembic_0 — `import elements` (la cassetta)
+
+**Cosa fa in concreto:** stampa il risultato di `elements.create_fire()` — la frase "Fire element created" prodotta dalla funzione dentro elements.py.
+
+**Meccanica dell'import in 3 passi:**
+1. Python cerca `elements.py` nella cartella dello script (quella da cui lanci).
+2. ESEGUE il file una volta sola, riga per riga: nascono le due funzioni `create_fire` e `create_water`, e il modulo finisce in CACHE (sys.modules) — se un altro script lo importa, NON lo riesegue: la cassetta è una sola, condivisa.
+3. Ti consegna il MODULO come un oggetto, nella variabile `elements`.
+
+**Il punto = "DENTRO":** `elements.create_fire()` si legge "dentro la cassetta elements, prendi create_fire".
+
+**Differenza dal C:** `#include` incolla il testo del file al suo posto, a compile time. `import` ESegue il file a runtime, una volta, e consegna un oggetto condiviso in cache.
+
+**Punto chiave (dimostrato dallo script stesso):** il modulo ha DUE funzioni ma noi ne usiamo UNA. Importare la cassetta intera non obbliga a usarla tutta: usi ciò che ti serve, quando ti serve.
+
+### ft_alembic_1 — `from elements import create_water` (l'attrezzo in mano)
+
+**Come si legge la riga:** "dal modulo elements, prendimi la funzione create_water".
+
+**La chiamata:** `create_water()` SENZA punto — come se la funzione fosse scritta nel nostro script. In alembic 0 si scriveva `elements.create_fire()` col punto.
+
+**Cosa succede DENTRO (la domanda da 100 all'evaluation):** il file elements.py viene ESEGUITO TUTTO comunque (create_fire nasce anche qui, e la cassetta finisce in sys.modules), ma a noi viene consegnato UN nome solo: `create_water`. Il nome `elements` NON esiste nel nostro script — dimostrato in demo: `print(elements)` → NameError, mentre `'elements' in sys.modules` → True (la cassetta c'è, in cache, ma non abbiamo un nome per raggiungerla).
+
+**Tabella di confronto (risposta pronta):**
+- alembic 0: `import elements` → 1 nome in mano (la cassetta) → chiami col punto
+- alembic 1: `from elements import create_water` → 1 nome in mano (l'attrezzo) → chiami senza punto
+- in entrambi: il file gira TUTTO una volta sola; cambia solo COSA ti viene consegnato come nome
+
+**Analogia C:** `import elements` = hai il puntatore alla struct del modulo e chiami `m->create_water()`. `from elements import create_water` = hai copiato un puntatore a funzione singolo in una variabile locale e chiami `f()` — la funzione è la stessa, cambia come la tieni in mano.
+
+**Perché esiste lo stile "from":** se usi sempre la stessa funzione ti risparmi il punto a ogni chiamata, e chi legge lo script vede in cima esattamente cosa ti serve.
+
+## ft_alembic_2 — `import alchemy.elements` (il package, prima puntata)
+
+**Cosa fa in concreto:** stampa il risultato di `alchemy.elements.create_earth()` — raggiunge il file `alchemy/elements.py` PASSANDO ATTRAVERSO il package.
+
+**Come si legge la riga 1:** "carica il package alchemy, e dentro di esso il modulo elements". La parola che ti resta in mano è la PRIMA: `alchemy` (il package). Il file dentro si raggiunge incatenando: `alchemy.elements`.
+
+**Novità — il package:** una CARTELLA con dentro `__init__.py` diventa importabile col nome della cartella. `__init__.py` è la firma che la trasforma in package.
+
+**Meccanica in 4 passi:**
+1. Python trova la cartella `alchemy/` e vede `__init__.py` → è un package.
+2. PRIMA gira l'`__init__.py` (la porta d'ingresso): fa 4 import relativi e mette in vetrina `create_air`, `heal`, `strength`, `transmutation`.
+3. Poi gira `alchemy/elements.py`: nascono `create_earth` e `create_air`.
+4. Ti consegna il nome `alchemy` = l'oggetto-package; i sotto-moduli caricati diventano suoi attributi (`alchemy.elements`, `alchemy.potions`...).
+
+**La demo (valori veri):** dopo `import alchemy.elements`, dentro `alchemy` ci sono: `create_air`, `elements`, `heal`, `potions`, `strength`, `transmutation` — ma `create_earth` NON c'è (False). Eppure `alchemy.elements.create_earth()` FUNZIONA: la vetrina non l'ha esposto, ma il retro del negozio è raggiungibile passando dall'attributo `elements`.
+
+**Effetto collaterale (stessa lezione dell'import che ESegue):** pur chiedendo solo `elements`, sono stati caricati anche `potions` e `transmutation.recipes` — perché l'`__init__.py` gira per intero e importando quei pezzi li esegue. (sys.modules lo dimostra.)
+
+**`__all__`:** ultima riga dell'`__init__.py` = il listino ufficiale della vetrina (usato da `from alchemy import *` e come dichiarazione di cosa è pubblico). NON è un lucchetto: non blocca l'accesso diretto ai file — create_earth resta raggiungibile dal retro.
+
+**La distinzione che anticipa la bomba di ft_alembic_4:**
+- `alchemy.elements.create_earth()` → porta sul retro (file diretto) → FUNZIONA
+- `alchemy.create_earth()` → vetrina (dentro alchemy senza passare da elements) → AttributeError, la vetrina non l'ha mai importato
+
+**Analogia C:** il package è la cartella `lib/alchemy/`; `__init__.py` è l'header-ombrello `alchemy/alchemy.h` che include SOLO gli header pubblici; ma puoi sempre includere direttamente `alchemy/elements.h` — la dichiarazione c'è, che l'ombrello la esponga o no.
+
+## alchemy/__init__.py — lettura riga per riga (la porta d'ingresso)
+
+NON lo chiami tu: Python lo esegue DA SOLO quando entri nella cartella, PRIMA del modulo che hai chiesto.
+
+**Riga 1** — `from .elements import create_air` — "dal modulo elements che sta IN QUESTA cartella, prendimi create_air".
+★ PRIMA VOLTA — **il puntino davanti** = import RELATIVO: `.` vuol dire "questa stessa cartella (il package in cui sono)". Il file non sa nemmeno che la cartella si chiama "alchemy": dice solo "da qui". Effetto: esegue elements.py per intero (nasce anche create_earth — il file gira sempre tutto) e mette create_air in vetrina.
+**Analogia C:** il puntino = `#include "elements.h"` con le VIRGOLETTE (relativo al file corrente); `from alchemy.elements import ...` = `#include <alchemy/elements.h>` con gli ANGOLI (assoluto dalla radice).
+
+**Riga 2** — `from .potions import healing_potion as heal` — "dal modulo potions in questa cartella, prendimi healing_potion e chiamala heal".
+★ PRIMA VOLTA — **`as` = ALIAS**, rinomina da qui in poi. Effetto doppio: esegue potions.py (effetto collaterale) e mette in vetrina il nome corto `heal`.
+
+**Riga 3** — stesso per `strength_potion` → in vetrina come `strength`.
+
+**Riga 4** — `from . import transmutation` — "da questa cartella, prendimi il sotto-package transmutation". Effetto a catena: esegue `transmutation/__init__.py`, che fa `from .recipes import lead_to_gold` → esegue pure recipes.py. Per questo la demo trovava tutti quei moduli in sys.modules senza che nessuno li avesse chiesti.
+
+**Riga 6** — `__all__ = [...]` — il listino ufficiale della vetrina (per `from alchemy import *` e come documentazione). NON è un lucchetto: create_earth non è in lista ma resta raggiungibile passando da `alchemy.elements`.
+
+**Verificato con la demo:** l'alias è lo STESSO oggetto, non una copia: `alchemy.heal is alchemy.potions.healing_potion` → True (stesso indirizzo di memoria).
+
+**L'ordine vero quando "entri nella cartella" (ft_alembic_2):**
+1. La porta si apre da sola: gira `alchemy/__init__.py` → esegue elements.py, potions.py, transmutation (→ recipes.py) e riempie la vetrina con create_air, heal, strength, transmutation.
+2. Poi `import alchemy.elements` — ma elements.py è GIÀ stato eseguito dalla riga 1 della porta → cache! Non riesegue niente, dà solo il nome `alchemy`.
+3. `alchemy.elements.create_earth()` → retro → trovata → "Earth element created".
+
+**CARICATA ≠ IN VETRINA (la distinzione chiave, dimostrata con la demo):** l'`__init__.py` NON decide cosa viene eseguito — decide solo a chi dà un NOME in vetrina. L'esecuzione è un effetto collaterale che tocca tutto: `import alchemy` esegue elements.py, potions.py e transmutation per intero (tutte le funzioni NASCONO), ma i nomi corti sono solo quelli importati dall'`__init__`.
+
+| funzione | ESEGUITA con `import alchemy`? | nome in VETRINA? | come raggiungerla |
+|---|---|---|---|
+| create_air | sì | sì | `alchemy.create_air()` |
+| create_earth | SÌ (il file gira tutto) | no | `alchemy.elements.create_earth()` |
+| healing_potion | sì | no (ma l'alias `heal` sì) | `alchemy.potions.healing_potion()` oppure `alchemy.heal()` |
+| strength_potion | sì | no (alias `strength` sì) | `alchemy.potions.strength_potion()` oppure `alchemy.strength()` |
+
+Prova lampo: `alchemy.healing_potion()` → AttributeError (in vetrina c'è solo l'alias), ma `alchemy.potions.healing_potion()` funziona — stesso gioco di create_earth su un'altra coppia.
+
+## ft_alembic_3 — `from alchemy.elements import create_air` (package + stile from)
+
+**Cosa fa in concreto:** stampa il risultato di `create_air()` — stessa funzione raggiungibile sia dal file sia dalla vetrina, qui presa dal FILE.
+
+**Come si legge la riga 1:** "dal package alchemy, dal modulo elements che sta dentro, prendimi create_air". Percorso ASSOLUTO (niente puntino): lo script sta alla RADICE, fuori dal package — da fuori indichi il percorso completo; l'`__init__.py` invece è DENTRO e usa il puntino. Regola del mistero 3 applicata dal vivo: **fuori → assoluto, dentro → relativo**.
+
+**La demo (valori veri):**
+- in mano c'è SOLO `create_air` — `alchemy` non esiste nello script (NameError), come in alembic_1
+- la porta è girata lo stesso: sys.modules contiene alchemy, elements, potions, transmutation, recipes — entri nel package → la porta gira SEMPRE, qualunque cosa tu chieda
+- `create_air` sta SIA nel file SIA in vetrina (stessa funzione, due porte) — qui la prendiamo dal file perché il percorso punta a `elements`
+
+**Il quadro dei 4 script visti finora (due stili × due percorsi):**
+- alembic_0: `import` + file radice → `elements.create_fire()`
+- alembic_1: `from` + file radice → `create_water()`
+- alembic_2: `import` + package→file → `alchemy.elements.create_earth()`
+- alembic_3: `from` + package→file → `create_air()`
+
+## ft_alembic_4 — `import alchemy` e la BOMBA AttributeError (voluta dal subject)
+
+**Cosa fa in concreto:** importa SOLO il package (senza dire quale file), chiama `alchemy.create_air()` dalla vetrina (funziona), poi prova `alchemy.create_earth()` e ESPLODE con AttributeError + traceback. Output atteso dal subject: il traceback È l'output giusto (eccezione ammessa, come le altre bombe).
+
+**Lettura riga per riga:**
+1. `import alchemy` — importi la cartella senza file: gira SOLO la porta (`__init__.py`). In mano hai l'oggetto-package con ciò che la vetrina espone: create_air, heal, strength, transmutation (+ elements e potions come attributi).
+2. `alchemy.create_air()` — UN punto = "dentro alchemy" → vetrina → "Air element created". ✅
+3. `alchemy.create_earth()` → **AttributeError: module 'alchemy' has no attribute 'create_earth'. Did you mean: 'create_air'?** — perché `create_earth` non è MAI stato importato nel namespace del package: vive solo dentro `alchemy/elements.py`. Il "Did you mean" è il suggerimento automatico di Python.
+
+**Il trucco completo (risposta da evaluation):** la parola giusta non è "protetta", è "NON IN VETRINA". Dimostrato con la demo: nello stesso script, `alchemy.elements.create_earth()` FUNZIONA — il retro esiste anche importando solo `alchemy`, perché la riga 1 della porta (`from .elements import create_air`) ha eseguito elements.py e attaccato `elements` come attributo del package.
+- `alchemy.create_earth()` → ❌ la vetrina non lo espone
+- `alchemy.elements.create_earth()` → ✅ il file ce l'ha
+
+Il subject non chiede di proteggere niente: chiede di capire che la vetrina decide cosa si raggiunge col nome corto, e che il percorso completo passa comunque.
+
+**Analogia C:** l'oggetto-package è una struct di puntatori a funzione costruita dall'`__init__.py`; `create_earth` non è un membro della struct → in C errore di compilazione, in Python AttributeError a RUNTIME (la ricerca degli attributi è dinamica).
+
+**`# type: ignore[attr-defined]`:** marca il punto anche per mypy (che lì dà errore DI PROPOSITO, come dice il subject).
+
+## ft_alembic_5 — `from alchemy import create_air` (l'attrezzo preso DALLA VETRINA)
+
+**Cosa fa in concreto:** stampa il risultato di `create_air()` chiamata a ZERO puntini, presa dalla vetrina con lo stile `from`.
+
+**Come si legge la riga 1:** "dal package alchemy — cioè dalla sua VETRINA — prendimi create_air". Funziona solo perché l'`__init__.py` l'ha messa in esposizione.
+
+**ZERO puntini, e attenzione: è un DEVO, non un posso.** Con lo stile `from` hai in mano solo l'attrezzo: il nome `alchemy` NON esiste nello script (demo: NameError). Scrivere `alchemy.create_air()` qui → NameError anche quello.
+
+**La novità — la vetrina blocca anche alla PORTA, non solo alla chiamata (demo):**
+- `from alchemy import create_earth` → ImportError: cannot import name 'create_earth' from 'alchemy' — subito, all'import
+- (ft_alembic_4) `alchemy.create_earth()` → AttributeError — dopo, alla chiamata
+
+Stessa ragione (non è in vetrina), due errori diversi: l'ImportError scatta nel momento in cui il `from` chiede il nome alla vetrina; l'AttributeError quando chiedi l'attributo a runtime. Il messaggio dell'ImportError indica pure il colpevole: `__init__.py`.
+
+**Quadro finale della serie alembic (2 stili × 3 porte):**
+- file alla radice: `import elements` → `elements.create_fire()` (0) · `from elements import create_water` → `create_water()` (1)
+- package → file: `import alchemy.elements` → `alchemy.elements.create_earth()` (2) · `from alchemy.elements import create_air` → `create_air()` (3)
+- vetrina: `import alchemy` → `alchemy.create_air()` + bomba AttributeError (4) · `from alchemy import create_air` → `create_air()` (5)
+
+## ft_kaboom_1 — il ciclo dark (la bomba ImportError)
+
+**ATTENZIONE alla causa:** NON esplode per la vetrina né per i puntini — il percorso `from alchemy.grimoire.dark_spellbook import dark_spell_record` è perfettamente legale (stessa forma di kaboom_0 col light, che funziona). Esplode SOLO per il CICLO A↔B. Le due bombe di p06 hanno cause diverse: ft_alembic_4 = nome non in vetrina; ft_kaboom_1 = ciclo.
+
+**Chi sta dove (file e funzioni separati, i nomi si somigliano tutti):**
+- `dark_spellbook.py` — riga 1: importa `dark_validate_ingredients` da `.dark_validator`; funzioni: `dark_spell_allowed_ingredients`, `dark_spell_record`
+- `dark_validator.py` — riga 1 (# bomba): importa `dark_spell_allowed_ingredients` da `.dark_spellbook`; funzione: `dark_validate_ingredients`
+Il ciclo è tra i FILE, alla riga 1 di ciascuno: spellbook vuole la funzione del validator, il validator vuole la funzione dello spellbook → anello.
+
+**Esecuzione vera (il traceback è la prova filmata):**
+1. ft_kaboom_1 riga 1: `from alchemy.grimoire.dark_spellbook import dark_spell_record` — "dal file dark_spellbook prendimi la funzione dark_spell_record"
+2. Girano le porte: alchemy/__init__.py (non tocca il dark) e grimoire/__init__.py (importa SOLO il light). Nessun problema.
+3. Parte dark_spellbook.py. MOMENTO CHIAVE: prima di eseguire la riga 1, Python registra il modulo in sys.modules come GUSCIO VUOTO — scatola col nome, senza contenuto = "partially initialized".
+4. dark_spellbook riga 1: chiede dark_validate_ingredients → Python SOSPENDE lo spellbook (guscio che resta vuoto) e parte con dark_validator.py.
+5. dark_validator riga 1: chiede dark_spell_allowed_ingredients → Python trova il GUSCIO in sys.modules ma è VUOTO (lo spellbook non è mai arrivato alla riga che definisce quella funzione, è bloccato alla riga 1) → ImportError.
+
+**Il dettaglio da evaluation:** l'errore non dice "dark_spellbook non esiste" — dice "partially initialized": il modulo ESISTE nel registro ma è nato a metà. Python registra prima di eseguire, quindi il secondo giro lo trova, ma lo trova vuoto.
+
+**Perché il LIGHT non esplode (il trucco del subject):** light_validator.py NON HA NESSUN IMPORT — la lista `ALLOWED` se la porta da casa. Il validator dark invece non ha lista sua: la CHIEDE allo spellbook (chiama `dark_spell_allowed_ingredients()` dentro `dark_validate_ingredients`) → due frecce → anello. Il light spezza l'anello dando a UN lato tutto ciò che gli serve.
+
+**Analogia C:** due .c si includono a vicenda gli header senza problemi (include guard: il testo si incolla, nulla si esegue). In Python gli import ESEGUONO: A per consegnare i nomi deve FINIRE, B per finire ha bisogno di A finito → stallo → ImportError. Come due persone che aspettano entrambe che l'altro finisca di parlare.
+
+## Chiusura p06 — distillation, transmutation e il `..` (passata veloce, 8/11)
+
+**distillation 0-1:** nessun concetto nuovo. potions.py importa i 4 elementi (2 assoluti: `from alchemy.elements import ...` e `from elements import ...`) e costruisce le frasi delle pozioni; gli script usano stili già visti (vetrina + alias `heal`/`strength` dal lato del cliente).
+
+**transmutation 0-2:** i 3 script ripetono le 3 porte di alembic (file diretto / sotto-package / vetrina di alchemy). L'UNICA sintassi nuova di tutto il resto di p06 è il `..` di recipes.py.
+
+**Il `..` (doppio puntino):** recipes.py sta in `alchemy/transmutation/` e ha TRE import in fila (il subject ne vuole almeno uno per tipo):
+- `from elements import create_fire` — ASSOLUTO (file alla radice)
+- `from alchemy.elements import create_air` — ASSOLUTO (package → file)
+- `from ..potions import strength_potion` — RELATIVO: `..` = "sali di un piano, poi entra in potions". IDENTICO al terminale: `cd ..` = cartella padre. Il puntino singolo `.` = "questa cartella", il doppio `..` = "la cartella di sopra".
+
+**Ripasso p06 in 4 punti (tutto negli appunti):** scala della comodità (retro/vetrina/attrezzo = 2/1/0 puntini) · caricata ≠ in vetrina · le 2 bombe con cause diverse (ft_alembic_4 AttributeError = nome non in vetrina; ft_kaboom_1 ImportError = ciclo A↔B) · il guscio "partially initialized" (registrato prima di eseguire, trovato vuoto al secondo giro).
+
 **Come testare:** `cd python/p06 && python3 ft_alembic_0.py` ecc. — ogni script si lancia da `python/p06/` (gli import sono relativi a quella cartella).
 
 **Teoria extra:**
 - **Chi è cosa:** `import`, `from`, `as` → parole chiave; `elements.py` / `alchemy/` → moduli e package NOSTRI; `__init__.py` → il file speciale di Python (nome DUNDER riservato) che trasforma la cartella in package; il resto è tutto nostro
+- **Commenti (politica 8/11):** nessun commento nei .py di p06, tranne `# bomba` sui DUE punti che esplodono (ft_alembic_4 riga 9 — AttributeError; `dark_validator.py` riga 1 — il ciclo dark) e il `# type: ignore[attr-defined]` FUNZIONALE: non è un commento per umani ma un'istruzione per mypy, e sulla stessa riga va messo PRIMA di `# bomba` (se lo segue, mypy non lo riconosce più — verificato). Le due bombe volute: ft_alembic_4 (AttributeError) e ft_kaboom_1 (ImportError) — gli altri 11 script girano puliti.
 - **L'`__init__.py` del subject "segue le convenzioni usuali"** per flake8/mypy: si usa `__all__` o i commenti noqa — nel nostro c'è `__all__` (lista dei nomi che la vetrina espone)
 - **Come si decide il percorso:** se il file che importa è DENTRO un package → relativi; se è uno script alla radice → assoluti (i relativi non funzionano nemmeno, in uno script eseguito direttamente)
 
@@ -1736,6 +2078,35 @@ if __name__ == "__main__":
 
 **Esecuzione:** battle.py → `test_factory(FlameFactory())` → `create_base()` → dentro la factory: `return Flameling()` → `describe()` (metodo CONCRETO della madre Creature) e `attack()` (metodo astratto, implementato dalla figlia) → stesso per evolved → `test_battle` fa combattere le due base.
 
+**Traccia riga per riga di battle.py (con i valori reali):**
+1. Riga 1 `from ex0 import AquaFactory, FlameFactory` — ex0 è un package (cartella+__init__.py, p06). Dietro le quinte: gira la porta ex0/__init__.py → `from .factories import ...` → esegue factories.py → la sua riga 2 `from .creatures import ...` → esegue creatures.py → nascono Creature (col buco attack) e le 4 figlie → nascono CreatureFactory (2 buchi) e le 2 fabbriche → la porta consegna i 2 nomi a battle.py.
+2. Riga 2 `from ex0.factories import CreatureFactory` — factories.py è GIÀ eseguito (cache): prende solo il nome, usato SOLO come etichetta nel type hint di riga 5 (mai per creare oggetti).
+3. Righe 5-31 — le tre `def` sono DEFINIZIONI: imparate a memoria, non eseguite.
+4. Riga 34 `if __name__ == "__main__":` → "questo file è stato lanciato direttamente?" → sì → main().
+5. Riga 29 `test_factory(FlameFactory())` — prima si valuta l'argomento: FlameFactory() = oggetto SENZA attributi (nessun __init__ scritto → default): è solo uno SPORTELLO.
+6. Dentro test_factory: `base = factory.create_base()` → ricerca nella classe FlameFactory → trovato → `return Flameling()` → Flameling.__init__ → `super().__init__("Flameling", "Fire")` → il costruttore della MADRE crea name e creature_type. `base` = mostro completo.
+7. `base.describe()` → Flameling NON ce l'ha → la ricerca SALE alla madre → gira quella di Creature → "Flameling is a Fire type Creature".
+8. `base.attack()` → Flameling CE l'HA (buco riempito) → gira quella della figlia → "Flameling uses Ember!".
+9. Riga 30: stesso giro con AquaFactory → Aquabub (Water Gun!) e Torragon (Hydro Pump!).
+10. Riga 31 test_battle: due sportelli → due mostri base → describe/describe/fight!/attack/attack → Ember! vs Water Gun!.
+
+**Osservazione che chiude il pattern:** il main NON nomina MAI una classe concreta — niente "Flameling" né "Pyrodon": parla solo con le fabbriche (`test_factory(FlameFactory())`). I nomi concreti vivono SOLO dentro factories.py (righe 19 e 22). Se domani cambiano i mostri, battle.py non si tocca: la fabbrica è l'unica che conosce i nomi delle classi.
+
+**Lettura di creatures.py (primo file eseguito nella catena):**
+- La coppia che rende astratta Creature: `class Creature(ABC)` + `@abstractmethod` sul metodo. Il decoratore È quello che segna il buco.
+- I tre puntini `...` = segnaposto (Ellipsis): una `def` DEVE avere un corpo, `...` = "corpo vuoto". Da solo non rende nulla astratto.
+- `describe` è CONCRETA ed EREDITATA: le 4 figlie non la riscrivono — la ricerca sale e gira quella della madre, che legge `self.name`/`self.creature_type` DI QUEL mostro (una sola funzione, dati che cambiano col self).
+- Le figlie: ognuna chiama `super().__init__("Nome", "Tipo")` (attributi creati dal costruttore della madre) e riempie il buco `attack` con la sua mossa (stringa). Il tipo è solo una STRINGA, nessuno lo controlla (Pyrodon: "Fire/Flying").
+- Chi è cosa: `abc`, `ABC`, `abstractmethod` predefiniti (libreria standard `abc`); `str` built-in; il resto tutto nostro.
+
+**Lettura di factories.py (secondo file eseguito):**
+- Riga 2 `from .creatures import Aquabub, Creature, Flameling, Pyrodon, Torragon` — import relativo (p06, il puntino) che ESEGUE creatures.py (per questo nella catena gira prima creatures, poi factories). Una classe si importa come un nome qualunque: le classi sono oggetti anche loro.
+- `CreatureFactory(ABC)` — madre astratta con DUE buchi (create_base, create_evolved) e type hint `-> Creature` = "consegno una creatura (o una figlia)". Non ha __init__: nessun attributo. NON istanziabile (astratta).
+- `FlameFactory`/`AquaFactory` — riempiono entrambi i buchi con UNA riga ciascuno: `return Flameling()` si legge "prendi la classe Flameling, chiamala con le parentesi → nasce un oggetto → consegnalo". Tutto il lavoro vero del file: 4 righe.
+- Risposte da evaluation: (1) CreatureFactory non si istanzia (astratta); (2) `-> Creature` e non `-> Flameling` perché il contratto dice solo "una creatura" — Flameling È una Creature, polimorfismo (stessa etichetta, un figlio qualunque sotto); (3) i nomi delle classi concrete vivono SOLO qui, dentro i return — la fabbrica è il distributore automatico: tu premi `create_base`, lui costruisce la classe giusta.
+- Analogia C: `create_base` ritorna `Creature *` ma dentro fa `malloc(sizeof(Flameling))` — chi chiama vede solo il puntatore alla madre.
+- `ex0/__init__.py` (2 righe, logica p06): espone solo `AquaFactory, FlameFactory` — le creature concrete non passano dalla vetrina.
+
 **Come testare:** `cd python/p07 && python3 battle.py`
 
 **Teoria:** `Creature` è astratta (attack senza corpo, `...`); `CreatureFactory` è astratta (create_base/create_evolved senza corpo); le classi concrete implementano tutto. L'`__init__.py` espone `FlameFactory, AquaFactory` — se qualcuno prova `from ex0 import Flameling` → errore: la creatura concreta non è in vetrina (stesso trucco di p06).
@@ -1752,7 +2123,57 @@ if __name__ == "__main__":
 
 **Il concetto in una riga:** una classe può avere DUE genitori: la creatura (cosa È) + la capacità (cosa SA FARE). Il TransformCapability ha uno STATO (`self._transformed`): dopo `transform()` l'`attack()` cambia (colpisce potenziato), dopo `revert()` torna normale — lo stato persiste tra le chiamate perché sta nell'oggetto.
 
+**ALBERO GENEALOGICO (regola permanente):**
+```
+ABC
+ ├── Creature (da ex0, IMPORTATA) — describe concreta, attack buco
+ ├── HealCapability (ABC) — heal buco, NESSUN __init__
+ ├── TransformCapability (ABC) — __init__ VERO (_transformed=False) + transform/revert buchi
+ ├── Sproutling(Creature, HealCapability)        ┐
+ ├── Bloomelle(Creature, HealCapability)         │ creature con DUE madri:
+ ├── Shiftling(Creature, TransformCapability)    │ creatura + capacità
+ └── Morphagon(Creature, TransformCapability)    ┘
+CreatureFactory (da ex0) — 2 buchi
+ ├── HealingCreatureFactory → Sproutling()/Bloomelle()
+ └── TransformCreatureFactory → Shiftling()/Morphagon()
+```
+Le capacità sono SORELLE di Creature (ereditano da ABC, NON da Creature): sono espansioni riusabili, si attaccano a QUALUNQUE creatura aggiungendole come seconda madre.
+
+**Le DUE regole della meccanica nuova:**
+1. **MRO (ordine di ricerca):** `Sproutling(Creature, HealCapability)` — la ricerca parte dalla classe dell'oggetto e sale da SINISTRA a destra: Sproutling → Creature → HealCapability. Il primo che ha il metodo vince. `describe()` → non in Sproutling → Creature sì → gira la madre. `heal()` → Sproutling ce l'ha → gira la figlia.
+2. **`__init__` col NOME della madre + self a MANO (★ PRIMA VOLTA):** `Creature.__init__(self, "Sproutling", "Grass")` si legge "Creature, esegui il tuo __init__ SU questo oggetto (self a mano)". Con DUE madri `super()` chiamerebbe solo la PRIMA (segue l'ordine delle parentesi) → la manovra classica è chiamare OGNI madre per nome. Quando chiami un metodo attraverso il NOME DELLA CLASSE, Python NON passa self da solo (il PUNTO lo passa, la classe no) → self va scritto a mano. Si chiamano gli __init__ SOLO delle madri che ce l'hanno: Shiftling chiama Creature E TransformCapability (che crea `_transformed` — senza → AttributeError in attack); Sproutling chiama solo Creature (HealCapability non ha __init__).
+**Analogia C:** `class Sproutling : public Creature, public HealCapability` (C++) e `Creature.__init__(self, ...)` = chiamare esplicitamente il costruttore della base (`Creature::Creature(this, ...)`).
+
+**DOMANDA D'ORO — la capacità si può dare a runtime? NO (demo):** l'accoppiata si decide alla NASCITA DELLA CLASSE, nel sorgente. Un Flameling già nato NON diventa mai Sproutling: `isinstance(flameling, HealCapability)` → False per sempre, `f.heal()` → AttributeError. Per un mostro di fuoco che guarisce bisogna SCRIVERE una classe NUOVA nel sorgente (`class FireHealer(Creature, HealCapability)`) — la demo l'ha creata al volo: `isinstance(fh, Creature)` True, `isinstance(fh, HealCapability)` True, describe() ereditata gratis da Creature, attack e heal propri. FireHealer NON È né Sproutling né Bloomelle: è una terza classe. La capacità è il pezzo RIUSABILE scritto una volta sola.
+
 **Esecuzione:** capacitor.py → crea la factory → base → `describe()`, `attack()`, `heal()` → factory transform → `transform()` mette `_transformed = True` → `attack()` ora va nel ramo "boosted" (l'if legge lo stato) → `revert()` lo rimette a False.
+
+**LA MAPPA DEL BESTIARIO (ex0 + ex1):**
+```
+EX0 — creature semplici (UNA madre: Creature)
+  FlameFactory (famiglia FUOCO)
+      Flameling --evolve--> Pyrodon
+      tipo Fire          tipo Fire/Flying
+      Ember!             Flamethrower!
+  AquaFactory (famiglia ACQUA)
+      Aquabub --evolve--> Torragon
+      tipo Water          tipo Water
+      Water Gun!          Hydro Pump!
+
+EX1 — creature con capacità (DUE madri: Creature + Capability)
+  HealingCreatureFactory (famiglia GUARITRICI)
+      Sproutling --evolve--> Bloomelle
+      tipo Grass            tipo Grass/Fairy
+      Vine Whip! + heal     Petal Dance! + heal grande
+  TransformCreatureFactory (famiglia TRASFORMISTE)
+      Shiftling --evolve--> Morphagon
+      tipo Normal           tipo Normal/Dragon
+      attacco normale/      attacco normale/
+      potenziato +          devastante +
+      transform/revert      transform/revert
+```
+**Le 3 regole della mappa:** (1) la freccia evolve È la factory — nel codice non c'è una freccia, c'è `create_base()` → `return Flameling()` e `create_evolved()` → `return Pyrodon()`; ogni famiglia = una classe factory coi suoi 2 pulsanti. (2) Le mosse sono i buchi riempiti: stringhe restituite da `attack()`; per le trasformiste `attack()` è l'unico con un `if` dentro (legge `_transformed` e sceglie la stringa). (3) Le capacità sono le SECONDE madri: Sproutling/Bloomelle = (Creature, HealCapability), Shiftling/Morphagon = (Creature, TransformCapability).
+**Cose che NON esistono (trappole da evaluation):** nessun mostro di fuoco che guarisce; nessuna famiglia mista; le capacità non sono creature (niente nome né tipo: sono cartellini di potere, non Pokémon).
 
 **Come testare:** `cd python/p07 && python3 capacitor.py`
 
@@ -2070,7 +2491,7 @@ Dove è comparso per la prima volta ogni elemento nuovo di Python (per ripassare
 | `ABC`, `@abstractmethod`, `isinstance()`, `all()`, `Any` | p05 ex0 |
 | router polimorfico (nessuna sintassi nuova) | p05 ex1 |
 | `Protocol` (duck typing) | p05 ex2 |
-| `import`/`from`, package, `__init__.py`, import relativi, dipendenze circolari | p06 |
+| `import`/`from`, package, `__init__.py`, import relativi (il puntino `.`), alias `as`, dipendenze circolari | p06 |
 | abstract factory, ereditarietà multipla, strategy pattern, `StrategyError` | p07 |
 | `sys.prefix`/`base_prefix`, `site`, `os.path.basename` | p08 ex0 |
 | `importlib.metadata`, `requirements.txt`, `pyproject.toml` | p08 ex1 |
