@@ -2148,6 +2148,15 @@ Le capacità sono SORELLE di Creature (ereditano da ABC, NON da Creature): sono 
 
 **Esecuzione:** capacitor.py → crea la factory → base → `describe()`, `attack()`, `heal()` → factory transform → `transform()` mette `_transformed = True` → `attack()` ora va nel ramo "boosted" (l'if legge lo stato) → `revert()` lo rimette a False.
 
+**Traccia di capacitor.py (il ciclo VIVO dello stato):**
+- Riga 1: `from ex1 import HealingCreatureFactory, TransformCreatureFactory` — dalla vetrina (espone solo le 2 factory).
+- Guaritrici: `create_base()` → `Sproutling()` → SOLO `Creature.__init__(self, ...)` (HealCapability non ha __init__) → describe (sale alla madre) + attack/heal (propri della figlia). Evolved: Bloomelle.
+- Trasformiste: `Shiftling()` → DUE __init__: `Creature.__init__(self, "Shiftling", "Normal")` (name, type) E `TransformCapability.__init__(self)` (`_transformed = False`).
+- Il ciclo: attack → `if self._transformed:` → NO (appena nato) → "attacks normally." → `transform()` scrive `_transformed = True` → attack di nuovo → SÌ → "performs a boosted strike!" → `revert()` scrive False → "returns to normal." (Morphagon: normale → morph form → devastating morph strike → stabilizes.)
+- **Lo STATO (terzo concetto di p07, dopo factory e capacità):** la stessa identica chiamata `attack()` due volte dà due risposte diverse SENZA argomenti — la differenza sta DENTRO l'oggetto: il flag `_transformed` che transform/revert SCRIVONO e attack LEGGE. L'oggetto RICORDA.
+- **Collaborazione tra le madri:** `attack()` riempie il buco di Creature ma il suo comportamento dipende dallo stato creato da TransformCapability — le due madri lavorano insieme nello stesso oggetto.
+- Analogia C: un campo della struct (`int transformed;`) che transform() mette a 1, revert() a 0, attack() controlla con `if (monster->transformed)`.
+
 **LA MAPPA DEL BESTIARIO (ex0 + ex1):**
 ```
 EX0 — creature semplici (UNA madre: Creature)
@@ -2555,4 +2564,62 @@ source .venv/bin/activate  # attiva
 pip install pydantic       # installa
 python3 ex0/space_station.py   # esegui con python3 (ora è quello del venv)
 deactivate                 # a fine lavoro
+```
+
+---
+
+# SCENEGGIATURA TEST VIVI PER L'EVALUATION (p05-p07) — tutti verificati il 9/11
+
+Regola d'oro: all'evaluation NON raccontare — MOSTRARE. Ogni caso qui sotto è stato eseguito davvero: copia il comando e mostra l'output.
+
+## p05 — i rami edge (tutti TypeError PULITI, mai traceback)
+
+Run normali: `cd python/p05/ex0 && python3 data_processor.py` · idem ex1 `data_stream.py` · ex2 `data_pipeline.py`
+
+```bash
+cd python/p05/ex0 && python3 -c "
+from data_processor import LogProcessor, TextProcessor, NumericProcessor
+LogProcessor().ingest({'log_level': 'ERROR'})   # chiave mancante (il caso del bugfix!) -> TypeError pulito
+LogProcessor().ingest({'log_level': 'ERROR', 'log_message': 42})  # valore non-stringa -> TypeError
+TextProcessor().ingest(42)                      # -> TypeError
+NumericProcessor().ingest(None)                 # -> TypeError
+NumericProcessor().ingest([])                   # lista vuota -> OK, nessun errore (all() su vuoto = True)
+NumericProcessor().ingest([1, 'x'])             # lista mista -> TypeError
+"
+```
+
+ex1 — elemento che NESSUN processore sa gestire: `python3 -c "from data_stream import DataStream, NumericProcessor; ds=DataStream(); ds.register_processor(NumericProcessor()); ds.process_stream([1,'ciao',b'bytes'])"` → stampa "Can't process element" per 'ciao' e b'bytes', nessun crash.
+ex2 — pipeline su magazzino vuoto (la guardia): `python3 -c "from data_pipeline import DataStream, CsvPlugin; DataStream().output_pipeline(5, CsvPlugin())"` → nessun crash.
+
+## p06 — gli 11 puliti + le 2 bombe + retro/vetrina
+
+```bash
+cd python/p06
+for f in ft_alembic_0 ft_alembic_1 ft_alembic_2 ft_alembic_3 ft_alembic_5 ft_distillation_0 ft_distillation_1 ft_transmutation_0 ft_transmutation_1 ft_transmutation_2 ft_kaboom_0; do python3 $f.py >/dev/null && echo "$f OK"; done
+python3 ft_alembic_4.py    # BOMBA voluta: AttributeError "no attribute 'create_earth'" (+ exit 1)
+python3 ft_kaboom_1.py     # BOMBA voluta: ImportError "partially initialized module ... circular import"
+python3 -c "import alchemy; print(alchemy.elements.create_earth())"   # il retro FUNZIONA: Earth element created
+python3 -c "from alchemy import create_earth"                          # vetrina bloccata all'import: ImportError
+```
+
+## p07 — factory astratta, vetrina, stato, isinstance
+
+```bash
+cd python/p07 && python3 battle.py && python3 capacitor.py    # i 2 run normali
+python3 -c "from ex0.factories import CreatureFactory; CreatureFactory()"
+    # -> TypeError: Can't instantiate abstract class CreatureFactory (senza create_base/create_evolved)
+python3 -c "from ex0 import Flameling"     # -> ImportError: la vetrina espone solo le factory
+python3 -c "
+from ex1.factories import TransformCreatureFactory
+s = TransformCreatureFactory().create_base()
+print(s.attack()); s.transform(); print(s.attack()); s.revert(); print(s.attack())
+"   # -> normally / boosted strike! / normally  (lo STATO in azione)
+python3 -c "
+from ex0.creatures import Creature, Flameling
+from ex1.creatures import Sproutling
+from ex1.capabilities import HealCapability
+print(isinstance(Sproutling(), Creature))      # True
+print(isinstance(Sproutling(), HealCapability))# True
+print(isinstance(Flameling(), HealCapability)) # False — la capacità si decide alla nascita della classe
+"
 ```
