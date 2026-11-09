@@ -2197,9 +2197,37 @@ EX1 — creature con capacità (DUE madri: Creature + Capability)
 
 **Cosa fa in concreto:** organizza un torneo dove ogni creatura combatte con una STRATEGIA assegnata (normale = solo attacco; aggressiva = trasforma-attacca-ripristina; difensiva = attacca-cura). Se la strategia non è adatta alla creatura, il torneo si ferma con un errore chiaro.
 
-**★ PRIME VOLTE qui:** pattern strategy (ABC + polimorfismo, niente sintassi nuova)
+**★ PRIME VOLTE qui:** pattern strategy + `cast()` di typing + eccezione NOSTRA (`class StrategyError(Exception): pass`)
 
 **Cosa chiede:** 3 strategie di battaglia (Normal, Aggressive per i trasformisti, Defensive per i guaritori) che decidono COME agisce una creatura in torneo. `is_valid(creature)` controlla la compatibilità, `act(creature)` esegue (e lancia StrategyError se invalida). Il torneo fa combattere tutti contro tutti con le proprie strategie.
+
+**ALBERO GENEALOGICO (regola permanente):** ex2 NON ha né creatures.py né factories.py — riusa TUTTO il bestiario da ex0+ex1 (import assoluti da pacchetto a pacchetto). Aggiunge solo il ramo delle strategie:
+```
+Exception (built-in)
+ └── StrategyError (nostra eccezione)
+ABC
+ └── BattleStrategy (astratta: is_valid + act = 2 buchi)
+      ├── NormalStrategy      is_valid: sempre True · act: attack()
+      ├── AggressiveStrategy  is_valid: è TransformCapability? · act: transform→attack→revert
+      └── DefensiveStrategy   is_valid: è HealCapability? · act: attack→heal
+```
+
+**COMPLETAMENTO DEL BESTIARIO — le coppie lecite:**
+- CHIUNQUE + NormalStrategy (sempre valida)
+- Shiftling/Morphagon + AggressiveStrategy (esige TransformCapability)
+- Sproutling/Bloomelle + DefensiveStrategy (esige HealCapability)
+- Il lottatore = COPPIA (creatura, strategia) formata a RUNTIME nel main: `(FlameFactory(), NormalStrategy())`. Confronto chiave con le capacità (ex1): la capacità si decide alla NASCITA della classe (sorgente, seconda madre, NON cambiabile); la strategia si sceglie a RUNTIME (oggetto a parte, cambiabile al volo per lo stesso mostro). Aggiungere una strategia nuova NON tocca il bestiario (principio aperto/chiuso).
+
+**cast() (★ PRIMA VOLTA, da typing):** `cast(Tipo, valore)` restituisce lo STESSO oggetto senza fare NULLA a runtime (demo: tipo invariato) — è una nota per mypy: "fidati, questo oggetto È un Tipo". Serve qui perché la guardia `is_valid` è una funzione OPAca per mypy: dopo `if not self.is_valid(...): raise`, mypy non sa che creature è un TransformCapability e `creature.transform()` darebbe errore — cast lo zittisce. `transforming = cast(TransformCapability, creature)` → due nomi per lo stesso oggetto, il secondo dichiara l'uso "come trasformista". Analogia C: `(TransformCapability *)creature` — ma in C il cast converte davvero a runtime, in Python è solo un'etichetta per il type-checker.
+
+**Lettura di strategies.py:**
+- righe 1-2: `from abc import ABC, abstractmethod` (p05) · `from typing import cast` (nuovo)
+- righe 3-4: `from ex0.creatures import Creature` e `from ex1.capabilities import HealCapability, TransformCapability` — import ASSOLUTI tra pacchetti fratelli (si poteva col `..`, ma l'assoluto è il più semplice)
+- `class StrategyError(Exception): pass` — eccezione NOSTRA: eredita tutto da Exception, `pass` = corpo vuoto. Serve un NOME nostro per catturare SOLO questo errore nel try/except del torneo
+- `class BattleStrategy(ABC)` — madre astratta, 2 buchi: `is_valid(creature: Creature) -> bool` e `act(creature: Creature) -> None`
+- NormalStrategy: `is_valid` → `return True` (tutti validi); `act` → `print(creature.attack())`
+- AggressiveStrategy: `is_valid` → `return isinstance(creature, TransformCapability)` — chiede alla creatura se HA la madre-capacità (l'ereditarietà multipla rende possibile questo isinstance); `act` → prima la GUARDIA: se non valida → `raise StrategyError(f"Invalid Creature '{creature.name}' for this aggressive strategy")` (doppio controllo di sicurezza) → poi `transforming = cast(...)` → print(transform/attack/revert)
+- DefensiveStrategy: speculare con HealCapability: attacco + heal
 
 **Il concetto in una riga:** la strategia è il "piano di battaglia" ATTACCATO alla creatura per il torneo: la creatura non sa combattere in torneo, il piano sì. `act()` di Normal = solo attack; Aggressive = transform → attack → revert; Defensive = attack → heal. Il tournament.py conosce SOLO `act()` — non sa quale piano sia.
 

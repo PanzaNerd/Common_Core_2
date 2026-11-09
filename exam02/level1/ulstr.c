@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ulstr.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mpanzani <mpanzani@student.42.fr>          +#+  +:+       +#+        */
+/*   By: matthias <matthias@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/20 17:37:07 by mpanzani          #+#    #+#             */
-/*   Updated: 2026/05/20 17:49:53 by mpanzani         ###   ########.fr       */
+/*   Updated: 2026/09/16 18:26:48 by matthias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,3 @@ int main(int ac, char **av)
 	write(1, "\n", 1);
 	return(0);
 }
-
-
