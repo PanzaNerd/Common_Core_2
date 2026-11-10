@@ -2233,6 +2233,16 @@ ABC
 
 **Esecuzione:** tournament.py → `battle([(FlameFactory(), NormalStrategy()), (HealingCreatureFactory(), DefensiveStrategy())])` → crea le creature, tutti contro tutti → per ogni scontro: `strat_a.act(a)` → dentro act: `is_valid`? → no? → `raise StrategyError("Invalid Creature 'Flameling' for this aggressive strategy")` (torneo 1, l'errore voluto) → si → esegue il piano.
 
+**Traccia di tournament.py (10/11):**
+1. Righe 1-4: import dalle 3 vetrine (p06, niente di nuovo).
+2. `def battle(opponents: list[tuple[CreatureFactory, BattleStrategy]])` — "una lista di COPPIE (fabbrica, strategia)": ogni elemento è una tupla di 2.
+3. `for factory, strategy in opponents:` — unpacking della coppia nel for: a ogni giro la tupla si APRE nelle due variabili. `creatures.append((factory.create_base(), strategy))` — coppia NUOVA col mostro appena NATO al posto della fabbrica.
+4. Tutti contro tutti: `for i in range(len): for j in range(i+1, len):` — il classico "ogni coppia UNA volta sola": j parte da i+1, mai incontri doppi né contro se stessi. 2 lottatori → 1 scontro; 3 → 3 scontri.
+5. `a, strat_a = creatures[i]` / `b, strat_b = creatures[j]` — unpacking della coppia.
+6. IL CUORE: `try: strat_a.act(a); strat_b.act(b)` / `except StrategyError as e: print("Battle error, aborting tournament...") + return` — l'errore di validità è un FLUSSO previsto: catturato per NOME (solo la nostra eccezione), stampato chiaro, e `return` chiude SOLO battle() (il main continua: torneo 2 gira anche dopo l'errore del torneo 1). Nessun traceback.
+7. I 3 tornei: 0 = Flameling+Normal vs Sproutling+Defensive (tutto valido) · 1 = Flameling+Aggressive → is_valid chiede "sei TransformCapability?" → no → StrategyError catturata (errore VOLUTO dal subject, senza crash) · 2 = 3 lottatori, e nello scontro con Shiftling si vede il ciclo di ex1 dentro la strategia (transform → boosted → revert).
+**Punto da evaluation:** il torneo conosce solo `act()` — non sa quale piano sta eseguendo. La decisione "come combattere" sta nella classe della strategia (polimorfismo, stessa lezione del router di p05). Doppio controllo: `is_valid` verifica PRIMA, `act` riverifica DENTRO.
+
 **Come testare:** `cd python/p07 && python3 tournament.py`
 
 **Teoria:**
