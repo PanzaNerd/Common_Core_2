@@ -2310,7 +2310,11 @@ numpy
 
 **Come testare:** `cd python/p08/ex2 && python3 oracle.py` (senza .env: warning) → `cp .env.example .env && python3 oracle.py` (legge) → modifica MATRIX_MODE=production e rilancia.
 
-**Teoria:** il file `.env.example` è la MASCHERA: mostra quali chiavi servono, senza valori segreti — quello SÌ va committato (e infatti sta nel repo). Il `.env` vero è nel .gitignore ("Never commit real secrets to version control! You must be able to explain why" — perché chiunque clona il repo si prenderebbe le chiavi vere). Le variabili d'ambiente vincono sul file: se il sistema le ha già, getenv trova quelle.
+**Teoria:** il file `.env.example` è la MASCHERA: mostra quali chiavi servono, senza valori segreti — quello SÌ va committato (e infatti sta nel repo). Il `.env` vero è nel .gitignore ("Never commit real secrets to version control! You must be able to explain why" — perché chiunque clona il repo si prenderebbe le chiavi vere). Le variabili d'ambiente vincono sul file: `load_dotenv()` NON sovrascrive le variabili già presenti nell'ambiente, quindi l'override della riga di comando batte il .env (VERIFICATO il 10/11: .env dice development, env dice production → vince production).
+
+**FIX del 10/11 (regola vitale):** prima il file crashava con ModuleNotFoundError se python-dotenv NON era installato (import in cima al file). Ora l'import è dentro try/except ImportError con una versione di riserva di load_dotenv che stampa un avviso — senza la libreria: warning + solo variabili d'ambiente, MAI crash. Stessa filosofia dell'ex1 (gestire le dipendenze mancanti con grazia).
+
+**I dettagli di production:** la API_KEY non si stampa MAI in chiaro: `'*' * len(api_key)` (la stringa moltiplicata = ripetuta N volte — il trucco per mascherare). Production è SEVERO: DATABASE_URL e ZION_ENDPOINT vuoti → "MISSING - production needs a database!", API_KEY assente → WARNING. Development tollera i default.
 
 **Codice:** in `python/p08/ex2/` (oracle.py + .env.example + .gitignore)
 
@@ -2661,3 +2665,22 @@ print(isinstance(Sproutling(), HealCapability))# True
 print(isinstance(Flameling(), HealCapability)) # False — la capacità si decide alla nascita della classe
 "
 ```
+
+## p08 — i 9 scenari (tutti verificati il 10/11)
+
+```bash
+cd python/p08/ex0 && python3 construct.py              # 1) FUORI dal venv: "still plugged in" + istruzioni
+cd python/p08/ex1 && python3 loading.py                # 2) SENZA dipendenze: [MISSING] x4 + istruzioni pip/Poetry
+cd python/p08/ex2 && python3 oracle.py                 # 3) SENZA .env: warning "copy .env.example to .env" (mai crash!)
+# 4) oracle.py SENZA python-dotenv installato: warning + solo variabili d'ambiente (il fix del 10/11)
+# 5) override: MATRIX_MODE=production python3 oracle.py  → vince la variabile d'ambiente sul .env
+cd python/p08/ex2 && cp .env.example .env && python3 oracle.py   # 6) CON .env: sviluppo, valori caricati
+# 7) .env con MATRIX_MODE=production e valori vuoti → "MISSING - production needs..." + WARNING API_KEY
+# DENTRO il venv (i comandi del subject):
+python3 -m venv matrix_env && source matrix_env/bin/activate
+python3 ../ex0/construct.py                            # 8) DENTRO: "Welcome to the construct" + site-packages
+pip install -r ../ex1/requirements.txt && cd ../ex1 && python3 loading.py   # 9) run completo → matrix_analysis.png
+deactivate
+```
+
+**La domanda dei 100 per p08:** "PERCHÉ esistono i venv?" → isolamento: ogni progetto ha la SUA copia di pip e le SUE versioni delle librerie in una cartella separata; installare nel globale sporca il sistema e crea conflitti di versioni tra progetti. "PERCHÉ il .env non si committa?" → contiene SEGRETI (API key, password): chi clona il repo li leggerebbe; il repo porta solo .env.example (la maschera).
