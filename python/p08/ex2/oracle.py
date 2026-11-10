@@ -1,6 +1,11 @@
 import os
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv  # type: ignore[import]
+except ImportError:
+    def load_dotenv() -> None:
+        print("WARNING: python-dotenv not installed. Environment")
+        print("         variables only. Install: pip install python-dotenv")
 
 
 def main() -> None:
