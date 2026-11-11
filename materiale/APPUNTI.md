@@ -2427,9 +2427,20 @@ main()
 - **Perché NON si vede mai un traceback:** l'errore di validazione non è un crash — è un'eccezione normale che il `try/except` cattura e trasforma in un print pulito.
 
 **Risposte pronte per l'evaluation:**
-- "Cosa fa Pydantic quando crei un oggetto?" → controlla ogni campo contro tipo e vincoli dichiarati; tutto ok → oggetto pronto; violazione → ValidationError con l'elenco degli errori.
-- "Cosa succede se passi una stringa a un campo datetime?" → la converte da solo in datetime; se il formato è illeggibile → errore.
-- "A cosa serve Field?" → ad attaccare vincoli e default ai campi.
+- Le 2 domande SCRITTE nel subject (pag. 9, "Think About" — garantite):
+  - "How does Pydantic's automatic type conversion work?" → durante la validazione, un valore compatibile ma di tipo diverso (stringa "6" per un int, stringa di data per un datetime) viene CONVERTITO da solo nel tipo giusto; non convertibile → ValidationError.
+  - "What happens when you pass a string timestamp to a datetime field?" → convertita in datetime automaticamente; formato illeggibile → errore.
+- Le domande classiche (con risposta):
+  - "Cos'è BaseModel?" → la classe madre il cui __init__ fa la validazione; la ereditiamo con class SpaceStation(BaseModel).
+  - "Chi valida, Field o BaseModel?" → BaseModel valida; Field scrive SOLO i vincoli.
+  - "Cosa significano ge/le, min_length/max_length?" → vincoli: ≥ e ≤ per i numeri; lunghezza min/max per le stringhe.
+  - "E se passo crew_size=25?" → ValidationError alla creazione: "Input should be less than or equal to 20".
+  - "Perché is_operational = True?" → default: se non lo passi, vale True.
+  - "Cos'è Optional[str]?" → stringa OPPURE None; con default=None il campo può mancare.
+  - "Se salto last_maintenance?" → senza default è obbligatorio → "Field required".
+  - "Perché il try/except?" → mostrare l'errore senza traceback: catturo ValidationError e stampo solo il messaggio.
+  - "Cos'è e.errors()?" → METODO (si chiama) che restituisce la LISTA degli errori; ogni errore è un dizionario; [0]["msg"] = testo del primo.
+- Le 3 modifiche dal vivo possibili: crew_size=0 → "greater than or equal to 1"; last_maintenance come stringa → conversione automatica; togliere un campo obbligatorio → "Field required".
 
 **Output atteso (dal subject):** titolo "Space Station Data Validation" + scheda della stazione valida + "Expected validation error:" + `Input should be less than or equal to 20`.
 
