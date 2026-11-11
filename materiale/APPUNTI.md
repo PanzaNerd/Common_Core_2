@@ -2334,6 +2334,8 @@ numpy
 
 **FIX del 10/11 (regola vitale):** prima il file crashava con ModuleNotFoundError se python-dotenv NON era installato (import in cima al file). Ora l'import è dentro try/except ImportError con una versione di riserva di load_dotenv che stampa un avviso — senza la libreria: warning + solo variabili d'ambiente, MAI crash. Stessa filosofia dell'ex1 (gestire le dipendenze mancanti con grazia).
 
+**FIX dell'11/11 (mypy alla scuola):** con python-dotenv INSTALLATO (lo scenario della scuola: mypy dentro il venv con le dipendenze), mypy vede DUE definizioni di load_dotenv — quella vera e la nostra riserva — e protesta con [misc] "All conditional function variants must have identical signatures". Soluzione: la riserva ora è `def load_dotenv(*args, **kwargs) -> None:` (accetta qualunque argomento e lo ignora, così nessuna chiamata crasha) con `# type: ignore[misc]` sulla riga del def (il commento DEVE stare sulla riga del def: messo sulla riga dopo NON funziona — testato). mypy pulito in entrambi gli scenari (con e senza dotenv), flake8 pulito, runtime invariato. LEZIONE per l'audit: testare mypy anche DENTRO un venv con le librerie installate, non solo nel venv dei soli tool.
+
 **I dettagli di production:** la API_KEY non si stampa MAI in chiaro: `'*' * len(api_key)` (la stringa moltiplicata = ripetuta N volte — il trucco per mascherare). Production è SEVERO: DATABASE_URL e ZION_ENDPOINT vuoti → "MISSING - production needs a database!", API_KEY assente → WARNING. Development tollera i default.
 
 **Codice:** in `python/p08/ex2/` (oracle.py + .env.example + .gitignore)
@@ -2344,49 +2346,151 @@ numpy
 
 **★ PRIME VOLTE qui:** `pydantic` (libreria esterna): `BaseModel`, `Field`, `Enum`, `@model_validator`
 
-**Prerequisito:** serve pydantic 2.x installato in un venv (il subject lo impone). Comandi: `cd python/p09 && python3 -m venv .venv && source .venv/bin/activate && pip install "pydantic>=2"`. Poi `python3 ex0/space_station.py` ecc.
+**Il contesto (l'analogia):** i dati arrivano dall'esterno — API, file, sensori — e NON ci si può fidare: tipo sbagliato, fuori scala, mancanti. Pydantic è il GUARDIANO alla porta della discoteca: tu scrivi il REGOLAMENTO (tipi + vincoli) e quando qualcuno prova a entrare (crei l'oggetto) il guardiano controlla TUTTO. Regola rispettata → entra. Violata → `ValidationError` con il messaggio preciso. È il guardiano dell'ex4 di p01, ma pronto e con regole in una riga. Perché serve: se i dati invalidi entrano, poi esplode tutto in punti lontani — meglio fermarli SUBITO alla porta.
 
-**Il concetto in una riga (vale per tutti e 3 gli esercizi):** Pydantic è un GUARDIANO dei dati: definisci una CLASSE-modello (`class SpaceStation(BaseModel)`) dove ogni campo ha un tipo e dei VINCOLI (`crew_size: int = Field(ge=1, le=20)` = "intero tra 1 e 20"). Quando crei l'oggetto, Pydantic CONTROLLA tutto: dato sbagliato → `ValidationError` con il messaggio preciso. È come il guardiano dell'ex4 di p01, ma pronto e con regole scrivibili in una riga. Perché serve: i dati arrivano dall'esterno (API, file) e non ci si può fidare — Pydantic li valida alla porta.
+**Il concetto in una riga:** `class MioModello(BaseModel)` con campi tipati e vincolati (`crew_size: int = Field(ge=1, le=20)` = "intero tra 1 e 20") → alla creazione dell'oggetto Pydantic controlla tutto e converte i tipi da solo.
+
+**Prerequisito (il subject lo impone):** Pydantic 2.x installato via pip in un venv. Comandi esatti nella Sceneggiatura p09 (in fondo agli appunti).
+
+**Le 3 tappe:** ex0 = guardiano base (vincoli sui singoli campi) → ex1 = regole DI BUSINESS (più campi insieme, `@model_validator`) → ex2 = modelli ANNIDATI (un modello dentro un altro).
 
 ## ex0 — space_station — il primo modello
 
-**Cosa fa in concreto:** definisce un modello di "scheda stazione spaziale" con vincoli su ogni campo (es. equipaggio da 1 a 20) e lo testa due volte: con dati validi (crea e stampa la scheda) e con un campo invalido (mostra il messaggio d'errore di Pydantic).
+**Cosa fa in concreto:** definisce una "scheda stazione spaziale" con vincoli su ogni campo (es. equipaggio da 1 a 20) e la testa due volte: dati validi → crea e stampa la scheda; crew_size=25 → mostra il messaggio d'errore.
 
-**Cosa chiede:** modello `SpaceStation` con campi vincolati (station_id 3-10 caratteri, crew_size 1-20, power/oxygen 0-100, last_maintenance datetime, is_operational default True, notes opzionale max 200) + main che crea una stazione valida e ne mostra i campi, poi prova una invalida e mostra l'errore ("Input should be less than or equal to 20").
+**L'ALBERO GENEALOGICO (chi è figlio di chi):**
 
-**Esecuzione:** main → `SpaceStation(station_id="ISS001", ..., last_maintenance=datetime(2024,6,1,10,0,0))` → Pydantic valida OGNI campo → tutto ok → oggetto pronto → stampa i campi → `SpaceStation(crew_size=25, ...)` → Pydantic rifiuta → `except ValidationError as e:` → `e.errors()[0]["msg"]` = il messaggio del primo errore.
+```
+BaseModel        <- la mamma, viene da pydantic: sa già validare,
+   |                convertire e raccogliere gli errori. NON la tocchiamo.
+   v
+SpaceStation     <- la nostra classe: eredita TUTTO il meccanismo.
+                    Noi scriviamo solo la DESCRIZIONE dei campi.
+```
 
-**Teoria:** `Field(min_length=3, max_length=10)` = vincolo sulla lunghezza delle stringhe; `Field(ge=0.0, le=100.0)` = greater-equal/less-equal (ge/le) per i numeri; `Optional[str] = None` = campo che può mancare; `bool = True` = valore di default. La CONVERSIONE automatica: se passi una stringa "2024-06-01" a un campo datetime, Pydantic la converte da solo (domanda del subject: "what happens when you pass a string timestamp to a datetime field?" → la converte, o errore se il formato è sbagliato).
+**La MAPPA DEI PROCESSI (chi chiama chi):**
 
-**Codice:** in `python/p09/ex0/space_station.py`
+```
+python3 ex0/space_station.py
+   |
+   v
+main()
+   |
+   |-- SpaceStation(dati VALIDI) ----> il guardiano controlla i 7 campi
+   |        |                          -> tutto ok -> nasce l'oggetto
+   |        v
+   |-- print dei campi (ID, Name, Crew, Power, Oxygen, Status)
+   |
+   |-- SpaceStation(crew_size=25) ---> il guardiano controlla...
+   |        |                          crew_size <= 20? NO
+   |        |                          -> lancia ValidationError
+   |        v
+   |-- except ValidationError as e --> catturiamo l'errore (niente crash)
+   |        v
+   `-- print del messaggio del primo errore
+       ("Input should be less than or equal to 20")
+```
+
+**I campi, uno per uno (righe 8-15 del file):**
+
+| Campo | Tipo | Vincolo | Si legge |
+|---|---|---|---|
+| `station_id` | str | 3-10 caratteri | "la targa, lunga da 3 a 10" |
+| `name` | str | 1-50 caratteri | "il nome, da 1 a 50" |
+| `crew_size` | int | 1-20 | "equipaggio da 1 a 20 persone" |
+| `power_level` | float | 0.0-100.0 | "potenza in percentuale" |
+| `oxygen_level` | float | 0.0-100.0 | "ossigeno in percentuale" |
+| `last_maintenance` | datetime | — | "data e ora dell'ultima manutenzione" |
+| `is_operational` | bool | default `True` | "se non lo dici, è operativa" |
+| `notes` | Optional[str] | default `None`, max 200 | "appunti opzionali" |
+
+**Come si legge una riga:** `crew_size: int = Field(ge=1, le=20)` si legge: "il campo crew_size è un intero, con vincolo: maggiore-uguale a 1, minore-uguale a 20". `ge` = Greater or Equal, `le` = Less or Equal. Senza `Field(...)` il campo avrebbe solo il tipo, nessun vincolo.
+
+**La traccia con i valori veri (esecuzione del main):**
+
+| Passo | Cosa succede |
+|---|---|
+| 1 | `SpaceStation(station_id="ISS001", name="International Space Station", crew_size=6, power_level=85.5, oxygen_level=92.3, last_maintenance=datetime(2024,6,1,10,0,0))` → il guardiano controlla i 7 campi: ISS001 è lungo 6 (ok 3-10), il nome 28 (ok 1-50), crew 6 (ok 1-20), power 85.5 e oxygen 92.3 (ok 0-100), la data è un datetime → TUTTO OK, nasce l'oggetto `station` |
+| 2 | print: ID: ISS001 / Name / Crew: 6 people / Power: 85.5% / Oxygen: 92.3% / Status: Operational (is_operational non specificato → default True) |
+| 3 | `SpaceStation(station_id="ISS002", name="Broken Station", crew_size=25, ...)` → il guardiano arriva a crew_size: 25 > 20 → si FERMA e lancia `ValidationError` |
+| 4 | `except ValidationError as e:` lo cattura → `e.errors()` = la lista di TUTTI gli errori (qui 1) → `[0]` = il primo → `["msg"]` = il testo del messaggio → print: "Input should be less than or equal to 20" |
+
+**Teoria:**
+- **`Field(...)`** = "etichetta di regole" attaccata a un campo: `min_length`/`max_length` per le stringhe, `ge`/`le` per i numeri, `default` per il valore di partenza. Analogia C: sono le condizioni che in C scriveresti a mano in una `validate_station()` piena di if — Pydantic le genera dalla descrizione dei campi.
+- **`Optional[str] = Field(default=None, max_length=200)`** = il campo può mancare: se manca, vale None.
+- **`is_operational: bool = True`** = valore di default: chi crea la stazione può non specificarlo.
+- **La CONVERSIONE automatica** (domanda del subject: "How does Pydantic's automatic type conversion work?"): arriva `crew_size="6"` (stringa)? La converte in int 6. Arriva `last_maintenance="2024-06-01T10:00:00"` (stringa)? La converte in datetime. Stringa NON convertibile ("sei") → errore. Verificato dal vivo.
+- **Perché NON si vede mai un traceback:** l'errore di validazione non è un crash — è un'eccezione normale che il `try/except` cattura e trasforma in un print pulito.
+
+**Risposte pronte per l'evaluation:**
+- "Cosa fa Pydantic quando crei un oggetto?" → controlla ogni campo contro tipo e vincoli dichiarati; tutto ok → oggetto pronto; violazione → ValidationError con l'elenco degli errori.
+- "Cosa succede se passi una stringa a un campo datetime?" → la converte da solo in datetime; se il formato è illeggibile → errore.
+- "A cosa serve Field?" → ad attaccare vincoli e default ai campi.
+
+**Output atteso (dal subject):** titolo "Space Station Data Validation" + scheda della stazione valida + "Expected validation error:" + `Input should be less than or equal to 20`.
+
+**Codice:** `python/p09/ex0/space_station.py`
 
 ## ex1 — alien_contact — validazione custom
 
-**Cosa fa in concreto:** definisce un modello di "rapporto di contatto alieno" con regole di business che i campi da soli non bastano a esprimere (es. i contatti telepatici richiedono almeno 3 testimoni) e lo testa con un rapporto valido e uno che viola le regole.
+**Cosa fa in concreto:** definisce un modello di "rapporto di contatto alieno" con regole di BUSINESS che i Field da soli non sanno esprimere (es. i contatti telepatici richiedono almeno 3 testimoni) e lo testa con un rapporto valido e uno che viola le regole.
 
 **★ PRIME VOLTE qui:** `Enum` (ContactType), `@model_validator(mode="after")`
 
-**Cosa chiede:** modello AlienContact con regole DI BUSINESS che i Field da soli non sanno esprimere: contact_id deve iniziare con "AC", i contatti PHYSICAL devono essere verificati, TELEPATHIC richiede ≥3 testimoni, segnali forti (>7.0) devono avere un messaggio. Un `@model_validator(mode="after")` le controlla TUTTE insieme dopo la validazione dei campi.
+**L'ALBERO GENEALOGICO:**
 
-**Esecuzione:** main → contatto valido → Pydantic valida i campi → POI gira il validator custom (mode="after" = DOPO i campi): controlla le 4 regole con if → tutte ok → `return self` (OBBLIGATORIO: il validator deve restituire il modello) → contatto invalido (telepathic con 1 testimone) → il validator fa `raise ValueError("Telepathic contact requires at least 3 witnesses")` → il ValidationError lo cattura.
+```
+Enum               BaseModel
+  |                    |
+  v                    v
+ContactType        AlienContact
+(radio, visual,       |
+physical,             |-- @model_validator(mode="after")
+telepathic)           v
+                   check_business_rules(self) -> "AlienContact"
+```
 
-**Teoria:** `Enum` = tipo con un numero CHIUSO di valori (`radio, visual, physical, telepathic`) — se arriva "laser" → errore di validazione automatico. `@model_validator(mode="after")` = decoratore che marca un metodo che gira dopo i campi e vede il modello INTERO (per le regole che coinvolgono più campi insieme — il vecchio `@validator` è deprecato, il subject lo vieta). Dentro il validator: `self.contact_id`, `self.contact_type` ecc. sono già disponibili.
+**Cosa chiede:** contatto con campi vincolati (contact_id 5-15, location 3-100, signal 0.0-10.0, duration 1-1440, witnesses 1-100, message opzionale max 500, is_verified default False, contact_type = Enum) + 4 REGOLE DI BUSINESS controllate da `@model_validator(mode="after")`: ID inizia con "AC"; PHYSICAL → deve essere verificato; TELEPATHIC → ≥3 testimoni; segnale >7.0 → deve avere un messaggio.
 
-**Codice:** in `python/p09/ex1/alien_contact.py`
+**Esecuzione:** main → contatto valido → Pydantic valida i campi → POI gira il validator (mode="after" = DOPO i campi): 4 if in fila → tutte ok → `return self` (OBBLIGATORIO: il validator restituisce il modello) → contatto invalido (telepathic con 1 testimone) → il validator fa `raise ValueError("Telepathic contact requires at least 3 witnesses")` → il ValidationError viene catturato.
+
+**Dettaglio importante (fix dell'11/11):** Pydantic v2 antepone "Value error, " ai messaggi dei NOSTRI validator. Il print usa `.removeprefix("Value error, ")` per mostrare il messaggio PULITO come nell'esempio del subject.
+
+**Teoria:** `Enum` = tipo con un numero CHIUSO di valori — arriva "laser"? Errore automatico. `@model_validator(mode="after")` = metodo che gira DOPO la validazione dei campi e vede il modello INTERO (per regole che coinvolgono più campi insieme; il vecchio `@validator` è deprecato e vietato dal subject). Dentro il validator i campi sono già pronti in `self`.
+
+**Output atteso:** titolo "Alien Contact Log Validation" + rapporto valido + "Expected validation error:" + `Telepathic contact requires at least 3 witnesses`.
+
+**Codice:** `python/p09/ex1/alien_contact.py`
 
 ## ex2 — space_crew — modelli ANNIDATI
 
-**Cosa fa in concreto:** definisce due modelli collegati (membro dell'equipaggio e missione che contiene una LISTA di membri) e valida regole che coinvolgono tutto l'equipaggio: serve un comandante, le missioni lunghe vogliono metà equipaggio esperto. Testa una missione valida e una senza comandante.
+**Cosa fa in concreto:** definisce due modelli collegati (membro dell'equipaggio e missione che contiene una LISTA di membri) e valida regole che coinvolgono TUTTO l'equipaggio: serve un comandante, le missioni lunghe vogliono metà equipaggio esperto. Testa una missione valida e una senza comandante.
 
-**Cosa chiede:** due modelli in relazione: `CrewMember` (membro singolo) e `SpaceMission` che CONTIENE una LISTA di CrewMember (`crew: List[CrewMember]`). Il validator della missione controlla regole che coinvolgono TUTTO l'equipaggio: serve almeno un Commander/Capitano, le missioni lunghe (>365 giorni) vogliono il 50% di esperti (≥5 anni), tutti attivi.
+**L'ALBERO GENEALOGICO:**
 
-**Il concetto in una riga:** un modello può stare DENTRO un altro modello (e in liste): `crew: List[CrewMember]` = "questa missione contiene una lista di oggetti CrewMember, e Pydantic valida OGNI membro della lista con le sue regole PRIMA di validare la missione". Come le bambole matrioska: la missione contiene l'equipaggio, l'equipaggio contiene i membri.
+```
+Enum               BaseModel
+  |                    |
+  v                    +--------------------+
+Rank              CrewMember          SpaceMission
+(cadet, officer,     |                    |
+ lieutenant,         | (lista di)         |-- crew: List[CrewMember]
+ captain,            |  ^                 |-- @model_validator(mode="after")
+ commander)          +--+                 v
+                    (dentro)          check_mission_rules(self)
+```
 
-**Esecuzione:** main → `CrewMember(...)` × 2 (validati uno a uno) → `SpaceMission(..., crew=crew, ...)` → Pydantic valida i campi della missione E in cascata i 2 membri → il validator: `[m for m in self.crew if m.rank in (Rank.CAPTAIN, Rank.COMMANDER)]` (list comprehension di p03 ex6!) → se la lista è vuota → raise → missione invalida di prova (solo ufficiali, nessun capitano) → "Must have at least one Commander or Captain".
+**Il concetto in una riga:** un modello può stare DENTRO un altro (anche in liste): `crew: List[CrewMember]` = "la missione contiene una lista di oggetti CrewMember, e Pydantic valida OGNI membro con le sue regole PRIMA di validare la missione". Matrioska: missione → equipaggio → membri.
 
-**Teoria:** il Rank è un Enum come il ContactType. Le regole nel validator usano le comprehension per filtrare l'equipaggio — è il p03 che rientra dalla finestra. `Field(min_length=1, max_length=12)` sulla lista = l'equipaggio deve avere 1-12 membri.
+**Cosa chiede:** CrewMember (member_id 3-10, name 2-50, rank Enum, age 18-80, specialization 3-30, years_experience 0-50, is_active default True) + SpaceMission (mission_id 5-15, mission_name 3-100, destination 3-50, launch_date datetime, duration_days 1-3650, crew 1-12 membri, mission_status default "planned", budget 1.0-10000.0) + 4 REGOLE di sicurezza nel validator: ID inizia con "M"; almeno un Commander o Captain; missioni >365 giorni → 50% di esperti (≥5 anni); tutti attivi.
 
-**Codice:** in `python/p09/ex2/space_crew.py`
+**Esecuzione:** main → 3 `CrewMember(...)` (validati uno a uno) → `SpaceMission(..., crew=crew, ...)` → Pydantic valida i campi della missione E in cascata i 3 membri → il validator: `[m for m in self.crew if m.rank in (Rank.CAPTAIN, Rank.COMMANDER)]` (list comprehension di p03 ex6!) → lista vuota → raise → missione invalida di prova (solo ufficiali) → "Mission must have at least one Commander or Captain". Il main stampa anche i dettagli dei membri col `for` (formato dell'esempio del subject: "- Sarah Connor (commander) - Mission Command").
+
+**Teoria:** il Rank è un Enum come il ContactType di ex1. `Field(min_length=1, max_length=12)` sulla lista = 1-12 membri. La regola del 50%: `len(experienced) < len(self.crew) / 2` (2 esperti su 3 membri → 2 < 1.5 è falso → ok). Anche qui il print dell'errore usa `removeprefix("Value error, ")` (vedi ex1).
+
+**Output atteso:** titolo "Space Mission Crew Validation" + missione valida con ID, destinazione, durata, budget, crew size e membri elencati + "Expected validation error:" + `Mission must have at least one Commander or Captain`.
+
+**Codice:** `python/p09/ex2/space_crew.py`
 
 # Elementi usati: cosa è cosa (per l'evaluation)
 
@@ -2704,3 +2808,20 @@ deactivate
 ```
 
 **La domanda dei 100 per p08:** "PERCHÉ esistono i venv?" → isolamento: ogni progetto ha la SUA copia di pip e le SUE versioni delle librerie in una cartella separata; installare nel globale sporca il sistema e crea conflitti di versioni tra progetti. "PERCHÉ il .env non si committa?" → contiene SEGRETI (API key, password): chi clona il repo li leggerebbe; il repo porta solo .env.example (la maschera).
+
+## p09 — la sequenza dell'evaluation (STAFF, venerdì 13/11)
+
+```bash
+cd python/p09
+python3 -m venv .venv            # PREPARAZIONE (una volta sola): crea il venv
+source .venv/bin/activate        # attiva (ogni terminale nuovo; il prompt mostra (.venv))
+pip install "pydantic>=2"        # installa Pydantic 2.x (obbligo del subject, via pip)
+python3 ex0/space_station.py     # RUN PURO: scheda valida + errore di validazione
+python3 ex1/alien_contact.py     # RUN PURO: rapporto valido + regola telepatici violata
+python3 ex2/space_crew.py        # RUN PURO: missione valida + missione senza comandante
+deactivate                       # PULIZIA a fine eval
+```
+
+Verifiche extra davanti allo staff: `pip show pydantic | head -2` (versione 2.x); `python3 -c "import pydantic"` senza venv → errore atteso (serve il venv, è nel subject). La cartella `.venv/` è gitignorata: NON va committata. In consegna: SOLO i 3 file .py.
+
+**La domanda dei 100 per p09:** "PERCHÉ serve Pydantic?" → perché i dati che arrivano dall'esterno non sono affidabili: Pydantic li valida ALLA PORTA (tipo + vincoli + regole di business) e rifiuta con un errore preciso PRIMA che entrino nel programma — senza che scriviamo un if a mano.
