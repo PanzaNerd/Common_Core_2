@@ -2,7 +2,7 @@
 name = "loading-programs"
 version = "0.1.0"
 description = "Matrix data analysis tool"
-authors = ["matthias <matthias@student.42.fr>"]
+authors = ["Matthias Panzani <mpanzani@student.42firenze.it>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
