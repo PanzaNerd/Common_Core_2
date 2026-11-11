@@ -38,6 +38,12 @@ def main() -> None:
     print(f"Mean: {data.mean():.2f}")
     print(f"Std: {data.std():.2f}")
 
+    import pandas as pd
+
+    table = pd.DataFrame(data, columns=["value"])
+    print("Pandas table summary:")
+    print(table.describe())
+
     print("Generating visualization...")
     import matplotlib
     matplotlib.use("Agg")
