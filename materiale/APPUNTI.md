@@ -2328,7 +2328,7 @@ numpy
 
 **Esecuzione:** main → `load_dotenv()` (legge `.env` se esiste e mette le righe `CHIAVE=valore` nelle variabili d'ambiente) → `os.getenv("MATRIX_MODE")` ecc. per ognuna → se MATRIX_MODE manca: avviso "copy .env.example to .env" e stop → se "development": stampa tutto (la API key può anche mancare) → se "production": nasconde la API key con `'*' * len(api_key)` e PRETENDE DATABASE_URL e ZION_ENDPOINT (avvisi se mancano) → mode sconosciuto: errore.
 
-**Come testare:** `cd python/p08/ex2 && python3 oracle.py` (senza .env: warning) → `cp .env.example .env && python3 oracle.py` (legge) → modifica MATRIX_MODE=production e rilancia.
+**Come testare:** `cd python/p08/ex2 && python3 oracle.py` (senza .env: warning) → `cp .env.example .env && python3 oracle.py` (legge) → modifica MATRIX_MODE=production e rilancia. Nel venv: `pip install -r requirements.txt` (c'è anche il requirements.txt con python-dotenv, aggiunto l'11/11 — l'evaluator se lo aspetta).
 
 **Teoria:** il file `.env.example` è la MASCHERA: mostra quali chiavi servono, senza valori segreti — quello SÌ va committato (e infatti sta nel repo). Il `.env` vero è nel .gitignore ("Never commit real secrets to version control! You must be able to explain why" — perché chiunque clona il repo si prenderebbe le chiavi vere). Le variabili d'ambiente vincono sul file: `load_dotenv()` NON sovrascrive le variabili già presenti nell'ambiente, quindi l'override della riga di comando batte il .env (VERIFICATO il 10/11: .env dice development, env dice production → vince production).
 
