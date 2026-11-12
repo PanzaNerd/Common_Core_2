@@ -2475,6 +2475,23 @@ telepathic)           v
 
 **Output atteso:** titolo "Alien Contact Log Validation" + rapporto valido + "Expected validation error:" + `Telepathic contact requires at least 3 witnesses`.
 
+**Risposte pronte per l'evaluation:**
+- Le domande SCRITTE nel subject (garantite):
+  - L'Advanced Tip: "@model_validator valida il modello INTERO dopo che tutti i campi sono stati validati. Ricordati di restituire self alla fine del validator." → return self è OBBLIGATORIO: pydantic prende ciò che il validator restituisce come modello finale; senza, l'oggetto si perde.
+  - "Why mode='after'?" → DOPO la validazione dei campi: dentro il validator i campi sono già validati e leggibili con self.
+- Le domande classiche (con risposta):
+  - "Perché @model_validator e non il vecchio @validator?" → @validator è deprecato in v2, il subject lo vieta esplicitamente.
+  - "Cos'è Enum / perché ContactType invece di str?" → lista CHIUSA di valori; qualunque cosa fuori (es. "laser") → ValidationError automatico, niente if a mano.
+  - "Cosa succede se contact_type='laser'?" → errore: "Input should be 'radio', 'visual', 'physical' or 'telepathic'".
+  - "Cosa fa .startswith('AC')?" → risponde vero/falso a "la stringa inizia con 'AC'?"; col not: la regola scatta quando NON inizia.
+  - "Cosa fa l'and nelle condizioni?" → unisce due domande: basta una falsa e si salta il raise.
+  - "Perché `is None` e non `== None`?" → `is` confronta l'identità: "è proprio il nulla" (stesso pattern di p08 con api_key).
+  - "Perché raise ValueError dentro il validator?" → è la convenzione: pydantic lo cattura e lo avvolge nel suo ValidationError.
+  - "Perché removeprefix('Value error, ')?" → pydantic v2 antepone quel prefisso ai NOSTRI errori; lo togliamo per mostrare il messaggio pulito come nell'esempio del subject.
+  - "Perché -> 'AlienContact' tra virgolette?" → dentro il corpo della classe il nome non è ancora nato; la stringa è una promessa (forward reference) letta da mypy.
+  - "Differenza tra Field e model_validator?" → Field controlla un campo ALLA VOLTA; il validator controlla regole che coinvolgono PIÙ campi insieme.
+- Le modifiche dal vivo possibili: witness_count a 5 → passa; physical senza is_verified → regola 2; segnale 8.5 senza messaggio → regola 4; contact_type='laser' → errore dell'Enum.
+
 **Codice:** `python/p09/ex1/alien_contact.py`
 
 ## ex2 — space_crew — modelli ANNIDATI
