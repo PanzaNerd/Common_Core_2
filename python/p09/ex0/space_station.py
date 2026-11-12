@@ -34,6 +34,7 @@ def main() -> None:
     print(f"Power: {station.power_level}%")
     print(f"Oxygen: {station.oxygen_level}%")
     print(f"Status: {'Operational' if station.is_operational else 'Offline'}")
+    print()
     print("=" * 40)
 
     print("Expected validation error:")

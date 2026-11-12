@@ -60,6 +60,7 @@ def main() -> None:
     print(f"Duration: {contact.duration_minutes} minutes")
     print(f"Witnesses: {contact.witness_count}")
     print(f"Message: '{contact.message_received}'")
+    print()
     print("=" * 38)
 
     print("Expected validation error:")
@@ -75,7 +76,7 @@ def main() -> None:
         )
     except ValidationError as e:
         first_error = e.errors()[0]
-        print(first_error["msg"])
+        print(first_error["msg"].removeprefix("Value error, "))
 
 
 if __name__ == "__main__":
