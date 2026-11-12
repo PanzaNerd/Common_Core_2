@@ -2467,7 +2467,9 @@ telepathic)           v
 
 **Cosa chiede:** contatto con campi vincolati (contact_id 5-15, location 3-100, signal 0.0-10.0, duration 1-1440, witnesses 1-100, message opzionale max 500, is_verified default False, contact_type = Enum) + 4 REGOLE DI BUSINESS controllate da `@model_validator(mode="after")`: ID inizia con "AC"; PHYSICAL → deve essere verificato; TELEPATHIC → ≥3 testimoni; segnale >7.0 → deve avere un messaggio.
 
-**Esecuzione:** main → contatto valido → Pydantic valida i campi → POI gira il validator (mode="after" = DOPO i campi): 4 if in fila → tutte ok → `return self` (OBBLIGATORIO: il validator restituisce il modello) → contatto invalido (telepathic con 1 testimone) → il validator fa `raise ValueError("Telepathic contact requires at least 3 witnesses")` → il ValidationError viene catturato.
+**Esecuzione:** main → contatto valido → Pydantic valida i campi → POI gira il validator (mode="after" = DOPO i campi): una variabile di servizio (`is_telepathic = self.contact_type == ContactType.TELEPATHIC`) + le 4 domande in fila → tutte ok → `return self` (OBBLIGATORIO: il validator restituisce il modello) → contatto invalido (telepathic con 1 testimone) → il validator fa `raise ValueError("Telepathic contact requires at least 3 witnesses")` → il ValidationError viene catturato.
+
+**LEZIONE FLAKE8 dell'11/11:** il repo ha un .flake8 PADRE (quello di AMAZEING) con un `ignore` custom che NON contiene W503/W504 — quindi con `flake8` NUDO (senza --isolated) gli operatori a inizio riga vengono segnalati: il validator di ex1 aveva `and` a inizio riga → W503. Fix: variabile di servizio così l'if sta su una riga sola. IMPORTANTE: l'evaluator clona il repo CON quel .flake8 → i controlli vanno fatti ANCHE con `flake8` nudo dalla repo, non solo con --isolated (verificato: p00-p09 tutti puliti in ENTRAMBI i modi).
 
 **Dettaglio importante (fix dell'11/11):** Pydantic v2 antepone "Value error, " ai messaggi dei NOSTRI validator. Il print usa `.removeprefix("Value error, ")` per mostrare il messaggio PULITO come nell'esempio del subject.
 
