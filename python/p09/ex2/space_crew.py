@@ -37,12 +37,17 @@ class SpaceMission(BaseModel):
     def check_mission_rules(self) -> "SpaceMission":
         if not self.mission_id.startswith("M"):
             raise ValueError("Mission ID must start with 'M'")
-        leaders = [m for m in self.crew
-                   if m.rank in (Rank.CAPTAIN, Rank.COMMANDER)]
+        leaders = []
+        for m in self.crew:
+            if m.rank in (Rank.CAPTAIN, Rank.COMMANDER):
+                leaders.append(m)
         if len(leaders) == 0:
             raise ValueError(
                 "Mission must have at least one Commander or Captain")
-        experienced = [m for m in self.crew if m.years_experience >= 5]
+        experienced = []
+        for m in self.crew:
+            if m.years_experience >= 5:
+                experienced.append(m)
         if self.duration_days > 365 and len(experienced) < len(self.crew) / 2:
             raise ValueError("Long missions need 50% experienced crew")
         if not all(m.is_active for m in self.crew):
