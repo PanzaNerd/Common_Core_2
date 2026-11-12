@@ -2524,6 +2524,13 @@ Rank              CrewMember          SpaceMission
 
 **Output atteso:** titolo "Space Mission Crew Validation" + missione valida con ID, destinazione, durata, budget, crew size e membri elencati + "Expected validation error:" + `Mission must have at least one Commander or Captain`.
 
+**Risposte pronte per l'evaluation:**
+- Le domande SCRITTE nel subject (Think About, garantite):
+  - "How does Pydantic handle validation of nested models?" → in CASCATA: prima costruisce e valida ogni CrewMember della lista (le sue regole), poi valida la missione. Matrioska.
+  - "What happens when a CrewMember fails validation within a SpaceMission?" → l'INTERA missione viene rifiutata: basta un membro invalido, con ValidationError che indica il colpevole.
+- Le classiche: concetto nuovo = modelli ANNIDATI (`crew: List[CrewMember]`); dizionario al posto di CrewMember → Pydantic lo CONVERTE costruendo il CrewMember dalle chiavi; for esplicito al posto della comprehension (più leggibile, stessa cosa compressa — p03); regola 50%: >365 giorni e `len(esperti) < len(crew)/2` → raise; `all(...)` di p05; `in (a, b)` = appartenenza a tupla; removeprefix come ex1.
+- Live coding (lo staff cambia VALORI/VINCOLI, non la struttura): missione invalida → valida: bad_crew rank OFFICER→CAPTAIN; missione valida → invalida: un membro is_active=False (regola 4); crew_size=25 valido: ex0 Field le=20→le=25; telepatici con 5 testimoni: ex1 <3→<5; aggiungere un campo: riga nel modello + print; notes obbligatorio: togliere default=None.
+
 **Codice:** `python/p09/ex2/space_crew.py`
 
 # Elementi usati: cosa è cosa (per l'evaluation)
