@@ -38,16 +38,16 @@ def main() -> None:
     print(f"Mean: {data.mean():.2f}")
     print(f"Std: {data.std():.2f}")
 
-    import pandas as pd  # type: ignore
+    import pandas as pd  # type: ignore[import, unused-ignore]
 
     table = pd.DataFrame(data, columns=["value"])
     print("Pandas table summary:")
     print(table.describe())
 
     print("Generating visualization...")
-    import matplotlib  # type: ignore
+    import matplotlib  # type: ignore[import, unused-ignore]
     matplotlib.use("Agg")
-    import matplotlib.pyplot as plt  # type: ignore
+    import matplotlib.pyplot as plt  # type: ignore[import, unused-ignore]
 
     plt.hist(data, bins=30)
     plt.title("Matrix data distribution")
